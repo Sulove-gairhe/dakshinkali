@@ -1,0 +1,4 @@
+- System architecture
+- Core modules
+- Layer rules
+- Tech stack
