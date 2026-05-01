@@ -17,23 +17,27 @@ import { ProductEntity, ProductStatus } from '../entities/product.entity';
 
 // Mock Supabase client
 const createMockSupabaseClient = () => {
-    const mockSelect = vi.fn().mockReturnThis();
     const mockSingle = vi.fn();
-    const mockInsert = vi.fn().mockReturnThis();
-    const mockFrom = vi.fn().mockReturnThis();
+    const mockSelect = vi.fn().mockReturnValue({
+        single: mockSingle
+    });
+    const mockInsert = vi.fn().mockReturnValue({
+        select: mockSelect
+    });
+    const mockFrom = vi.fn().mockReturnValue({
+        insert: mockInsert,
+        select: mockSelect
+    });
 
     return {
         from: mockFrom,
         mockSelect,
         mockSingle,
         mockInsert,
+        mockFrom,
         // Helper to set up mock responses
         __setInsertResponse: (data: any, error: any = null) => {
-            mockInsert.mockReturnValue({
-                select: () => ({
-                    single: () => Promise.resolve({ data, error })
-                })
-            });
+            mockSingle.mockResolvedValue({ data, error });
         }
     };
 };

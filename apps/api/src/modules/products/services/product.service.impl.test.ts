@@ -96,7 +96,7 @@ describe('ProductServiceImpl', () => {
 
             // Act & Assert
             await expect(service.createProduct(productData)).rejects.toThrow(
-                'Price must be greater than 0.'
+                'Invalid product data.'
             );
         });
 

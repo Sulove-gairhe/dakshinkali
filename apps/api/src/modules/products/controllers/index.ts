@@ -5,3 +5,4 @@
  */
 
 export { AdminProductController } from './admin-product.controller';
+export { PublicProductController } from './public-product.controller';

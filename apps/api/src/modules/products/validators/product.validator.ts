@@ -102,8 +102,9 @@ export class ProductValidator {
      * Validate complete product data for creation
      * 
      * Validates all required fields and business rules for CreateProductData.
+     * For UpdateProductData, only validates fields that are present (partial updates allowed).
      * 
-     * @param data - CreateProductData to validate
+     * @param data - CreateProductData or UpdateProductData to validate
      * @throws ValidationException if any validation fails
      * 
      * **Validates: Requirements 1.1, 1.2, 9.2, 9.3**
@@ -111,8 +112,30 @@ export class ProductValidator {
     static validateProductData(data: CreateProductData | UpdateProductData): void {
         const errors: Array<{ field: string; message: string }> = [];
 
+        // Determine if this is CreateProductData or UpdateProductData
+        // If any of the core fields (name, price, category) are present, we need to check
+        // if this is a complete CreateProductData or a partial UpdateProductData
+        const hasName = 'name' in data;
+        const hasPrice = 'price' in data;
+        const hasCategory = 'category' in data;
+
+        // If at least one core field is present, check if all required fields are present
+        // If all 3 are present, it's CreateProductData
+        // If only some are present, it could be either incomplete CreateProductData or UpdateProductData
+        // We'll treat it as CreateProductData if it has at least 2 of the 3 core fields
+        const coreFieldCount = (hasName ? 1 : 0) + (hasPrice ? 1 : 0) + (hasCategory ? 1 : 0);
+        const isLikelyCreateData = coreFieldCount >= 2;
+
         // For CreateProductData, name is required
-        if ('name' in data && data.name !== undefined) {
+        if (isLikelyCreateData && !hasName) {
+            errors.push({
+                field: 'name',
+                message: 'Product name is required.'
+            });
+        }
+
+        // Validate name if provided
+        if (hasName && data.name !== undefined) {
             try {
                 this.validateProductName(data.name);
             } catch (error) {
@@ -120,16 +143,18 @@ export class ProductValidator {
                     errors.push(...error.fields);
                 }
             }
-        } else if (!('name' in data)) {
-            // This is CreateProductData without name
+        }
+
+        // For CreateProductData, price is required
+        if (isLikelyCreateData && !hasPrice) {
             errors.push({
-                field: 'name',
-                message: 'Product name is required.'
+                field: 'price',
+                message: 'Product price is required.'
             });
         }
 
         // Validate price if provided
-        if ('price' in data && data.price !== undefined) {
+        if (hasPrice && data.price !== undefined) {
             try {
                 this.validatePrice(data.price);
             } catch (error) {
@@ -137,23 +162,14 @@ export class ProductValidator {
                     errors.push(...error.fields);
                 }
             }
-        } else if (!('price' in data)) {
-            // This is CreateProductData without price
-            errors.push({
-                field: 'price',
-                message: 'Product price is required.'
-            });
         }
 
-        // Validate category if this is CreateProductData
-        if (!('category' in data) || (data as CreateProductData).category === undefined) {
-            // Check if this is CreateProductData (has name and price)
-            if ('name' in data && 'price' in data) {
-                errors.push({
-                    field: 'category',
-                    message: 'Product category is required.'
-                });
-            }
+        // For CreateProductData, category is required
+        if (isLikelyCreateData && !hasCategory) {
+            errors.push({
+                field: 'category',
+                message: 'Product category is required.'
+            });
         }
 
         // Validate description length if provided

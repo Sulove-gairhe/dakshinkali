@@ -1,68 +1,33 @@
 /**
  * Supabase Storage Configuration
  * 
- * Provides centralized configuration for Supabase Storage buckets with:
- * - Product image storage bucket configuration
- * - File upload validation rules
- * - Public URL generation
- * - Storage client initialization
+ * Provides centralized configuration for Supabase Storage (file uploads).
+ * Used by ImageStorageService for product image management.
  * 
- * Requirements: 11.1, 11.3 (Image storage integration and validation)
+ * Requirements: 11.1, 11.4 (Image storage integration)
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
-import { getSupabaseClient } from './supabase.config';
 
 /**
- * Storage bucket names
- */
-export const STORAGE_BUCKETS = {
-    PRODUCTS: 'products',
-    PRODUCT_IMAGES: 'product-images',
-} as const;
-
-/**
- * Allowed image MIME types for product images
- * Requirements: 11.3 (Validate image file types)
- */
-export const ALLOWED_IMAGE_TYPES = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp',
-] as const;
-
-/**
- * Maximum file size for product images (5MB)
- * Requirements: 11.3 (Validate image size limits)
- */
-export const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
-
-/**
- * Maximum number of images per product
- * Requirements: 1.2 (Business rule validation)
- */
-export const MAX_IMAGES_PER_PRODUCT = 5;
-
-/**
- * Storage bucket configuration interface
+ * Storage bucket configuration
  */
 export interface StorageBucketConfig {
+    /** Bucket name in Supabase Storage */
     name: string;
-    public: boolean;
-    fileSizeLimit: number;
-    allowedMimeTypes: readonly string[];
-}
 
-/**
- * Product images bucket configuration
- */
-export const PRODUCT_IMAGES_BUCKET_CONFIG: StorageBucketConfig = {
-    name: STORAGE_BUCKETS.PRODUCT_IMAGES,
-    public: true, // Public access for product images
-    fileSizeLimit: MAX_IMAGE_SIZE_BYTES,
-    allowedMimeTypes: ALLOWED_IMAGE_TYPES,
-};
+    /** Whether the bucket is public (files accessible without auth) */
+    public: boolean;
+
+    /** Allowed file MIME types */
+    allowedMimeTypes: string[];
+
+    /** Maximum file size in bytes */
+    maxFileSizeBytes: number;
+
+    /** File size limit in MB (for display) */
+    maxFileSizeMB: number;
+}
 
 /**
  * File validation result
@@ -73,39 +38,115 @@ export interface FileValidationResult {
 }
 
 /**
- * Validate image file type and size
+ * Allowed image MIME types for product images
+ */
+export const ALLOWED_IMAGE_TYPES = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+] as const;
+
+/**
+ * Maximum image file size (5MB)
+ */
+export const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+
+/**
+ * Maximum number of images per product
+ */
+export const MAX_IMAGES_PER_PRODUCT = 10;
+
+/**
+ * Product images bucket configuration
  * 
- * @param file - File to validate (with mimetype and size properties)
- * @param config - Bucket configuration with validation rules
+ * Stores product images with public access
+ */
+export const PRODUCT_IMAGES_BUCKET_CONFIG: StorageBucketConfig = {
+    name: 'product-images',
+    public: true,
+    allowedMimeTypes: [...ALLOWED_IMAGE_TYPES],
+    maxFileSizeBytes: MAX_IMAGE_SIZE_BYTES,
+    maxFileSizeMB: 5,
+};
+
+/**
+ * All storage buckets configuration
+ */
+export const STORAGE_BUCKETS = {
+    PRODUCT_IMAGES: PRODUCT_IMAGES_BUCKET_CONFIG,
+} as const;
+
+/**
+ * Get storage bucket configuration by name
+ * 
+ * @param bucketName - Name of the bucket
+ * @returns Bucket configuration
+ * @throws {Error} If bucket name is not recognized
+ */
+export function getStorageBucketConfig(bucketName: string): StorageBucketConfig {
+    switch (bucketName) {
+        case 'product-images':
+            return PRODUCT_IMAGES_BUCKET_CONFIG;
+        default:
+            throw new Error(`Unknown storage bucket: ${bucketName}`);
+    }
+}
+
+/**
+ * Validate image file for product uploads
+ * 
+ * @param file - File to validate (with type and size properties)
+ * @param maxSizeBytes - Maximum file size in bytes (optional, defaults to MAX_IMAGE_SIZE_BYTES)
  * @returns Validation result with error message if invalid
  */
 export function validateImageFile(
-    file: { mimetype?: string; size: number; type?: string },
-    config: StorageBucketConfig = PRODUCT_IMAGES_BUCKET_CONFIG
+    file: { type: string; size: number },
+    maxSizeBytes: number = MAX_IMAGE_SIZE_BYTES
 ): FileValidationResult {
-    const mimeType = file.mimetype || file.type;
-
-    // Validate MIME type
-    if (!mimeType) {
+    // Check file type
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type as any)) {
         return {
             valid: false,
-            error: 'File type is required',
+            error: `Invalid file type. Allowed types: ${ALLOWED_IMAGE_TYPES.join(', ')}`,
         };
     }
 
-    if (!config.allowedMimeTypes.includes(mimeType as any)) {
+    // Check file size
+    if (file.size > maxSizeBytes) {
         return {
             valid: false,
-            error: `Invalid file type. Allowed types: ${config.allowedMimeTypes.join(', ')}`,
+            error: `File size exceeds maximum allowed size of ${maxSizeBytes / 1024 / 1024}MB`,
         };
     }
 
-    // Validate file size
-    if (file.size > config.fileSizeLimit) {
-        const maxSizeMB = config.fileSizeLimit / (1024 * 1024);
+    return { valid: true };
+}
+
+/**
+ * Validate file against bucket configuration
+ * 
+ * @param file - File to validate
+ * @param bucketConfig - Bucket configuration
+ * @returns Validation result with error message if invalid
+ */
+export function validateFile(
+    file: File,
+    bucketConfig: StorageBucketConfig
+): { valid: boolean; error?: string } {
+    // Check file type
+    if (!bucketConfig.allowedMimeTypes.includes(file.type)) {
         return {
             valid: false,
-            error: `File size exceeds maximum limit of ${maxSizeMB}MB`,
+            error: `Invalid file type. Allowed types: ${bucketConfig.allowedMimeTypes.join(', ')}`,
+        };
+    }
+
+    // Check file size
+    if (file.size > bucketConfig.maxFileSizeBytes) {
+        return {
+            valid: false,
+            error: `File size exceeds maximum allowed size of ${bucketConfig.maxFileSizeMB}MB`,
         };
     }
 
@@ -114,215 +155,245 @@ export function validateImageFile(
 
 /**
  * Generate unique filename for storage
- * Format: {uuid}-{timestamp}.{extension}
  * 
- * Requirements: 11.2 (Generate unique filenames to prevent collisions)
+ * Prevents filename collisions by using UUID and timestamp
  * 
- * @param originalFilename - Original filename with extension
- * @returns Unique filename
+ * @param originalFilename - Original filename from upload
+ * @returns Unique filename with preserved extension
  */
 export function generateUniqueFilename(originalFilename: string): string {
     const timestamp = Date.now();
-    const randomId = crypto.randomUUID();
-    const extension = originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const extension = originalFilename.split('.').pop() || 'jpg';
 
-    return `${randomId}-${timestamp}.${extension}`;
+    return `${timestamp}-${randomString}.${extension}`;
 }
 
 /**
- * Get storage path for product image
+ * Get product image storage path
+ * 
+ * Organizes images by product ID for better file management
  * 
  * @param productId - Product UUID
  * @param filename - Image filename
- * @returns Storage path
+ * @returns Storage path in format: products/{productId}/{filename}
  */
 export function getProductImagePath(productId: string, filename: string): string {
-    return `${productId}/${filename}`;
+    return `products/${productId}/${filename}`;
 }
 
 /**
- * Get public URL for stored image
+ * Get public URL for a file in storage
  * 
- * @param client - Supabase client
+ * @param supabase - Supabase client
  * @param bucketName - Storage bucket name
- * @param path - File path in bucket
- * @returns Public URL
+ * @param filePath - File path in bucket
+ * @returns Public URL for the file
  */
 export function getPublicUrl(
-    client: SupabaseClient,
+    supabase: SupabaseClient,
     bucketName: string,
-    path: string
+    filePath: string
 ): string {
-    const { data } = client.storage.from(bucketName).getPublicUrl(path);
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
     return data.publicUrl;
 }
 
 /**
- * Storage client wrapper for product images
+ * Upload file to storage bucket
+ * 
+ * @param supabase - Supabase client
+ * @param bucketName - Storage bucket name
+ * @param filePath - Destination path in bucket
+ * @param file - File to upload
+ * @returns Upload result with public URL
  */
-export class ProductImageStorage {
-    private client: SupabaseClient;
-    private bucketName: string;
+export async function uploadFile(
+    supabase: SupabaseClient,
+    bucketName: string,
+    filePath: string,
+    file: File | Buffer | Blob
+): Promise<{ url: string; path: string }> {
+    const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+        });
 
-    constructor(client?: SupabaseClient, bucketName: string = STORAGE_BUCKETS.PRODUCT_IMAGES) {
-        this.client = client || getSupabaseClient();
-        this.bucketName = bucketName;
+    if (error) {
+        throw new Error(`Failed to upload file: ${error.message}`);
     }
 
-    /**
-     * Upload image file to storage
-     * 
-     * @param productId - Product UUID
-     * @param file - File buffer or blob
-     * @param originalFilename - Original filename
-     * @returns Public URL of uploaded image
-     */
-    async uploadImage(
-        productId: string,
-        file: Buffer | Blob,
-        originalFilename: string
-    ): Promise<string> {
-        const filename = generateUniqueFilename(originalFilename);
-        const path = getProductImagePath(productId, filename);
+    const publicUrl = getPublicUrl(supabase, bucketName, data.path);
 
-        const { data, error } = await this.client.storage
-            .from(this.bucketName)
-            .upload(path, file, {
-                contentType: this.getContentType(originalFilename),
-                cacheControl: '3600', // Cache for 1 hour
-                upsert: false, // Don't overwrite existing files
-            });
+    return {
+        url: publicUrl,
+        path: data.path,
+    };
+}
 
-        if (error) {
-            throw new Error(`Failed to upload image: ${error.message}`);
-        }
+/**
+ * Delete file from storage bucket
+ * 
+ * @param supabase - Supabase client
+ * @param bucketName - Storage bucket name
+ * @param filePath - File path to delete
+ */
+export async function deleteFile(
+    supabase: SupabaseClient,
+    bucketName: string,
+    filePath: string
+): Promise<void> {
+    const { error } = await supabase.storage.from(bucketName).remove([filePath]);
 
-        return getPublicUrl(this.client, this.bucketName, data.path);
+    if (error) {
+        throw new Error(`Failed to delete file: ${error.message}`);
+    }
+}
+
+/**
+ * Delete multiple files from storage bucket
+ * 
+ * @param supabase - Supabase client
+ * @param bucketName - Storage bucket name
+ * @param filePaths - Array of file paths to delete
+ */
+export async function deleteFiles(
+    supabase: SupabaseClient,
+    bucketName: string,
+    filePaths: string[]
+): Promise<void> {
+    if (filePaths.length === 0) {
+        return;
     }
 
-    /**
-     * Delete image from storage
-     * 
-     * @param path - File path in bucket (can be full URL or path)
-     */
-    async deleteImage(path: string): Promise<void> {
-        // Extract path from URL if full URL is provided
-        const filePath = this.extractPathFromUrl(path);
+    const { error } = await supabase.storage.from(bucketName).remove(filePaths);
 
-        const { error } = await this.client.storage
-            .from(this.bucketName)
-            .remove([filePath]);
+    if (error) {
+        throw new Error(`Failed to delete files: ${error.message}`);
+    }
+}
 
-        if (error) {
-            // Log error but don't throw - file might already be deleted
-            console.warn(`Failed to delete image: ${error.message}`);
-        }
+/**
+ * Ensure storage bucket exists
+ * 
+ * Creates bucket if it doesn't exist, with proper configuration
+ * 
+ * @param supabase - Supabase client
+ * @param config - Bucket configuration
+ */
+export async function ensureStorageBucket(
+    supabase: SupabaseClient,
+    config: StorageBucketConfig
+): Promise<void> {
+    // Check if bucket exists
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+
+    if (listError) {
+        throw new Error(`Failed to list buckets: ${listError.message}`);
     }
 
-    /**
-     * Delete multiple images from storage
-     * 
-     * @param paths - Array of file paths or URLs
-     */
-    async deleteImages(paths: string[]): Promise<void> {
-        const filePaths = paths.map(p => this.extractPathFromUrl(p));
+    const bucketExists = buckets?.some((b) => b.name === config.name);
 
-        const { error } = await this.client.storage
-            .from(this.bucketName)
-            .remove(filePaths);
+    if (!bucketExists) {
+        // Create bucket
+        const { error: createError } = await supabase.storage.createBucket(config.name, {
+            public: config.public,
+            fileSizeLimit: config.maxFileSizeBytes,
+            allowedMimeTypes: config.allowedMimeTypes,
+        });
 
-        if (error) {
-            console.warn(`Failed to delete images: ${error.message}`);
-        }
-    }
-
-    /**
-     * Get public URL for image
-     * 
-     * @param path - File path in bucket
-     * @returns Public URL
-     */
-    getPublicUrl(path: string): string {
-        return getPublicUrl(this.client, this.bucketName, path);
-    }
-
-    /**
-     * Extract file path from full URL
-     * 
-     * @param urlOrPath - Full URL or path
-     * @returns File path
-     */
-    private extractPathFromUrl(urlOrPath: string): string {
-        // If it's already a path (no protocol), return as-is
-        if (!urlOrPath.startsWith('http')) {
-            return urlOrPath;
-        }
-
-        // Extract path from URL
-        // Format: https://{project}.supabase.co/storage/v1/object/public/{bucket}/{path}
-        const match = urlOrPath.match(/\/object\/public\/[^/]+\/(.+)$/);
-        return match ? match[1] : urlOrPath;
-    }
-
-    /**
-     * Get content type from filename
-     * 
-     * @param filename - Filename with extension
-     * @returns MIME type
-     */
-    private getContentType(filename: string): string {
-        const extension = filename.split('.').pop()?.toLowerCase();
-
-        switch (extension) {
-            case 'jpg':
-            case 'jpeg':
-                return 'image/jpeg';
-            case 'png':
-                return 'image/png';
-            case 'webp':
-                return 'image/webp';
-            default:
-                return 'image/jpeg';
+        if (createError) {
+            throw new Error(`Failed to create bucket: ${createError.message}`);
         }
     }
 }
 
 /**
- * Create storage bucket if it doesn't exist
+ * Product Image Storage Service
  * 
- * This should be run during application initialization or deployment
- * Requires service role key
- * 
- * @param client - Supabase client with admin privileges
- * @param config - Bucket configuration
+ * High-level API for managing product images in Supabase Storage
  */
-export async function ensureStorageBucket(
-    client: SupabaseClient,
-    config: StorageBucketConfig = PRODUCT_IMAGES_BUCKET_CONFIG
-): Promise<void> {
-    // Check if bucket exists
-    const { data: buckets, error: listError } = await client.storage.listBuckets();
+export class ProductImageStorage {
+    constructor(private supabase: SupabaseClient) { }
 
-    if (listError) {
-        throw new Error(`Failed to list storage buckets: ${listError.message}`);
-    }
-
-    const bucketExists = buckets?.some(b => b.name === config.name);
-
-    if (!bucketExists) {
-        // Create bucket
-        const { error: createError } = await client.storage.createBucket(config.name, {
-            public: config.public,
-            fileSizeLimit: config.fileSizeLimit,
-            allowedMimeTypes: config.allowedMimeTypes as string[],
-        });
-
-        if (createError) {
-            throw new Error(`Failed to create storage bucket: ${createError.message}`);
+    /**
+     * Upload product image
+     * 
+     * @param productId - Product UUID
+     * @param file - Image file to upload
+     * @param originalFilename - Original filename
+     * @returns Upload result with public URL and storage path
+     */
+    async uploadImage(
+        productId: string,
+        file: File | Buffer | Blob,
+        originalFilename: string
+    ): Promise<{ url: string; path: string }> {
+        // Validate file if it's a File object
+        if (file instanceof File) {
+            const validation = validateImageFile(file);
+            if (!validation.valid) {
+                throw new Error(validation.error);
+            }
         }
 
-        console.log(`Storage bucket '${config.name}' created successfully`);
-    } else {
-        console.log(`Storage bucket '${config.name}' already exists`);
+        // Generate unique filename
+        const filename = generateUniqueFilename(originalFilename);
+        const filePath = getProductImagePath(productId, filename);
+
+        // Upload to storage
+        return uploadFile(
+            this.supabase,
+            PRODUCT_IMAGES_BUCKET_CONFIG.name,
+            filePath,
+            file
+        );
+    }
+
+    /**
+     * Delete product image
+     * 
+     * @param imagePath - Storage path of the image
+     */
+    async deleteImage(imagePath: string): Promise<void> {
+        return deleteFile(this.supabase, PRODUCT_IMAGES_BUCKET_CONFIG.name, imagePath);
+    }
+
+    /**
+     * Delete all images for a product
+     * 
+     * @param productId - Product UUID
+     */
+    async deleteProductImages(productId: string): Promise<void> {
+        const folderPath = `products/${productId}`;
+
+        // List all files in the product folder
+        const { data: files, error } = await this.supabase.storage
+            .from(PRODUCT_IMAGES_BUCKET_CONFIG.name)
+            .list(folderPath);
+
+        if (error) {
+            throw new Error(`Failed to list product images: ${error.message}`);
+        }
+
+        if (!files || files.length === 0) {
+            return;
+        }
+
+        // Delete all files
+        const filePaths = files.map((f) => `${folderPath}/${f.name}`);
+        return deleteFiles(this.supabase, PRODUCT_IMAGES_BUCKET_CONFIG.name, filePaths);
+    }
+
+    /**
+     * Get public URL for an image
+     * 
+     * @param imagePath - Storage path of the image
+     * @returns Public URL
+     */
+    getImageUrl(imagePath: string): string {
+        return getPublicUrl(this.supabase, PRODUCT_IMAGES_BUCKET_CONFIG.name, imagePath);
     }
 }
