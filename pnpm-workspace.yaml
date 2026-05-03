@@ -1,0 +1,9 @@
+# pnpm workspace configuration
+# Defines which directories contain workspace packages
+
+packages:
+  # Applications (runnable services)
+  - 'apps/*'
+  
+  # Shared packages (libraries, utilities, configs)
+  - 'packages/*'

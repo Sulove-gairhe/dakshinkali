@@ -199,7 +199,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Verify validation rejects other types and oversized files
   - Tag: `Feature: product-module, Property 8: Image File Validation`
 
-- [ ]* 4.8 Write unit tests for ImageStorageService
+- [x] 4.8 Write unit tests for ImageStorageService
   - Test validateImageFile with valid and invalid files
   - Test generateUniqueFilename produces unique names
   - Test uploadImage success and error cases
@@ -335,7 +335,8 @@ This implementation plan converts the Product Module design into actionable codi
   - Create forbidden.exception.ts (ForbiddenException)
   - Create conflict.exception.ts (ConflictException)
   - Define domain-specific exceptions: ProductNotFoundException, DuplicateProductException
-  - _Requirements: 12.1, 12.2, 12.3, 12.4_
+  - _Requirements: 12
+  +.1, 12.2, 12.3, 12.4_
 
 - [x] 7.2 Implement error handler middleware
   - Create error-handler.middleware.ts
@@ -366,7 +367,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Verify structure: { error: { code: string, message: string, fields?: array } }
   - Tag: `Feature: product-module, Property 9: Error Response Format Consistency`
 
-- [ ]* 7.6 Write unit tests for error handling
+- [x] 7.6 Write unit tests for error handling
   - Test ValidationException → 400 with field errors
   - Test UnauthorizedException → 401
   - Test ForbiddenException → 403
@@ -466,7 +467,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Return 200 OK with ProductDTO
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 7.1_
 
-- [ ]* 9.4 Write property test for filter correctness
+- [x] 9.4 Write property test for filter correctness
   - **Property 1: Filter Correctness**
   - **Validates: Requirements 2.2, 5.3, 5.4**
   - Generate random product lists and random filter combinations
@@ -474,7 +475,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Verify all returned products match ALL specified filter criteria
   - Tag: `Feature: product-module, Property 1: Filter Correctness`
 
-- [ ]* 9.5 Write property test for public API exclusion
+- [x] 9.5 Write property test for public API exclusion
   - **Property 2: Public API Exclusion of Deleted and Inactive Products**
   - **Validates: Requirements 4.3, 5.6**
   - Generate random product lists with various statuses and deleted_at values
@@ -483,7 +484,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Verify inactive products (status != 'active') never returned
   - Tag: `Feature: product-module, Property 2: Public API Exclusion of Deleted and Inactive Products`
 
-- [ ]* 9.6 Write property test for sort order correctness
+- [x] 9.6 Write property test for sort order correctness
   - **Property 13: Sort Order Correctness**
   - **Validates: Requirements 5.5**
   - Generate random product lists
@@ -491,7 +492,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Verify returned list is correctly ordered
   - Tag: `Feature: product-module, Property 13: Sort Order Correctness`
 
-- [ ]* 9.7 Write property test for search result relevance
+- [x] 9.7 Write property test for search result relevance
   - **Property 14: Search Result Relevance**
   - **Validates: Requirements 5.2**
   - Generate random search terms and product lists
@@ -556,7 +557,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Return 429 Too Many Requests when limit exceeded
   - _Requirements: 15.5_
 
-- [ ] 12.2 Optimize repository queries for performance
+- [x] 12.2 Optimize repository queries for performance
   - Verify all queries use appropriate indexes
   - Use parameterized queries to prevent SQL injection
   - Implement cursor-based pagination for large result sets (optional enhancement)
@@ -585,7 +586,7 @@ This implementation plan converts the Product Module design into actionable codi
   - Log any failing examples for debugging
   - _Requirements: All correctness properties_
 
-- [ ] 13.4 Final checkpoint - Ensure all tests pass
+- [x] 13.4 Final checkpoint - Ensure all tests pass
   - Run complete test suite (unit + property + integration + smoke)
   - Verify test coverage meets goals (90%+ for business logic)
   - Fix any failing tests
@@ -593,21 +594,21 @@ This implementation plan converts the Product Module design into actionable codi
 
 ### 14. Documentation and Deployment Preparation
 
-- [ ] 14.1 Create API documentation
+- [x] 14.1 Create API documentation
   - Document all endpoints with request/response examples
   - Document error codes and messages
   - Document authentication and authorization requirements
   - Create OpenAPI/Swagger specification (optional)
   - _Requirements: 10.1, 12.6_
 
-- [ ] 14.2 Create README for Product Module
+- [x] 14.2 Create README for Product Module
   - Document module architecture and layer responsibilities
   - Document how to run tests
   - Document environment variables and configuration
   - Document database migration steps
   - _Requirements: All requirements_
 
-- [ ] 14.3 Final checkpoint - Review and validation
+- [x] 14.3 Final checkpoint - Review and validation
   - Review all code for production readiness
   - Verify all requirements are implemented
   - Verify all acceptance criteria are met

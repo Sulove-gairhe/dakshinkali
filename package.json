@@ -14,12 +14,21 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:migrate": "supabase migration up",
-    "db:migration:new": "supabase migration new"
+    "db:migration:new": "supabase migration new",
+    "db:verify": "node verify-supabase-integration.js"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^1.0.0",
+    "fast-check": "^4.7.0",
     "supabase": "^2.96.0",
     "turbo": "latest",
     "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.105.1",
+    "dotenv": "^17.4.2",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
   }
 }

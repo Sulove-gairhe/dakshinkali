@@ -15,10 +15,11 @@ import {
 } from './image-storage.service';
 import {
     ProductImageStorage,
+    StoredFile,
     ALLOWED_IMAGE_TYPES,
     MAX_IMAGE_SIZE_BYTES,
     generateUniqueFilename as generateFilename,
-} from '@packages/database/storage.config';
+} from '@dakshinkali/database';
 
 /**
  * ImageStorageServiceImpl
@@ -29,8 +30,8 @@ import {
 export class ImageStorageServiceImpl implements ImageStorageService {
     private storage: ProductImageStorage;
 
-    constructor(storage?: ProductImageStorage) {
-        this.storage = storage || new ProductImageStorage();
+    constructor(storage: ProductImageStorage) {
+        this.storage = storage;
     }
 
     /**
@@ -38,36 +39,28 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      * 
      * Requirements: 11.1, 11.4 (Upload to Supabase Storage, return public URL)
      * 
-     * @param file - Image file buffer or blob
+     * @param file - Standardized backend file object
      * @param productId - Product UUID for organizing storage
-     * @param originalFilename - Original filename with extension
      * @returns Image upload result with public URL and generated filename
      * @throws ImageValidationError if file validation fails
      * @throws ImageStorageError if upload fails
      */
     async uploadImage(
-        file: Buffer | Blob,
-        productId: string,
-        originalFilename: string
+        file: StoredFile,
+        productId: string
     ): Promise<ImageUploadResult> {
         // Validate file before upload
-        const fileSize = file instanceof Buffer ? file.length : file.size;
-        const mimeType = this.getMimeTypeFromFilename(originalFilename);
-
-        this.validateImageFile({
-            mimetype: mimeType,
-            size: fileSize,
-        });
+        this.validateImageFile(file);
 
         try {
             // Generate unique filename
-            const filename = this.generateUniqueFilename(originalFilename);
+            const filename = this.generateUniqueFilename(file.originalName);
 
             // Upload to Supabase Storage
-            const url = await this.storage.uploadImage(productId, file, originalFilename);
+            const result = await this.storage.uploadImage(productId, file);
 
             return {
-                url,
+                url: result.url,
                 filename,
             };
         } catch (error) {
@@ -108,7 +101,10 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      */
     async deleteImages(imageUrls: string[]): Promise<void> {
         try {
-            await this.storage.deleteImages(imageUrls);
+            // Delete each image individually since ProductImageStorage doesn't have batch delete
+            for (const imageUrl of imageUrls) {
+                await this.storage.deleteImage(imageUrl);
+            }
         } catch (error) {
             // Log error but don't throw - graceful error handling
             console.warn(
@@ -135,25 +131,14 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      * 
      * Requirements: 11.3 (Validate JPEG/PNG/WebP, max 5MB)
      * 
-     * @param file - File object with mimetype/type and size properties
+     * @param file - Standardized backend file object
      * @throws ImageValidationError if validation fails with descriptive message
      */
-    validateImageFile(file: {
-        mimetype?: string;
-        type?: string;
-        size: number;
-    }): void {
-        const mimeType = file.mimetype || file.type;
-
-        // Validate MIME type exists
-        if (!mimeType) {
-            throw new ImageValidationError('File type is required');
-        }
-
+    validateImageFile(file: StoredFile): void {
         // Validate MIME type is allowed (JPEG, PNG, WebP only)
-        if (!ALLOWED_IMAGE_TYPES.includes(mimeType as any)) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype as any)) {
             throw new ImageValidationError(
-                `Invalid file type. Allowed types: JPEG, PNG, WebP. Received: ${mimeType}`
+                `Invalid file type. Allowed types: JPEG, PNG, WebP. Received: ${file.mimetype}`
             );
         }
 
@@ -164,28 +149,6 @@ export class ImageStorageServiceImpl implements ImageStorageService {
             throw new ImageValidationError(
                 `File size exceeds maximum limit of ${maxSizeMB}MB. File size: ${fileSizeMB}MB`
             );
-        }
-    }
-
-    /**
-     * Get MIME type from filename extension
-     * 
-     * @param filename - Filename with extension
-     * @returns MIME type
-     */
-    private getMimeTypeFromFilename(filename: string): string {
-        const extension = filename.split('.').pop()?.toLowerCase();
-
-        switch (extension) {
-            case 'jpg':
-            case 'jpeg':
-                return 'image/jpeg';
-            case 'png':
-                return 'image/png';
-            case 'webp':
-                return 'image/webp';
-            default:
-                return 'application/octet-stream';
         }
     }
 }

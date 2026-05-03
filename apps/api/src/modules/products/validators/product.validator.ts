@@ -99,43 +99,27 @@ export class ProductValidator {
     }
 
     /**
-     * Validate complete product data for creation
+     * Validate product data for creation
      * 
      * Validates all required fields and business rules for CreateProductData.
-     * For UpdateProductData, only validates fields that are present (partial updates allowed).
+     * All fields (name, price, category) are required.
      * 
-     * @param data - CreateProductData or UpdateProductData to validate
+     * @param data - CreateProductData to validate
      * @throws ValidationException if any validation fails
      * 
      * **Validates: Requirements 1.1, 1.2, 9.2, 9.3**
      */
-    static validateProductData(data: CreateProductData | UpdateProductData): void {
+    static validateCreateProduct(data: CreateProductData): void {
         const errors: Array<{ field: string; message: string }> = [];
 
-        // Determine if this is CreateProductData or UpdateProductData
-        // If any of the core fields (name, price, category) are present, we need to check
-        // if this is a complete CreateProductData or a partial UpdateProductData
-        const hasName = 'name' in data;
-        const hasPrice = 'price' in data;
-        const hasCategory = 'category' in data;
-
-        // If at least one core field is present, check if all required fields are present
-        // If all 3 are present, it's CreateProductData
-        // If only some are present, it could be either incomplete CreateProductData or UpdateProductData
-        // We'll treat it as CreateProductData if it has at least 2 of the 3 core fields
-        const coreFieldCount = (hasName ? 1 : 0) + (hasPrice ? 1 : 0) + (hasCategory ? 1 : 0);
-        const isLikelyCreateData = coreFieldCount >= 2;
-
-        // For CreateProductData, name is required
-        if (isLikelyCreateData && !hasName) {
+        // Name is required and must be valid
+        if (data.name === undefined) {
             errors.push({
                 field: 'name',
                 message: 'Product name is required.'
             });
-        }
-
-        // Validate name if provided
-        if (hasName && data.name !== undefined) {
+        } else {
+            // Validate name format (handles empty string case)
             try {
                 this.validateProductName(data.name);
             } catch (error) {
@@ -145,16 +129,14 @@ export class ProductValidator {
             }
         }
 
-        // For CreateProductData, price is required
-        if (isLikelyCreateData && !hasPrice) {
+        // Price is required
+        if (data.price === undefined) {
             errors.push({
                 field: 'price',
                 message: 'Product price is required.'
             });
-        }
-
-        // Validate price if provided
-        if (hasPrice && data.price !== undefined) {
+        } else {
+            // Validate price value
             try {
                 this.validatePrice(data.price);
             } catch (error) {
@@ -164,8 +146,8 @@ export class ProductValidator {
             }
         }
 
-        // For CreateProductData, category is required
-        if (isLikelyCreateData && !hasCategory) {
+        // Category is required
+        if (!data.category || data.category === undefined) {
             errors.push({
                 field: 'category',
                 message: 'Product category is required.'
@@ -193,6 +175,88 @@ export class ProductValidator {
 
         if (errors.length > 0) {
             throw new ValidationException('Invalid product data.', errors);
+        }
+    }
+
+    /**
+     * Validate product data for update
+     * 
+     * Validates only the fields that are present (partial updates allowed).
+     * No fields are required - empty updates are valid.
+     * 
+     * @param data - UpdateProductData to validate
+     * @throws ValidationException if any validation fails
+     * 
+     * **Validates: Requirements 1.1, 1.2, 9.2, 9.3**
+     */
+    static validateUpdateProduct(data: UpdateProductData): void {
+        const errors: Array<{ field: string; message: string }> = [];
+
+        // Validate name if provided
+        if (data.name !== undefined) {
+            try {
+                this.validateProductName(data.name);
+            } catch (error) {
+                if (error instanceof ValidationException && error.fields) {
+                    errors.push(...error.fields);
+                }
+            }
+        }
+
+        // Validate price if provided
+        if (data.price !== undefined) {
+            try {
+                this.validatePrice(data.price);
+            } catch (error) {
+                if (error instanceof ValidationException && error.fields) {
+                    errors.push(...error.fields);
+                }
+            }
+        }
+
+        // Validate description length if provided
+        if (data.description !== undefined && data.description !== null && data.description.length > 2000) {
+            errors.push({
+                field: 'description',
+                message: 'Product description cannot exceed 2000 characters.'
+            });
+        }
+
+        // Validate status if provided
+        if (data.status !== undefined) {
+            const validStatuses = ['active', 'inactive', 'out_of_stock'];
+            if (!validStatuses.includes(data.status)) {
+                errors.push({
+                    field: 'status',
+                    message: `Product status must be one of: ${validStatuses.join(', ')}.`
+                });
+            }
+        }
+
+        if (errors.length > 0) {
+            throw new ValidationException('Invalid product data.', errors);
+        }
+    }
+
+    /**
+     * Validate product data (legacy method for backward compatibility)
+     * 
+     * @deprecated Use validateCreateProduct() or validateUpdateProduct() instead
+     * @param data - CreateProductData or UpdateProductData to validate
+     * @throws ValidationException if any validation fails
+     */
+    static validateProductData(data: CreateProductData | UpdateProductData): void {
+        // Heuristic: Check if this looks like a create operation
+        // If it has at least 2 of the 3 core fields (name, price, category), treat as create
+        const hasName = 'name' in data;
+        const hasPrice = 'price' in data;
+        const hasCategory = 'category' in data;
+        const coreFieldCount = (hasName ? 1 : 0) + (hasPrice ? 1 : 0) + (hasCategory ? 1 : 0);
+
+        if (coreFieldCount >= 2) {
+            this.validateCreateProduct(data as CreateProductData);
+        } else {
+            this.validateUpdateProduct(data as UpdateProductData);
         }
     }
 }

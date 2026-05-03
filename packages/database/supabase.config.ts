@@ -80,7 +80,9 @@ export const DEFAULT_POOL_CONFIG: ConnectionPoolConfig = {
  */
 export function getSupabaseConfig(): SupabaseConfig {
     const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const anonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const anonKey = process.env.SUPABASE_ANON_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!url) {
@@ -91,7 +93,7 @@ export function getSupabaseConfig(): SupabaseConfig {
 
     if (!anonKey) {
         throw new Error(
-            'Missing SUPABASE_ANON_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable'
+            'Missing SUPABASE_ANON_KEY, NEXT_PUBLIC_SUPABASE_ANON_KEY, or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable'
         );
     }
 

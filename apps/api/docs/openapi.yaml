@@ -1,0 +1,780 @@
+openapi: 3.0.3
+info:
+  title: Product Module API
+  description: |
+    REST API for managing product inventory in the Dakshinkali Electronics Center e-commerce platform.
+    
+    The API follows a layered architecture with strict separation of concerns and uses DTOs (Data Transfer Objects) 
+    to decouple clients from database schema changes.
+    
+    **Key Features:**
+    - Admin API for full CRUD operations (requires authentication)
+    - Public API for product browsing (no authentication required)
+    - Soft delete for data preservation
+    - Image storage integration with Supabase
+    - Pagination, filtering, search, and sorting
+    - Consistent error response format
+    
+    **Authentication:**
+    - Admin endpoints require JWT Bearer token
+    - User must have admin role
+    
+    **Rate Limiting:**
+    - Admin endpoints: 100 requests per minute per user
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@dakshinkali-electronics.com
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.dakshinkali-electronics.com/api/v1
+    description: Production server
+  - url: https://staging-api.dakshinkali-electronics.com/api/v1
+    description: Staging server
+  - url: http://localhost:3002/api/v1
+    description: Local development server
+
+tags:
+  - name: Admin Products
+    description: Admin product management endpoints (requires authentication)
+  - name: Public Products
+    description: Public product browsing endpoints (no authentication required)
+
+paths:
+  /admin/products:
+    post:
+      tags:
+        - Admin Products
+      summary: Create a new product
+      description: |
+        Create a new product with optional images.
+        
+        **Business Rules:**
+        - Product name must be unique within the same category
+        - Price must be greater than 0
+        - Maximum 5 images allowed
+        - Each image must be max 5MB
+        - Supported image formats: JPEG, PNG, WebP
+        - Status defaults to "active" if not provided
+      operationId: createProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      tags:
+        - Admin Products
+      summary: List all products (admin)
+      description: |
+        List all products with filtering and pagination.
+        
+        **Features:**
+        - Pagination with configurable page size (default: 20, max: 100)
+        - Filter by category, status, price range
+        - Search in product name and description (case-insensitive)
+        - Option to include soft-deleted products
+      operationId: listProductsAdmin
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/CategoryParam'
+        - $ref: '#/components/parameters/StatusParam'
+        - $ref: '#/components/parameters/MinPriceParam'
+        - $ref: '#/components/parameters/MaxPriceParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - name: includeDeleted
+          in: query
+          description: Include soft-deleted products
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Products retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/products/{id}:
+    get:
+      tags:
+        - Admin Products
+      summary: Get product by ID (admin)
+      description: |
+        Get a single product by ID.
+        
+        **Features:**
+        - Option to include soft-deleted products
+        - Returns complete product details including all images
+      operationId: getProductByIdAdmin
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+        - name: includeDeleted
+          in: query
+          description: Include soft-deleted product
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Admin Products
+      summary: Update a product
+      description: |
+        Update an existing product. All fields are optional (partial update).
+        
+        **Features:**
+        - Partial updates supported (only provided fields are updated)
+        - Add new images via images array
+        - Remove existing images via removeImages array
+        - Name uniqueness is checked within category if name is being changed
+      operationId: updateProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Admin Products
+      summary: Delete a product (soft delete)
+      description: |
+        Soft delete a product. The product is marked as deleted but data is preserved.
+        
+        **Behavior:**
+        - Sets deleted_at timestamp
+        - Preserves all product data
+        - Product is excluded from public API responses
+        - Admin can still view with includeDeleted=true parameter
+      operationId: deleteProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+      responses:
+        '204':
+          description: Product deleted successfully (no content)
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /products:
+    get:
+      tags:
+        - Public Products
+      summary: List active products (public)
+      description: |
+        List active products with filtering, search, sorting, and pagination.
+        
+        **Features:**
+        - No authentication required
+        - Returns only active, non-deleted products
+        - Pagination with configurable page size (default: 20, max: 100)
+        - Filter by category, price range
+        - Search in product name and description (case-insensitive)
+        - Sort by price, name, or creation date
+        - Default sorting: newest first (createdAt desc)
+      operationId: listProductsPublic
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/CategoryParam'
+        - $ref: '#/components/parameters/MinPriceParam'
+        - $ref: '#/components/parameters/MaxPriceParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - name: sortBy
+          in: query
+          description: Field to sort by
+          required: false
+          schema:
+            type: string
+            enum: [price, name, createdAt]
+            default: createdAt
+        - name: sortOrder
+          in: query
+          description: Sort direction
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Products retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /products/{id}:
+    get:
+      tags:
+        - Public Products
+      summary: Get product by ID (public)
+      description: |
+        Get a single active product by ID.
+        
+        **Behavior:**
+        - No authentication required
+        - Returns only active, non-deleted products
+        - Returns 404 for deleted products
+        - Returns 404 for inactive products
+        - Returns 404 for non-existent products
+      operationId: getProductByIdPublic
+      parameters:
+        - $ref: '#/components/parameters/ProductIdParam'
+      responses:
+        '200':
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDTO'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from authentication endpoint
+
+  parameters:
+    ProductIdParam:
+      name: id
+      in: path
+      description: Product UUID
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+
+    PageParam:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+
+    PageSizeParam:
+      name: pageSize
+      in: query
+      description: Number of items per page (max 100)
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+        example: 20
+
+    CategoryParam:
+      name: category
+      in: query
+      description: Filter by category (exact match)
+      required: false
+      schema:
+        type: string
+        example: Electronics
+
+    StatusParam:
+      name: status
+      in: query
+      description: Filter by product status
+      required: false
+      schema:
+        $ref: '#/components/schemas/ProductStatus'
+
+    MinPriceParam:
+      name: minPrice
+      in: query
+      description: Filter products with price >= minPrice
+      required: false
+      schema:
+        type: number
+        format: double
+        minimum: 0
+        example: 100.00
+
+    MaxPriceParam:
+      name: maxPrice
+      in: query
+      description: Filter products with price <= maxPrice
+      required: false
+      schema:
+        type: number
+        format: double
+        minimum: 0
+        example: 1000.00
+
+    SearchParam:
+      name: search
+      in: query
+      description: Search in product name and description (case-insensitive)
+      required: false
+      schema:
+        type: string
+        example: iphone
+
+  schemas:
+    ProductStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - out_of_stock
+      description: Product availability status
+      example: active
+
+    ProductImageDTO:
+      type: object
+      required:
+        - id
+        - url
+        - order
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the image
+          example: img-uuid-1
+        url:
+          type: string
+          format: uri
+          description: Full public URL from Supabase Storage
+          example: https://storage.supabase.co/products/img1.jpg
+        order:
+          type: integer
+          minimum: 0
+          description: Display order for image gallery (0-indexed)
+          example: 0
+
+    ProductDTO:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - category
+        - status
+        - images
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique product identifier (UUID v4)
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Product name
+          example: iPhone 15 Pro
+        description:
+          type: string
+          nullable: true
+          maxLength: 2000
+          description: Product description (null if not provided)
+          example: Latest iPhone with A17 Pro chip
+        price:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Product price (numeric value)
+          example: 999.99
+        category:
+          type: string
+          description: Product category
+          example: Electronics
+        status:
+          $ref: '#/components/schemas/ProductStatus'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductImageDTO'
+          description: Array of product images with public URLs
+          maxItems: 5
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when product was created
+          example: '2024-01-15T10:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when product was last updated
+          example: '2024-01-15T10:30:00.000Z'
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - category
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Product name (unique within category)
+          example: iPhone 15 Pro
+        description:
+          type: string
+          maxLength: 2000
+          description: Product description
+          example: Latest iPhone with A17 Pro chip
+        price:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Product price (must be > 0)
+          example: 999.99
+        category:
+          type: string
+          minLength: 1
+          description: Product category
+          example: Electronics
+        status:
+          $ref: '#/components/schemas/ProductStatus'
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+          maxItems: 5
+          description: Product images (max 5 files, 5MB each, JPEG/PNG/WebP)
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Product name (unique within category)
+          example: iPhone 15 Pro Max
+        description:
+          type: string
+          maxLength: 2000
+          description: Product description
+          example: Updated description
+        price:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Product price (must be > 0)
+          example: 1099.99
+        category:
+          type: string
+          minLength: 1
+          description: Product category
+          example: Electronics
+        status:
+          $ref: '#/components/schemas/ProductStatus'
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+          maxItems: 5
+          description: New images to add (5MB each, JPEG/PNG/WebP)
+        removeImages:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Image IDs to remove
+          example: [img-uuid-1, img-uuid-2]
+
+    PaginatedProductResponse:
+      type: object
+      required:
+        - data
+        - total
+        - page
+        - pageSize
+        - totalPages
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDTO'
+          description: Array of products
+        total:
+          type: integer
+          minimum: 0
+          description: Total number of products matching filters
+          example: 150
+        page:
+          type: integer
+          minimum: 1
+          description: Current page number
+          example: 1
+        pageSize:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Number of items per page
+          example: 20
+        totalPages:
+          type: integer
+          minimum: 0
+          description: Total number of pages
+          example: 8
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid product data
+            fields:
+              type: array
+              items:
+                type: object
+                required:
+                  - field
+                  - message
+                properties:
+                  field:
+                    type: string
+                    description: Field name with error
+                    example: price
+                  message:
+                    type: string
+                    description: Field-specific error message
+                    example: Product price must be greater than 0
+              description: Field-specific validation errors (optional)
+
+  responses:
+    ValidationError:
+      description: Invalid request data (validation errors)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Invalid product data
+              fields:
+                - field: price
+                  message: Product price must be greater than 0
+                - field: name
+                  message: Product name is required
+
+    UnauthorizedError:
+      description: Missing or invalid authentication token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: UNAUTHORIZED
+              message: Authentication required. Please provide a valid access token.
+
+    ForbiddenError:
+      description: Valid token but insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: FORBIDDEN
+              message: Admin access required for this operation.
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: PRODUCT_NOT_FOUND
+              message: Product with ID '123e4567-e89b-12d3-a456-426614174000' not found.
+
+    ConflictError:
+      description: Business rule violation (e.g., duplicate name)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: DUPLICATE_PRODUCT
+              message: A product with name 'iPhone 15' already exists in category 'Electronics'.
+
+    RateLimitError:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          description: Request limit per time window
+          schema:
+            type: integer
+            example: 100
+        X-RateLimit-Remaining:
+          description: Remaining requests in current window
+          schema:
+            type: integer
+            example: 0
+        X-RateLimit-Reset:
+          description: Unix timestamp when rate limit resets
+          schema:
+            type: integer
+            example: 1705320000
+        Retry-After:
+          description: Seconds to wait before retrying
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: RATE_LIMIT_EXCEEDED
+              message: Too many requests. Please try again later.
+              retryAfter: 60
+
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              code: INTERNAL_SERVER_ERROR
+              message: An unexpected error occurred. Please try again later.

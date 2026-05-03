@@ -254,10 +254,23 @@ export function createProductRoutes(config: RouteConfig): Route[] {
                 }
 
                 // 6. Call controller
-                const result = await controllerMethod.call(
-                    controllerMethod,
-                    context.params.id || context.query || context.body
-                );
+                // Determine what to pass based on HTTP method and route
+                let controllerArg;
+                if (context.method === 'POST') {
+                    // For POST, pass body
+                    controllerArg = context.body;
+                } else if (context.method === 'PUT') {
+                    // For PUT, merge params and body
+                    controllerArg = { ...context.params, ...context.body };
+                } else if (context.params && context.params.id) {
+                    // For GET/DELETE with ID, pass params
+                    controllerArg = context.params;
+                } else {
+                    // For GET list, pass query
+                    controllerArg = context.query;
+                }
+
+                const result = await controllerMethod(controllerArg);
 
                 // 7. Caching
                 if (options.cache && context.method === 'GET') {
@@ -272,6 +285,11 @@ export function createProductRoutes(config: RouteConfig): Route[] {
                 };
             } catch (error) {
                 // Error handling
+                console.error('ERROR CAUGHT IN ROUTE HANDLER:', error);
+                console.error('Error name:', (error as Error).name);
+                console.error('Error message:', (error as Error).message);
+                console.error('Error stack:', (error as Error).stack);
+
                 const requestContext = {
                     method: context.method,
                     url: context.url,

@@ -111,10 +111,10 @@ export function createAuthMiddleware(verifyToken: JWTVerifier) {
 
             // Create AuthUser object
             const user: AuthUser = {
+                ...payload, // Include additional claims first
                 id: payload.sub,
                 email: payload.email,
                 role: payload.role,
-                ...payload, // Include additional claims
             };
 
             return user;

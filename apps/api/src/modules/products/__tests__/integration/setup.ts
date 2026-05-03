@@ -26,97 +26,204 @@ export class MockSupabaseClient {
     }
 
     from(table: string) {
+        const self = this;
         return {
-            select: (columns: string = '*') => ({
-                eq: (column: string, value: any) => this.selectEq(table, column, value),
-                neq: (column: string, value: any) => this.selectNeq(table, column, value),
-                is: (column: string, value: any) => this.selectIs(table, column, value),
-                gte: (column: string, value: any) => this.selectGte(table, column, value),
-                lte: (column: string, value: any) => this.selectLte(table, column, value),
-                ilike: (column: string, value: any) => this.selectIlike(table, column, value),
-                order: (column: string, options?: any) => this.selectOrder(table, column, options),
-                range: (from: number, to: number) => this.selectRange(table, from, to),
-                single: () => this.selectSingle(table),
+            select: (columns: string = '*', options?: any) => {
+                const selectQuery = {
+                    _table: table,
+                    _columns: columns,
+                    _options: options,
+                    _filters: [] as Array<{ type: string; column: string; value: any }>,
+
+                    eq(column: string, value: any) {
+                        this._filters.push({ type: 'eq', column, value });
+                        return this;
+                    },
+                    neq(column: string, value: any) {
+                        this._filters.push({ type: 'neq', column, value });
+                        return this;
+                    },
+                    is(column: string, value: any) {
+                        this._filters.push({ type: 'is', column, value });
+                        return this;
+                    },
+                    gte(column: string, value: any) {
+                        this._filters.push({ type: 'gte', column, value });
+                        return this;
+                    },
+                    lte(column: string, value: any) {
+                        this._filters.push({ type: 'lte', column, value });
+                        return this;
+                    },
+                    ilike(column: string, value: any) {
+                        this._filters.push({ type: 'ilike', column, value });
+                        return this;
+                    },
+                    order(column: string, options?: any) {
+                        this._order = { column, options };
+                        return this;
+                    },
+                    range(from: number, to: number) {
+                        this._range = { from, to };
+                        return this;
+                    },
+                    single() {
+                        return self.executeSelect(this, true);
+                    },
+                    then(resolve: any, reject: any) {
+                        return self.executeSelect(this, false).then(resolve, reject);
+                    },
+                    _order: null as any,
+                    _range: null as any,
+                };
+                return selectQuery;
+            },
+            insert: (data: any) => ({
+                select: () => ({
+                    single: () => self.insert(table, data),
+                }),
             }),
-            insert: (data: any) => this.insert(table, data),
-            update: (data: any) => ({
-                eq: (column: string, value: any) => this.updateEq(table, data, column, value),
-            }),
+            update: (data: any) => {
+                const updateQuery = {
+                    _table: table,
+                    _data: data,
+                    _filters: [] as Array<{ type: string; column: string; value: any }>,
+
+                    eq(column: string, value: any) {
+                        this._filters.push({ type: 'eq', column, value });
+                        return this;
+                    },
+                    is(column: string, value: any) {
+                        this._filters.push({ type: 'is', column, value });
+                        return this;
+                    },
+                    select() {
+                        return {
+                            single: () => self.executeUpdate(this),
+                        };
+                    },
+                };
+                return updateQuery;
+            },
         };
     }
 
-    private selectEq(table: string, column: string, value: any) {
-        const rows = this.data.get(table) || [];
-        const filtered = rows.filter(row => row[column] === value);
-        return { data: filtered, error: null };
-    }
+    private executeSelect(query: any, single: boolean) {
+        const rows = this.data.get(query._table) || [];
+        let filtered = rows;
 
-    private selectNeq(table: string, column: string, value: any) {
-        const rows = this.data.get(table) || [];
-        const filtered = rows.filter(row => row[column] !== value);
-        return { data: filtered, error: null };
-    }
-
-    private selectIs(table: string, column: string, value: any) {
-        const rows = this.data.get(table) || [];
-        const filtered = rows.filter(row => row[column] === value);
-        return { data: filtered, error: null };
-    }
-
-    private selectGte(table: string, column: string, value: any) {
-        const rows = this.data.get(table) || [];
-        const filtered = rows.filter(row => row[column] >= value);
-        return { data: filtered, error: null };
-    }
-
-    private selectLte(table: string, column: string, value: any) {
-        const rows = this.data.get(table) || [];
-        const filtered = rows.filter(row => row[column] <= value);
-        return { data: filtered, error: null };
-    }
-
-    private selectIlike(table: string, column: string, value: any) {
-        const rows = this.data.get(table) || [];
-        const searchTerm = value.replace(/%/g, '').toLowerCase();
-        const filtered = rows.filter(row =>
-            row[column]?.toLowerCase().includes(searchTerm)
-        );
-        return { data: filtered, error: null };
-    }
-
-    private selectOrder(table: string, column: string, options?: any) {
-        const rows = this.data.get(table) || [];
-        const sorted = [...rows].sort((a, b) => {
-            if (options?.ascending) {
-                return a[column] > b[column] ? 1 : -1;
+        // Apply all filters
+        for (const filter of query._filters) {
+            if (filter.type === 'eq') {
+                filtered = filtered.filter(row => row[filter.column] === filter.value);
+            } else if (filter.type === 'neq') {
+                filtered = filtered.filter(row => row[filter.column] !== filter.value);
+            } else if (filter.type === 'is') {
+                filtered = filtered.filter(row => row[filter.column] === filter.value);
+            } else if (filter.type === 'gte') {
+                // Ensure numeric comparison for gte
+                filtered = filtered.filter(row => Number(row[filter.column]) >= Number(filter.value));
+            } else if (filter.type === 'lte') {
+                // Ensure numeric comparison for lte
+                filtered = filtered.filter(row => Number(row[filter.column]) <= Number(filter.value));
+            } else if (filter.type === 'ilike') {
+                const searchTerm = filter.value.replace(/%/g, '').toLowerCase();
+                filtered = filtered.filter(row =>
+                    row[filter.column]?.toLowerCase().includes(searchTerm)
+                );
             }
-            return a[column] < b[column] ? 1 : -1;
-        });
-        return { data: sorted, error: null };
-    }
+        }
 
-    private selectRange(table: string, from: number, to: number) {
-        const rows = this.data.get(table) || [];
-        const sliced = rows.slice(from, to + 1);
-        return { data: sliced, error: null };
-    }
+        // Apply ordering
+        if (query._order) {
+            filtered = [...filtered].sort((a, b) => {
+                if (query._order.options?.ascending) {
+                    return a[query._order.column] > b[query._order.column] ? 1 : -1;
+                }
+                return a[query._order.column] < b[query._order.column] ? 1 : -1;
+            });
+        }
 
-    private selectSingle(table: string) {
-        const rows = this.data.get(table) || [];
-        return { data: rows[0] || null, error: null };
+        // Store total count BEFORE pagination
+        const totalCount = filtered.length;
+
+        // Apply range (pagination)
+        if (query._range) {
+            filtered = filtered.slice(query._range.from, query._range.to + 1);
+        }
+
+        // Handle count option
+        if (query._options?.count === 'exact') {
+            return Promise.resolve({
+                data: query._options?.head ? null : filtered,
+                count: totalCount, // Use count from BEFORE pagination
+                error: null,
+            });
+        }
+
+        if (single) {
+            return Promise.resolve({ data: filtered[0] || null, error: null });
+        }
+
+        return Promise.resolve({ data: filtered, error: null });
     }
 
     private insert(table: string, data: any) {
         const rows = this.data.get(table) || [];
+        // Generate valid UUID v4 for testing
+        const generateUUID = () => {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        };
         const newRow = {
             ...data,
-            id: data.id || `test-id-${this.idCounter++}`,
+            id: data.id || generateUUID(),
             created_at: data.created_at || new Date().toISOString(),
             updated_at: data.updated_at || new Date().toISOString(),
+            deleted_at: data.deleted_at !== undefined ? data.deleted_at : null,
         };
         rows.push(newRow);
         this.data.set(table, rows);
-        return { data: newRow, error: null };
+        return Promise.resolve({ data: newRow, error: null });
+    }
+
+    private executeUpdate(query: any) {
+        const rows = this.data.get(query._table) || [];
+        let filtered = rows;
+
+        // Apply all filters to find the row to update
+        for (const filter of query._filters) {
+            if (filter.type === 'eq') {
+                filtered = filtered.filter(row => row[filter.column] === filter.value);
+            } else if (filter.type === 'is') {
+                filtered = filtered.filter(row => row[filter.column] === filter.value);
+            }
+        }
+
+        if (filtered.length === 0) {
+            return Promise.resolve({ data: null, error: { code: 'PGRST116', message: 'Not found' } });
+        }
+
+        // Update the first matching row
+        const rowToUpdate = filtered[0];
+        const updatedRow = {
+            ...rowToUpdate,
+            ...query._data,
+            updated_at: new Date().toISOString(),
+        };
+
+        // Replace in the data store
+        const allRows = this.data.get(query._table) || [];
+        const index = allRows.findIndex(r => r === rowToUpdate);
+        if (index !== -1) {
+            allRows[index] = updatedRow;
+            this.data.set(query._table, allRows);
+        }
+
+        return Promise.resolve({ data: updatedRow, error: null });
     }
 
     private updateEq(table: string, data: any, column: string, value: any) {
@@ -244,12 +351,13 @@ export function createTestContext(): TestContext {
             ip?: string;
         } = {}
     ) => {
-        const route = routes.find(r => r.method === method && r.path === path);
+        // Look up route from context.routes (not closure variable) to support dynamic route replacement
+        const route = context.routes.find(r => r.method === method && r.path === path);
         if (!route) {
             throw new Error(`Route not found: ${method} ${path}`);
         }
 
-        const context = {
+        const requestContext = {
             method,
             url: path,
             headers: options.headers || {},
@@ -259,10 +367,10 @@ export function createTestContext(): TestContext {
             ip: options.ip || '127.0.0.1',
         };
 
-        return await route.handler(context);
+        return await route.handler(requestContext);
     };
 
-    return {
+    const context = {
         supabase,
         productRepository,
         imageStorageService,
@@ -272,6 +380,8 @@ export function createTestContext(): TestContext {
         routes,
         executeRoute,
     };
+
+    return context;
 }
 
 /**
