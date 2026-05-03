@@ -142,7 +142,7 @@ export function createProductRoutes(config: RouteConfig): Route[] {
     // Initialize middleware
     const authMiddleware = createAuthMiddleware(jwtVerifier);
     const adminAuthMiddleware = createAdminAuthMiddleware();
-    const errorHandler = createErrorHandler(logger);
+    const errorHandler = createErrorHandler();
     const apiVersionMiddleware = createAPIVersionMiddleware({
         currentVersion: 'v1',
         supportedVersions: ['v1'],

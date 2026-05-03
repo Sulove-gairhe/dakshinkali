@@ -59,12 +59,35 @@ export type ErrorHandler = (
     body: ErrorResponse;
 };
 
+type TestLogger = (level: 'error' | 'warn' | 'info', message: string, meta?: Record<string, any>) => void;
+
 /**
  * Create error handler middleware
  * 
  * @returns Error handler function
  */
-export function createErrorHandler(): ErrorHandler {
+export function createErrorHandler(testLogger?: TestLogger): ErrorHandler {
+    const logInfo = (message: string, meta: Record<string, any>) => {
+        if (testLogger) testLogger('info', message, meta);
+        else logger.info(message, meta);
+    };
+    const logWarn = (message: string, meta: Record<string, any>) => {
+        if (testLogger) testLogger('warn', message, meta);
+        else logger.warn(message, meta);
+    };
+    const logError = (message: string, error: Error, meta: Record<string, any>) => {
+        if (testLogger) {
+            testLogger('error', message, {
+                ...meta,
+                errorName: error.name,
+                errorMessage: error.message,
+                stack: error.stack,
+            });
+        } else {
+            logger.error(message, error, meta);
+        }
+    };
+
     return (error: Error, context: RequestContext) => {
         // Determine status code and error response based on exception type
         let statusCode: number;
@@ -81,7 +104,7 @@ export function createErrorHandler(): ErrorHandler {
                 },
             };
 
-            logger.info('Validation error', {
+            logInfo('Validation error', {
                 ...context,
                 errorCode: 'VALIDATION_ERROR',
                 fields: error.fields,
@@ -96,7 +119,7 @@ export function createErrorHandler(): ErrorHandler {
                 },
             };
 
-            logger.warn('Authentication failure', {
+            logWarn('Authentication failure', {
                 ...context,
                 errorCode: 'UNAUTHORIZED',
             });
@@ -110,7 +133,7 @@ export function createErrorHandler(): ErrorHandler {
                 },
             };
 
-            logger.warn('Authorization failure', {
+            logWarn('Authorization failure', {
                 ...context,
                 errorCode: 'FORBIDDEN',
             });
@@ -124,7 +147,7 @@ export function createErrorHandler(): ErrorHandler {
                 },
             };
 
-            logger.info('Product not found', {
+            logInfo('Product not found', {
                 ...context,
                 errorCode: 'PRODUCT_NOT_FOUND',
             });
@@ -138,7 +161,7 @@ export function createErrorHandler(): ErrorHandler {
                 },
             };
 
-            logger.info('Resource not found', {
+            logInfo('Resource not found', {
                 ...context,
                 errorCode: 'NOT_FOUND',
             });
@@ -152,7 +175,7 @@ export function createErrorHandler(): ErrorHandler {
                 },
             };
 
-            logger.warn('Conflict error', {
+            logWarn('Conflict error', {
                 ...context,
                 errorCode: 'CONFLICT',
             });
@@ -166,7 +189,7 @@ export function createErrorHandler(): ErrorHandler {
                 },
             };
 
-            logger.error('Unexpected error', error, {
+            logError('Unexpected error', error, {
                 ...context,
                 errorCode: 'INTERNAL_SERVER_ERROR',
             });

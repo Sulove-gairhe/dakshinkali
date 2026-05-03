@@ -15,7 +15,7 @@ export interface EnvConfig {
     supabaseAnonKey: string;
     supabaseServiceRoleKey: string;
 
-    // JWT
+    // JWT (for Supabase token verification)
     jwtSecret: string;
 
     // CORS
@@ -47,7 +47,7 @@ export function loadEnvConfig(): EnvConfig {
     }
 
     return {
-        port: parseInt(process.env.PORT || '3001', 10),
+        port: parseInt(process.env.PORT || process.env.API_PORT || '3002', 10),
         nodeEnv: (process.env.NODE_ENV as any) || 'development',
 
         supabaseUrl: process.env.SUPABASE_URL!,
@@ -58,7 +58,7 @@ export function loadEnvConfig(): EnvConfig {
 
         corsOrigins: process.env.CORS_ORIGINS
             ? process.env.CORS_ORIGINS.split(',')
-            : ['http://localhost:3000'],
+            : ['http://localhost:3000', 'http://localhost:3001'],
 
         rateLimitEnabled: process.env.RATE_LIMIT_ENABLED !== 'false',
     };

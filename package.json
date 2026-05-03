@@ -15,11 +15,21 @@
     "db:reset": "supabase db reset",
     "db:migrate": "supabase migration up",
     "db:migration:new": "supabase migration new",
-    "db:verify": "node verify-supabase-integration.js"
+    "db:verify": "node verify-supabase-integration.js",
+    "db:push": "supabase db push",
+    "db:link": "supabase link",
+    "auth:migrate": "node scripts/show-migration-instructions.js",
+    "auth:fix-rls": "node scripts/fix-rls.js",
+    "auth:link": "supabase link",
+    "auth:create-admin": "node scripts/create-admin-user.js",
+    "auth:update-role": "node scripts/update-user-role.js",
+    "auth:test": "node scripts/test-auth.js",
+    "auth:token": "node scripts/get-auth-token.js"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^1.0.0",
     "fast-check": "^4.7.0",
+    "node-fetch": "^3.3.2",
     "supabase": "^2.96.0",
     "turbo": "latest",
     "vitest": "^1.0.0"

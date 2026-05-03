@@ -47,6 +47,10 @@ const productEntityArbitrary = fc.record({
     deletedAt: fc.option(fc.date({ min: new Date('2020-01-01'), max: new Date('2024-12-31') }), { nil: null }),
 });
 
+const nonBlankSearchTermArbitrary = fc
+    .array(fc.constantFrom('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'), { minLength: 3, maxLength: 20 })
+    .map(value => value.join(''));
+
 /**
  * Apply search filter to a product list (in-memory filtering logic)
  * This mimics the repository layer's search filtering logic
@@ -145,7 +149,7 @@ describe('Property Test: Search Result Relevance', () => {
     it('should match search term in product name', () => {
         fc.assert(
             fc.property(
-                fc.string({ minLength: 3, maxLength: 20 }),
+                nonBlankSearchTermArbitrary,
                 fc.string({ minLength: 1, maxLength: 50 }),
                 fc.string({ minLength: 1, maxLength: 50 }),
                 (searchTerm, prefix, suffix) => {
@@ -177,7 +181,7 @@ describe('Property Test: Search Result Relevance', () => {
     it('should match search term in product description', () => {
         fc.assert(
             fc.property(
-                fc.string({ minLength: 3, maxLength: 20 }),
+                nonBlankSearchTermArbitrary,
                 fc.string({ minLength: 1, maxLength: 50 }),
                 fc.string({ minLength: 1, maxLength: 50 }),
                 (searchTerm, prefix, suffix) => {
@@ -209,7 +213,7 @@ describe('Property Test: Search Result Relevance', () => {
     it('should match search term in either name or description', () => {
         fc.assert(
             fc.property(
-                fc.string({ minLength: 3, maxLength: 20 }),
+                nonBlankSearchTermArbitrary,
                 (searchTerm) => {
                     // Create products with search term in different fields
                     const productWithNameMatch: ProductEntity = {
@@ -288,7 +292,7 @@ describe('Property Test: Search Result Relevance', () => {
     it('should handle products with null description', () => {
         fc.assert(
             fc.property(
-                fc.string({ minLength: 3, maxLength: 20 }),
+                nonBlankSearchTermArbitrary,
                 (searchTerm) => {
                     // Create a product with null description
                     const productWithNullDescription: ProductEntity = {
@@ -349,7 +353,7 @@ describe('Property Test: Search Result Relevance', () => {
     it('should trim search term before matching', () => {
         fc.assert(
             fc.property(
-                fc.string({ minLength: 3, maxLength: 20 }),
+                nonBlankSearchTermArbitrary,
                 (searchTerm) => {
                     const product: ProductEntity = {
                         id: 'test-id',

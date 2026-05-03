@@ -45,6 +45,12 @@ importers:
       '@dakshinkali/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@supabase/ssr':
+        specifier: ^0.10.2
+        version: 0.10.2(@supabase/supabase-js@2.105.1)
+      '@supabase/supabase-js':
+        specifier: ^2.105.1
+        version: 2.105.1
       next:
         specifier: ^14.0.0
         version: 14.2.35(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -79,6 +85,9 @@ importers:
       '@dakshinkali/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@supabase/supabase-js':
+        specifier: ^2.105.1
+        version: 2.105.1
       cors:
         specifier: ^2.8.5
         version: 2.8.6
@@ -88,6 +97,9 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.22.1
+      jose:
+        specifier: ^6.2.3
+        version: 6.2.3
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@4.22.1)
@@ -131,6 +143,12 @@ importers:
       '@dakshinkali/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@supabase/ssr':
+        specifier: ^0.10.2
+        version: 0.10.2(@supabase/supabase-js@2.105.1)
+      '@supabase/supabase-js':
+        specifier: ^2.105.1
+        version: 2.105.1
       next:
         specifier: ^14.0.0
         version: 14.2.35(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -156,6 +174,25 @@ importers:
       eslint-config-next:
         specifier: ^14.0.0
         version: 14.2.35(eslint@8.57.1)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
+  packages/auth:
+    dependencies:
+      '@supabase/ssr':
+        specifier: ^0.5.2
+        version: 0.5.2(@supabase/supabase-js@2.105.1)
+      '@supabase/supabase-js':
+        specifier: ^2.45.4
+        version: 2.105.1
+    devDependencies:
+      '@types/react':
+        specifier: ^18.2.0
+        version: 18.3.28
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
@@ -657,6 +694,11 @@ packages:
     peerDependencies:
       '@supabase/supabase-js': ^2.102.1
 
+  '@supabase/ssr@0.5.2':
+    resolution: {integrity: sha512-n3plRhr2Bs8Xun1o4S3k1CDv17iH5QY9YcoEvXX3bxV1/5XSasA0mNXYycFmADIdtdE6BG9MRjP5CGIs8qxC8A==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.43.4
+
   '@supabase/storage-js@2.105.1':
     resolution: {integrity: sha512-owfdCNH5ikXXDusjzsgU6LavEBqGUoueOnL/9XIucld70/WJ/rbqp89K//c9QPICDNuegsmpoeasydDAiucLKQ==}
     engines: {node: '>=20.0.0'}
@@ -721,6 +763,9 @@ packages:
 
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
+
+  '@types/cookie@0.6.0':
+    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
@@ -1886,6 +1931,9 @@ packages:
   jackspeak@2.3.6:
     resolution: {integrity: sha512-N3yCS/NegsOBokc8GAdM8UcmfsKiSS8cipheD/nivzr700H+nsMOxJjQnvwOcRYVuFkdH0wGUvW2WbXGmrZGbQ==}
     engines: {node: '>=14'}
+
+  jose@6.2.3:
+    resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -3185,6 +3233,12 @@ snapshots:
       '@supabase/supabase-js': 2.105.1
       cookie: 1.1.1
 
+  '@supabase/ssr@0.5.2(@supabase/supabase-js@2.105.1)':
+    dependencies:
+      '@supabase/supabase-js': 2.105.1
+      '@types/cookie': 0.6.0
+      cookie: 0.7.2
+
   '@supabase/storage-js@2.105.1':
     dependencies:
       iceberg-js: 0.8.1
@@ -3247,6 +3301,8 @@ snapshots:
   '@types/connect@3.4.38':
     dependencies:
       '@types/node': 20.19.39
+
+  '@types/cookie@0.6.0': {}
 
   '@types/cors@2.8.19':
     dependencies:
@@ -4684,6 +4740,8 @@ snapshots:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
+
+  jose@6.2.3: {}
 
   js-tokens@4.0.0: {}
 

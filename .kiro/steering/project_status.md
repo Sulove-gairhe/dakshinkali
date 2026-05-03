@@ -4,243 +4,92 @@ inclusion: auto
 
 # Project Status & Context
 
-## 📍 Current State (May 3, 2026)
+## Current State (May 3, 2026)
 
-### ✅ Completed Modules
+### Completed Backend Modules
 
-#### Product Module - PRODUCTION READY
-- **Database**: Products table with migrations and indexes
-- **Repository**: Full CRUD + filtering, search, pagination
-- **Service**: Business logic + Supabase storage integration
-- **Controllers**: Admin (protected) + Public endpoints
-- **Tests**: Unit + Integration + Property-based tests
-- **Storage**: Image upload to Supabase storage buckets
-- **Status**: ✅ Complete and tested
+#### Product Module
+- Database schema, repository, service, admin/public controllers, routes, Swagger docs, Supabase storage support, and tests.
 
-### ⚠️ Partially Implemented
+#### Auth Foundation
+- Supabase JWT verification middleware, optional auth middleware, admin role middleware, profile migration, and auth helper package.
+- Supabase Auth still owns login/register/refresh directly; the Express API verifies tokens and roles.
 
-#### Cart Module - DATABASE ONLY
-- **Database**: ✅ Migrations exist (`carts`, `cart_items` tables)
-- **Code**: ❌ No repository/service/controller layers
-- **Status**: 10% complete
-
-### ❌ Not Implemented
-
-#### Authentication System
-- **Current**: Mock JWT verifier (accepts any token)
-- **Missing**: 
-  - Real Supabase Auth integration
-  - User registration/login endpoints
-  - JWT verification with real tokens
-  - Session management
-  - Password reset flow
-- **Impact**: Admin endpoints are NOT secure
-- **Priority**: 🚨 CRITICAL
+#### Cart Module
+- Canonical cart migrations, repositories, service, controller, Express routes, Swagger docs, and tests.
+- Supports guest carts via `X-Session-ID`, authenticated carts via bearer token, and guest-to-user merge.
 
 #### Order Module
-- **Status**: Not started
-- **Missing**: Database schema, all layers, payment integration
+- `orders`, `order_items`, and `order_status_history` migration.
+- Customer create/list/detail/cancel endpoints.
+- Admin list/detail/stats/status-update endpoints.
+- Creates orders from authenticated carts and snapshots product/price data.
+- Includes `create_order_from_cart` RPC for atomic order creation, order item insert, status history insert, and cart item clearing.
 
-#### User Management
-- **Status**: Only Supabase auth.users table exists
-- **Missing**: User profiles, roles, CRUD endpoints
+#### Profile And Admin Support
+- Current profile get/update endpoints.
+- Admin dashboard stats endpoint.
+- Admin user list and role update endpoints.
 
----
+#### Web And Admin UI Wiring
+- Web page calls product, cart, checkout/order, profile, and order history APIs.
+- Admin page calls dashboard stats, order list/status update, user list, and role update APIs.
 
-## 🏗️ Architecture
+## Verification
 
-### Tech Stack
-- **Frontend**: Next.js (TypeScript)
-  - `apps/web` - Storefront (port 3000)
-  - `apps/admin` - Admin panel (port 3001)
-- **Backend**: Express + TypeScript (port 3002)
-- **Database**: Supabase (PostgreSQL)
-- **Storage**: Supabase Storage
-- **Monorepo**: Turborepo + pnpm workspaces
+Passed:
+- `pnpm test`
+- `pnpm --filter @dakshinkali/api type-check`
+- `pnpm --filter @dakshinkali/web type-check`
+- `pnpm --filter @dakshinkali/admin type-check`
+- OpenAPI YAML parse check.
 
-### Layer Pattern (Enforced)
-```
-Controller (HTTP/Express)
-    ↓
-Service (Business Logic)
-    ↓
-Repository (Data Access)
-    ↓
-Database (Supabase)
-```
+Local caveat:
+- Live Supabase storage integration tests are skipped unless storage credentials are present.
 
-### Package Structure
-```
-apps/
-  ├── web/          # Next.js storefront
-  ├── admin/        # Next.js admin panel
-  └── api/          # Express API server
-packages/
-  └── database/     # Supabase client + storage config
-```
+## API Endpoint Status
 
----
+Public/customer:
+- `GET /api/v1/products`
+- `GET /api/v1/products/:id`
+- `GET /api/v1/cart`
+- `POST /api/v1/cart/items`
+- `PUT /api/v1/cart/items/:id`
+- `DELETE /api/v1/cart/items/:id`
+- `DELETE /api/v1/cart`
+- `POST /api/v1/cart/merge`
+- `POST /api/v1/orders`
+- `GET /api/v1/orders`
+- `GET /api/v1/orders/:id`
+- `PUT /api/v1/orders/:id/cancel`
+- `GET /api/v1/profile`
+- `PUT /api/v1/profile`
 
-## 🔐 Security Status
+Admin:
+- Product CRUD under `/api/v1/admin/products`
+- `GET /api/v1/admin/orders/stats`
+- `GET /api/v1/admin/orders`
+- `GET /api/v1/admin/orders/:id`
+- `PUT /api/v1/admin/orders/:id/status`
+- `GET /api/v1/admin/dashboard/stats`
+- `GET /api/v1/admin/users`
+- `PUT /api/v1/admin/users/:id/role`
 
-### Current Issues
-1. **Mock Authentication Active** - Any token is accepted
-2. **Admin Endpoints Open** - No real authorization
-3. **No Rate Limiting** - Basic implementation only
+## Remaining Priority Work
 
-### What Works (Insecurely)
-- Admin product CRUD (accepts mock tokens)
-- Public product listing (no auth needed)
+1. Apply and verify migrations in the target Supabase project.
+2. Audit RLS policies for products, carts, orders, order items, order status history, and profiles.
+3. Manually test with real admin/customer tokens.
+4. Run live storage integration tests with Supabase credentials.
 
-### What Doesn't Work
-- User login/registration
-- Real JWT verification
-- Role-based access control
+## Architecture
 
----
-
-## 📊 API Endpoints Status
-
-### Public Endpoints (Working ✅)
-- `GET /api/v1/products` - List products
-- `GET /api/v1/products/:id` - Get product details
-- `GET /api/v1/products?search=...` - Search products
-- `GET /api/v1/products?category=...` - Filter by category
-
-### Admin Endpoints (Mock Auth ⚠️)
-- `POST /api/v1/admin/products` - Create product
-- `PUT /api/v1/admin/products/:id` - Update product
-- `DELETE /api/v1/admin/products/:id` - Delete product
-- `GET /api/v1/admin/products` - List all (including inactive)
-
-### Not Implemented (❌)
-- Auth endpoints (login, register, refresh)
-- Cart endpoints (add, remove, update)
-- Order endpoints (create, list, update status)
-- User profile endpoints
-
----
-
-## 🎯 Next Steps (Priority Order)
-
-### Phase 1: Security (CRITICAL) 🚨
-1. Implement Supabase Auth integration
-2. Replace mockJWTVerifier with real verification
-3. Add user registration/login endpoints
-4. Secure admin endpoints with real tokens
-5. Add refresh token flow
-
-### Phase 2: Cart Module
-1. Create cart repository layer
-2. Create cart service layer
-3. Create cart controllers + routes
-4. Add cart validation
-5. Write cart tests
-
-### Phase 3: Order Module
-1. Design order schema (orders, order_items, payments)
-2. Create migrations
-3. Implement repository layer
-4. Implement service layer (order flow)
-5. Create order endpoints
-6. Integrate payment gateway
-
-### Phase 4: Production Readiness
-1. Add comprehensive logging
-2. Set up monitoring/alerting
-3. Create CI/CD pipeline
-4. Add database backup strategy
-5. Performance testing
-6. Security audit
-
----
-
-## 📚 Documentation Location
-
-All agent-generated documentation is in `agent/docs/`:
-- `REALITY_CHECK.md` - Detailed gap analysis
-- `SUPABASE_SETUP.md` - Database setup guide
-- `TESTING_QUICKSTART.md` - Test execution guide
-- `API_DEV_STATUS.md` - Development progress
-- `PRODUCTION_READY_BACKEND.md` - Production checklist
-- Other technical reports
-
----
-
-## 🚀 Development Commands
-
-### Start All Apps
-```bash
-pnpm dev              # All apps in parallel
-pnpm --filter @dakshinkali/web dev      # Web only
-pnpm --filter @dakshinkali/admin dev    # Admin only
-pnpm --filter @dakshinkali/api dev      # API only
+Layer pattern:
+```text
+Controller
+Service
+Repository
+Database
 ```
 
-### Database
-```bash
-pnpm db:start         # Start local Supabase
-pnpm db:stop          # Stop local Supabase
-pnpm db:reset         # Reset database
-```
-
-### Testing
-```bash
-pnpm test             # Run all tests
-pnpm test:coverage    # With coverage report
-```
-
----
-
-## ⚠️ Important Constraints
-
-### DO NOT
-- ❌ Design for multi-platform (Flutter, mobile apps)
-- ❌ Skip layer audits (mandatory after each layer)
-- ❌ Proceed to next layer without audit approval
-- ❌ Use frontend direct database access
-- ❌ Deploy with mock authentication
-
-### ALWAYS
-- ✅ Follow layered architecture (Repository → Service → Controller)
-- ✅ Audit each layer before proceeding
-- ✅ Write tests for new features
-- ✅ Use TypeScript strict mode
-- ✅ Validate inputs at controller layer
-- ✅ Handle errors properly with custom exceptions
-
----
-
-## 🎓 Key Takeaways for AI Agents
-
-1. **Product module is complete** - Use it as reference for other modules
-2. **Auth is mocked** - Do not assume real security exists
-3. **Cart has DB only** - Full implementation needed
-4. **Orders don't exist** - Start from scratch
-5. **Follow layer pattern** - Repository → Service → Controller → Audit
-6. **Security first** - Implement real auth before building more features
-
----
-
-## 📝 Environment Variables
-
-Required in `.env`:
-```bash
-# Supabase
-SUPABASE_URL=https://txpfjmnxifwiwqxwtxlf.supabase.co
-SUPABASE_ANON_KEY=sb_publishable_0rsBxrI7_vss4cqixFeoTw_JLwtj3tM
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-
-# JWT (for when auth is implemented)
-JWT_SECRET=your-jwt-secret
-
-# Ports
-WEB_PORT=3000
-ADMIN_PORT=3001
-API_PORT=3002
-```
-
----
-
-## 🔄 Last Updated
-May 3, 2026 - After product module completion and reality check
+Do not bypass the API from frontend apps. Frontends should call Express endpoints, and the API should own authorization, validation, and database access.

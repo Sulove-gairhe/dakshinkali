@@ -16,9 +16,13 @@ import {
     PRODUCT_IMAGES_BUCKET_CONFIG,
 } from '@dakshinkali/database';
 import { ImageStorageServiceImpl } from '../../services/image-storage.service.impl';
-import { env } from '../../../../config/env.config';
 
-describe('Storage Integration Tests', () => {
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const shouldRunStorageIntegration = Boolean(supabaseUrl && supabaseServiceRoleKey);
+const describeStorageIntegration = shouldRunStorageIntegration ? describe : describe.skip;
+
+describeStorageIntegration('Storage Integration Tests', () => {
     let supabase: SupabaseClient;
     let storage: ProductImageStorage;
     let service: ImageStorageServiceImpl;
@@ -27,7 +31,7 @@ describe('Storage Integration Tests', () => {
 
     beforeAll(async () => {
         // Initialize Supabase client
-        supabase = createClient(env.supabaseUrl, env.supabaseServiceRoleKey);
+        supabase = createClient(supabaseUrl!, supabaseServiceRoleKey!);
 
         // Ensure storage bucket exists
         await ensureStorageBucket(supabase, PRODUCT_IMAGES_BUCKET_CONFIG);

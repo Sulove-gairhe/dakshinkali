@@ -5,7 +5,8 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { createAuthMiddleware, JWTVerifier, AuthUser, mockJWTVerifier } from './auth.middleware';
+import { createAuthMiddleware, JWTVerifier, AuthUser } from './auth.middleware';
+import { createSupabaseJWTVerifier } from './supabase-auth.middleware';
 import { createAdminAuthMiddleware } from './admin-auth.middleware';
 import { createRateLimitMiddleware, RateLimitConfig, RateLimitExceededError } from './rate-limit.middleware';
 import { defaultErrorHandler } from './error-handler.middleware';
@@ -21,10 +22,30 @@ declare global {
 }
 
 /**
+ * Supabase JWT verifier instance (singleton)
+ */
+let supabaseVerifier: JWTVerifier | null = null;
+
+/**
+ * Get or create Supabase JWT verifier
+ */
+function getSupabaseVerifier(): JWTVerifier {
+    if (!supabaseVerifier) {
+        supabaseVerifier = createSupabaseJWTVerifier(
+            env.supabaseUrl,
+            env.supabaseServiceRoleKey
+        );
+    }
+    return supabaseVerifier;
+}
+
+/**
  * Express authentication middleware
+ * 
+ * Verifies Supabase JWT tokens and attaches user to request.
  */
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
-    const verifier: JWTVerifier = mockJWTVerifier; // TODO: Replace with real JWT verifier
+    const verifier = getSupabaseVerifier();
     const auth = createAuthMiddleware(verifier);
 
     auth(req.headers.authorization)
@@ -35,6 +56,21 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
         .catch(error => {
             next(error);
         });
+}
+
+/**
+ * Express optional authentication middleware.
+ *
+ * If a bearer token is present, it is verified and attached to the request.
+ * If no token is present, the request continues as a guest request.
+ */
+export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction): void {
+    if (!req.headers.authorization) {
+        next();
+        return;
+    }
+
+    authMiddleware(req, res, next);
 }
 
 /**

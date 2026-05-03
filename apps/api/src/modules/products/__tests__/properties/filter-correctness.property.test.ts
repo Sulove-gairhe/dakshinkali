@@ -167,9 +167,9 @@ function productMatchesFilters(product: ProductEntity, filters: RepositoryFilter
 }
 
 describe('Property Test: Filter Correctness', () => {
-    it('should return only products that match ALL specified filter criteria', () => {
-        fc.assert(
-            fc.property(
+    it('should return only products that match ALL specified filter criteria', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 0, maxLength: 100 }),
                 repositoryFiltersArbitrary,
                 (products, filters) => {
@@ -197,9 +197,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should filter by category correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should filter by category correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 fc.constantFrom('Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Toys'),
                 (products, category) => {
@@ -216,9 +216,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should filter by status correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should filter by status correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 productStatusArbitrary,
                 (products, status) => {
@@ -235,9 +235,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should filter by price range correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should filter by price range correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 fc.double({ min: 0, max: 50000, noNaN: true }),
                 fc.double({ min: 50000, max: 100000, noNaN: true }),
@@ -256,9 +256,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should filter by search term correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should filter by search term correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 fc.string({ minLength: 1, maxLength: 20 }),
                 (products, searchTerm) => {
@@ -279,9 +279,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should exclude soft-deleted products when includeDeleted is false', () => {
-        fc.assert(
-            fc.property(
+    it('should exclude soft-deleted products when includeDeleted is false', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 (products) => {
                     const filters: RepositoryFilters = { includeDeleted: false };
@@ -297,9 +297,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should include soft-deleted products when includeDeleted is true', () => {
-        fc.assert(
-            fc.property(
+    it('should include soft-deleted products when includeDeleted is true', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 (products) => {
                     const filters: RepositoryFilters = { includeDeleted: true };
@@ -320,9 +320,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should apply multiple filters correctly (combination test)', () => {
-        fc.assert(
-            fc.property(
+    it('should apply multiple filters correctly (combination test)', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 10, maxLength: 100 }),
                 fc.constantFrom('Electronics', 'Clothing', 'Books'),
                 productStatusArbitrary,
@@ -352,9 +352,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should return empty array when no products match filters', () => {
-        fc.assert(
-            fc.property(
+    it('should return empty array when no products match filters', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 (products) => {
                     // Create a filter that is unlikely to match any product
@@ -374,9 +374,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should handle edge case: empty product list', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: empty product list', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 repositoryFiltersArbitrary,
                 (filters) => {
                     const products: ProductEntity[] = [];
@@ -390,9 +390,9 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 
-    it('should handle edge case: no filters applied', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: no filters applied', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 (products) => {
                     const filters: RepositoryFilters = {};
@@ -407,3 +407,4 @@ describe('Property Test: Filter Correctness', () => {
         );
     });
 });
+

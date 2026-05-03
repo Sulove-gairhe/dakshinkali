@@ -26,6 +26,9 @@ import { Pagination, PaginatedResult, PublicProductFilters } from '../../types/p
  * Arbitrary generator for ProductStatus
  */
 const productStatusArbitrary = fc.constantFrom<ProductStatus>('active', 'inactive', 'out_of_stock');
+const validDateArbitrary = fc
+    .date({ min: new Date('2020-01-01'), max: new Date('2024-12-31') })
+    .filter(date => !Number.isNaN(date.getTime()));
 
 /**
  * Arbitrary generator for ProductEntity
@@ -47,8 +50,8 @@ const productEntityArbitrary = fc.record({
         }),
         { maxLength: 5 }
     ),
-    createdAt: fc.date({ min: new Date('2020-01-01'), max: new Date('2024-12-31') }),
-    updatedAt: fc.date({ min: new Date('2020-01-01'), max: new Date('2024-12-31') }),
+    createdAt: validDateArbitrary,
+    updatedAt: validDateArbitrary,
     deletedAt: fc.option(fc.date({ min: new Date('2020-01-01'), max: new Date('2024-12-31') }), { nil: null }),
 });
 
@@ -280,9 +283,9 @@ describe('Property Test: Sort Order Correctness', () => {
         productService = new ProductServiceImpl(mockRepository, mockImageStorage);
     });
 
-    it('should return products sorted correctly for any sort criteria and order', () => {
-        fc.assert(
-            fc.property(
+    it('should return products sorted correctly for any sort criteria and order', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 2, maxLength: 100 }),
                 sortByArbitrary,
                 sortOrderArbitrary,
@@ -316,9 +319,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should sort by price in ascending order correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should sort by price in ascending order correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 2, maxLength: 50 }),
                 async (products) => {
                     // Ensure all products are active and non-deleted
@@ -348,9 +351,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should sort by price in descending order correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should sort by price in descending order correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 2, maxLength: 50 }),
                 async (products) => {
                     // Ensure all products are active and non-deleted
@@ -380,9 +383,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should sort by name in ascending order correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should sort by name in ascending order correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 2, maxLength: 50 }),
                 async (products) => {
                     // Ensure all products are active and non-deleted
@@ -414,9 +417,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should sort by name in descending order correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should sort by name in descending order correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 2, maxLength: 50 }),
                 async (products) => {
                     // Ensure all products are active and non-deleted
@@ -448,9 +451,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should sort by createdAt in ascending order correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should sort by createdAt in ascending order correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 2, maxLength: 50 }),
                 async (products) => {
                     // Ensure all products are active and non-deleted
@@ -482,9 +485,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should sort by createdAt in descending order correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should sort by createdAt in descending order correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 2, maxLength: 50 }),
                 async (products) => {
                     // Ensure all products are active and non-deleted
@@ -516,13 +519,13 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should maintain sort order across pagination', () => {
-        fc.assert(
-            fc.property(
+    it('should maintain sort order across pagination', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 20, maxLength: 100 }),
                 sortByArbitrary,
                 sortOrderArbitrary,
-                fc.nat({ min: 5, max: 20 }),
+                fc.integer({ min: 5, max: 20 }),
                 async (products, sortBy, sortOrder, pageSize) => {
                     // Ensure all products are active and non-deleted
                     const activeProducts = products.map(p => ({
@@ -556,9 +559,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should handle edge case: products with identical sort values', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: products with identical sort values', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 5, maxLength: 20 }),
                 sortByArbitrary,
                 sortOrderArbitrary,
@@ -616,9 +619,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should handle edge case: empty product list', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: empty product list', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 sortByArbitrary,
                 sortOrderArbitrary,
                 async (sortBy, sortOrder) => {
@@ -638,9 +641,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should handle edge case: single product', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: single product', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 productEntityArbitrary,
                 sortByArbitrary,
                 sortOrderArbitrary,
@@ -671,9 +674,9 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 
-    it('should combine sorting with other filters correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should combine sorting with other filters correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 10, maxLength: 100 }),
                 fc.constantFrom('Electronics', 'Clothing', 'Books'),
                 sortByArbitrary,
@@ -711,3 +714,4 @@ describe('Property Test: Sort Order Correctness', () => {
         );
     });
 });
+

@@ -316,10 +316,11 @@ export class ProductRepositoryImpl implements ProductRepository {
             query = query.lte('price', filters.maxPrice);
         }
 
-        if (filters.search) {
+        const searchTerm = filters.search?.trim();
+        if (searchTerm) {
             // Escape special characters in search term to prevent SQL injection
             // Supabase PostgREST requires manual escaping for pattern matching
-            const escapedSearch = filters.search.replace(/[%_]/g, '\\$&');
+            const escapedSearch = searchTerm.replace(/[%_]/g, '\\$&');
 
             // Use ilike for case-insensitive pattern matching
             // The query builder properly parameterizes the escaped value
@@ -441,9 +442,10 @@ export class ProductRepositoryImpl implements ProductRepository {
             query = query.lte('price', filters.maxPrice);
         }
 
-        if (filters.search) {
+        const searchTerm = filters.search?.trim();
+        if (searchTerm) {
             // Escape special characters in search term to prevent SQL injection
-            const escapedSearch = filters.search.replace(/[%_]/g, '\\$&');
+            const escapedSearch = searchTerm.replace(/[%_]/g, '\\$&');
             query = query.or(`name.ilike.%${escapedSearch}%,description.ilike.%${escapedSearch}%`);
         }
 

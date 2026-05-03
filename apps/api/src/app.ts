@@ -13,6 +13,9 @@ import path from 'path';
 import { env } from './config/env.config';
 import { errorHandlerMiddleware } from './common/middleware/express-adapters';
 import { registerProductRoutes } from './modules/products/routes/express.routes';
+import { registerCartRoutes } from './modules/cart/routes/express.routes';
+import { registerOrderRoutes } from './modules/orders';
+import { registerAdminSupportRoutes } from './modules/admin';
 import { checkDatabaseHealth, isDatabaseConnected } from './lib/database';
 
 /**
@@ -32,7 +35,7 @@ export function createApp(): Express {
         origin: env.corsOrigins,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+                allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-ID'],
     }));
 
     // API Versioning header
@@ -103,6 +106,15 @@ export function createApp(): Express {
 
     // Product routes
     registerProductRoutes(app);
+
+    // Cart routes
+    registerCartRoutes(app);
+
+    // Order routes
+    registerOrderRoutes(app);
+
+    // Profile and admin dashboard/user routes
+    registerAdminSupportRoutes(app);
 
     // ===== 404 Handler =====
 

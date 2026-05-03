@@ -46,18 +46,25 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      * @throws ImageStorageError if upload fails
      */
     async uploadImage(
-        file: StoredFile,
-        productId: string
+        file: StoredFile | Buffer | Blob,
+        productId: string,
+        originalFilename?: string
     ): Promise<ImageUploadResult> {
+        const storedFile = this.normalizeFile(file, originalFilename);
+
         // Validate file before upload
-        this.validateImageFile(file);
+        this.validateImageFile(storedFile);
 
         try {
             // Generate unique filename
-            const filename = this.generateUniqueFilename(file.originalName);
+            const filename = this.generateUniqueFilename(storedFile.originalName);
 
-            // Upload to Supabase Storage
-            const result = await this.storage.uploadImage(productId, file);
+            const uploadInput = this.isStoredFile(file) ? storedFile : file;
+            const result = await (this.storage as any).uploadImage(
+                productId,
+                uploadInput,
+                this.isStoredFile(file) ? undefined : storedFile.originalName
+            );
 
             return {
                 url: result.url,
@@ -101,9 +108,12 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      */
     async deleteImages(imageUrls: string[]): Promise<void> {
         try {
-            // Delete each image individually since ProductImageStorage doesn't have batch delete
-            for (const imageUrl of imageUrls) {
-                await this.storage.deleteImage(imageUrl);
+            if (typeof (this.storage as any).deleteImages === 'function') {
+                await (this.storage as any).deleteImages(imageUrls);
+            } else {
+                for (const imageUrl of imageUrls) {
+                    await this.storage.deleteImage(imageUrl);
+                }
             }
         } catch (error) {
             // Log error but don't throw - graceful error handling
@@ -134,11 +144,16 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      * @param file - Standardized backend file object
      * @throws ImageValidationError if validation fails with descriptive message
      */
-    validateImageFile(file: StoredFile): void {
+    validateImageFile(file: { mimetype?: string; type?: string; size: number }): void {
+        const mimetype = file.mimetype || file.type;
+        if (!mimetype) {
+            throw new ImageValidationError('File type is required');
+        }
+
         // Validate MIME type is allowed (JPEG, PNG, WebP only)
-        if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype as any)) {
+        if (!ALLOWED_IMAGE_TYPES.includes(mimetype as any)) {
             throw new ImageValidationError(
-                `Invalid file type. Allowed types: JPEG, PNG, WebP. Received: ${file.mimetype}`
+                `Invalid file type. Allowed types: JPEG, PNG, WebP. Received: ${mimetype}`
             );
         }
 
@@ -149,6 +164,52 @@ export class ImageStorageServiceImpl implements ImageStorageService {
             throw new ImageValidationError(
                 `File size exceeds maximum limit of ${maxSizeMB}MB. File size: ${fileSizeMB}MB`
             );
+        }
+    }
+
+    private normalizeFile(file: StoredFile | Buffer | Blob, originalFilename?: string): StoredFile {
+        if (Buffer.isBuffer(file)) {
+            const filename = originalFilename || 'upload.jpg';
+            return {
+                buffer: file,
+                size: file.length,
+                mimetype: this.inferMimeType(filename),
+                originalName: filename,
+            };
+        }
+
+        if (typeof Blob !== 'undefined' && file instanceof Blob) {
+            const filename = originalFilename || 'upload.jpg';
+            return {
+                buffer: Buffer.from([]),
+                size: file.size,
+                mimetype: file.type || this.inferMimeType(filename),
+                originalName: filename,
+            };
+        }
+
+        return file as StoredFile;
+    }
+
+    private isStoredFile(file: StoredFile | Buffer | Blob): file is StoredFile {
+        return !Buffer.isBuffer(file) &&
+            !(typeof Blob !== 'undefined' && file instanceof Blob) &&
+            typeof (file as StoredFile).mimetype === 'string' &&
+            typeof (file as StoredFile).originalName === 'string';
+    }
+
+    private inferMimeType(filename: string): string {
+        const extension = filename.split('.').pop()?.toLowerCase();
+        switch (extension) {
+            case 'jpg':
+            case 'jpeg':
+                return 'image/jpeg';
+            case 'png':
+                return 'image/png';
+            case 'webp':
+                return 'image/webp';
+            default:
+                return 'application/octet-stream';
         }
     }
 }

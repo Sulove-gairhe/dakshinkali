@@ -3,7 +3,21 @@
 **Module:** Cart Management  
 **Version:** 1.0.0  
 **Date:** 2026-05-03  
-**Status:** Ready for Execution
+**Status:** Backend implemented; live integration verification remains
+
+## Senior Recovery Status (2026-05-03)
+
+The original task list below was stale: several layers had been generated while the file still said "Pending", and the previous audit overstated readiness.
+
+- Database migrations are consolidated to the `20260503100000` and `20260503100100` migration pair.
+- Repository layer is implemented and unit-tested; `findWithItems` still needs real Supabase integration coverage.
+- Service layer is implemented with owner-context validation and corrected merge quantity handling; focused service unit tests now pass.
+- API layer is implemented with controller/routes and registered in `app.ts`.
+- Swagger/OpenAPI includes the cart endpoints.
+- Verification passes for `pnpm test`, `pnpm --filter @dakshinkali/api type-check`, and OpenAPI YAML parsing.
+- Remaining before production: Supabase integration tests and manual endpoint verification with real auth/session flows.
+
+The detailed task checklist below is historical and still contains stale "Pending" labels. Treat this recovery status and the steering status as authoritative until the full checklist is normalized.
 
 ---
 

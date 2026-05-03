@@ -12,9 +12,11 @@
     },
     "dependencies": {
         "@dakshinkali/database": "workspace:*",
+        "@supabase/supabase-js": "^2.105.1",
         "cors": "^2.8.5",
         "dotenv": "^16.0.3",
         "express": "^4.18.2",
+        "jose": "^6.2.3",
         "swagger-ui-express": "^5.0.1",
         "yamljs": "^0.3.0"
     },

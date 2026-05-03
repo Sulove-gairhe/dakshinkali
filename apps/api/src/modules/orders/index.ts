@@ -1,0 +1,1 @@
+export { registerOrderRoutes } from './routes';

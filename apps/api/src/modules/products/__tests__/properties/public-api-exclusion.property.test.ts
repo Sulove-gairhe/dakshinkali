@@ -255,9 +255,9 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         productService = new ProductServiceImpl(mockRepository, mockImageStorage);
     });
 
-    it('should never return deleted products in listActiveProducts', () => {
-        fc.assert(
-            fc.property(
+    it('should never return deleted products in listActiveProducts', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 100 }),
                 publicFiltersArbitrary,
                 async (products, filters) => {
@@ -289,9 +289,9 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should never return inactive products in listActiveProducts', () => {
-        fc.assert(
-            fc.property(
+    it('should never return inactive products in listActiveProducts', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 100 }),
                 publicFiltersArbitrary,
                 async (products, filters) => {
@@ -323,16 +323,20 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should never return deleted products in getActiveProductById', () => {
-        fc.assert(
-            fc.property(
+    it('should never return deleted products in getActiveProductById', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 async (products) => {
-                    // Set up mock repository with test products
-                    mockRepository.setProducts(products);
+                    // Set up mock repository with stable unique IDs.
+                    const uniqueProducts = products.map((product, index) => ({
+                        ...product,
+                        id: `test-product-${index}`,
+                    }));
+                    mockRepository.setProducts(uniqueProducts);
 
                     // Test each product
-                    for (const product of products) {
+                    for (const product of uniqueProducts) {
                         const result = await productService.getActiveProductById(product.id);
 
                         if (product.deletedAt !== null) {
@@ -358,16 +362,20 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should never return inactive products in getActiveProductById', () => {
-        fc.assert(
-            fc.property(
+    it('should never return inactive products in getActiveProductById', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 async (products) => {
-                    // Set up mock repository with test products
-                    mockRepository.setProducts(products);
+                    // Set up mock repository with stable unique IDs.
+                    const uniqueProducts = products.map((product, index) => ({
+                        ...product,
+                        id: `test-product-${index}`,
+                    }));
+                    mockRepository.setProducts(uniqueProducts);
 
                     // Test each product
-                    for (const product of products) {
+                    for (const product of uniqueProducts) {
                         const result = await productService.getActiveProductById(product.id);
 
                         if (product.status !== 'active') {
@@ -391,14 +399,18 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should only return products that are both active AND non-deleted', () => {
-        fc.assert(
-            fc.property(
+    it('should only return products that are both active AND non-deleted', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 10, maxLength: 100 }),
                 publicFiltersArbitrary,
                 async (products, filters) => {
-                    // Set up mock repository with test products
-                    mockRepository.setProducts(products);
+                    // Set up mock repository with stable unique IDs.
+                    const uniqueProducts = products.map((product, index) => ({
+                        ...product,
+                        id: `test-product-${index}`,
+                    }));
+                    mockRepository.setProducts(uniqueProducts);
 
                     // Call public API method
                     const pagination: Pagination = { page: 1, pageSize: 100 };
@@ -411,7 +423,7 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
                     }
 
                     // Count products that should be excluded
-                    const shouldBeExcluded = products.filter(p =>
+                    const shouldBeExcluded = uniqueProducts.filter(p =>
                         p.deletedAt !== null || p.status !== 'active'
                     );
 
@@ -429,9 +441,9 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should handle edge case: all products are deleted', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: all products are deleted', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 publicFiltersArbitrary,
                 async (products, filters) => {
@@ -459,9 +471,9 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should handle edge case: all products are inactive', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: all products are inactive', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 publicFiltersArbitrary,
                 async (products, filters) => {
@@ -490,9 +502,9 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should handle edge case: mix of active, inactive, and deleted products', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: mix of active, inactive, and deleted products', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.nat({ max: 30 }),
                 fc.nat({ max: 30 }),
                 fc.nat({ max: 30 }),
@@ -536,9 +548,9 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should handle edge case: product with out_of_stock status', () => {
-        fc.assert(
-            fc.property(
+    it('should handle edge case: product with out_of_stock status', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 publicFiltersArbitrary,
                 async (products, filters) => {
@@ -569,9 +581,9 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 
-    it('should maintain exclusion rules across pagination', () => {
-        fc.assert(
-            fc.property(
+    it('should maintain exclusion rules across pagination', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 20, maxLength: 100 }),
                 fc.nat({ min: 1, max: 10 }),
                 publicFiltersArbitrary,
@@ -599,3 +611,4 @@ describe('Property Test: Public API Exclusion of Deleted and Inactive Products',
         );
     });
 });
+

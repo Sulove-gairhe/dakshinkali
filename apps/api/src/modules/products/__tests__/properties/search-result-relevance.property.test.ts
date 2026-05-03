@@ -255,9 +255,9 @@ describe('Property Test: Search Result Relevance', () => {
         productService = new ProductServiceImpl(mockRepository, mockImageStorage);
     });
 
-    it('should return only products that contain the search term in name or description', () => {
-        fc.assert(
-            fc.property(
+    it('should return only products that contain the search term in name or description', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 100 }),
                 searchTermArbitrary,
                 async (products, searchTerm) => {
@@ -283,9 +283,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should perform case-insensitive search', () => {
-        fc.assert(
-            fc.property(
+    it('should perform case-insensitive search', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 fc.string({ minLength: 1, maxLength: 20 }),
                 async (products, searchTerm) => {
@@ -319,9 +319,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should search in product name', () => {
-        fc.assert(
-            fc.property(
+    it('should search in product name', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.string({ minLength: 3, maxLength: 20 }),
                 fc.nat({ max: 20 }),
                 async (searchTerm, productCount) => {
@@ -359,9 +359,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should search in product description', () => {
-        fc.assert(
-            fc.property(
+    it('should search in product description', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.string({ minLength: 3, maxLength: 20 }),
                 fc.nat({ max: 20 }),
                 async (searchTerm, productCount) => {
@@ -399,9 +399,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should handle products with null description', () => {
-        fc.assert(
-            fc.property(
+    it('should handle products with null description', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.string({ minLength: 3, maxLength: 20 }),
                 fc.nat({ min: 5, max: 30 }),
                 async (searchTerm, productCount) => {
@@ -437,9 +437,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should return empty array when no products match search term', () => {
-        fc.assert(
-            fc.property(
+    it('should return empty array when no products match search term', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 async (products) => {
                     // Use a search term that is unlikely to match
@@ -472,9 +472,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should combine search with other filters correctly', () => {
-        fc.assert(
-            fc.property(
+    it('should combine search with other filters correctly', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 10, maxLength: 100 }),
                 fc.string({ minLength: 3, maxLength: 20 }),
                 fc.constantFrom('Electronics', 'Clothing', 'Books'),
@@ -524,9 +524,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should handle partial word matches', () => {
-        fc.assert(
-            fc.property(
+    it('should handle partial word matches', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.constantFrom('phone', 'laptop', 'shirt', 'book'),
                 fc.nat({ min: 5, max: 20 }),
                 async (baseWord, productCount) => {
@@ -565,9 +565,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should handle single character search terms', () => {
-        fc.assert(
-            fc.property(
+    it('should handle single character search terms', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 10, maxLength: 50 }),
                 fc.constantFrom('a', 'e', 'i', 'o', 'u'),
                 async (products, singleChar) => {
@@ -597,9 +597,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should maintain search relevance across pagination', () => {
-        fc.assert(
-            fc.property(
+    it('should maintain search relevance across pagination', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.string({ minLength: 3, maxLength: 20 }),
                 fc.nat({ min: 30, max: 100 }),
                 fc.nat({ min: 5, max: 20 }),
@@ -638,9 +638,9 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 
-    it('should handle empty search term gracefully', () => {
-        fc.assert(
-            fc.property(
+    it('should handle empty search term gracefully', async () => {
+        await fc.assert(
+            fc.asyncProperty(
                 fc.array(productEntityArbitrary, { minLength: 1, maxLength: 50 }),
                 async (products) => {
                     // Set up products with active status
@@ -669,3 +669,4 @@ describe('Property Test: Search Result Relevance', () => {
         );
     });
 });
+
