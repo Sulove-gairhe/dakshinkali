@@ -223,7 +223,7 @@ describe('Product API Integration Tests', () => {
 
             // Assert
             expect(response.statusCode).toBe(200);
-            expect(response.body.data.length).toBe(2);
+            expect(response.body.data.length).toBe(1); // Only iPhone 15 (999.99) matches 900-1000 range
             expect(response.body.data.every((p: any) => p.price >= 900 && p.price <= 1000)).toBe(true);
         });
 

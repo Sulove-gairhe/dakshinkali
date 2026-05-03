@@ -22,6 +22,8 @@ import { UnauthorizedException } from '../exceptions/unauthorized.exception';
 import { ForbiddenException } from '../exceptions/forbidden.exception';
 import { NotFoundException } from '../exceptions/not-found.exception';
 import { ConflictException } from '../exceptions/conflict.exception';
+import { ProductNotFoundException } from '../../modules/products/exceptions/product-not-found.exception';
+import { logger } from '../../lib/logger';
 
 /**
  * Standard error response format
@@ -57,35 +59,35 @@ export type ErrorHandler = (
     body: ErrorResponse;
 };
 
+type TestLogger = (level: 'error' | 'warn' | 'info', message: string, meta?: Record<string, any>) => void;
+
 /**
  * Create error handler middleware
  * 
- * @param logger - Optional logger function for error logging
  * @returns Error handler function
- * 
- * @example
- * ```typescript
- * const errorHandler = createErrorHandler((level, message, meta) => {
- *   console.log(`[${level}] ${message}`, meta);
- * });
- * 
- * // In Express
- * app.use((err, req, res, next) => {
- *   const context = {
- *     method: req.method,
- *     url: req.url,
- *     requestId: req.id,
- *     userId: req.user?.id,
- *     timestamp: new Date().toISOString()
- *   };
- *   const { statusCode, body } = errorHandler(err, context);
- *   res.status(statusCode).json(body);
- * });
- * ```
  */
-export function createErrorHandler(
-    logger?: (level: 'error' | 'warn' | 'info', message: string, meta?: Record<string, any>) => void
-): ErrorHandler {
+export function createErrorHandler(testLogger?: TestLogger): ErrorHandler {
+    const logInfo = (message: string, meta: Record<string, any>) => {
+        if (testLogger) testLogger('info', message, meta);
+        else logger.info(message, meta);
+    };
+    const logWarn = (message: string, meta: Record<string, any>) => {
+        if (testLogger) testLogger('warn', message, meta);
+        else logger.warn(message, meta);
+    };
+    const logError = (message: string, error: Error, meta: Record<string, any>) => {
+        if (testLogger) {
+            testLogger('error', message, {
+                ...meta,
+                errorName: error.name,
+                errorMessage: error.message,
+                stack: error.stack,
+            });
+        } else {
+            logger.error(message, error, meta);
+        }
+    };
+
     return (error: Error, context: RequestContext) => {
         // Determine status code and error response based on exception type
         let statusCode: number;
@@ -102,8 +104,7 @@ export function createErrorHandler(
                 },
             };
 
-            // Log validation errors at info level (not critical)
-            logger?.('info', 'Validation error', {
+            logInfo('Validation error', {
                 ...context,
                 errorCode: 'VALIDATION_ERROR',
                 fields: error.fields,
@@ -118,8 +119,7 @@ export function createErrorHandler(
                 },
             };
 
-            // Log auth failures at warn level
-            logger?.('warn', 'Authentication failure', {
+            logWarn('Authentication failure', {
                 ...context,
                 errorCode: 'UNAUTHORIZED',
             });
@@ -133,13 +133,26 @@ export function createErrorHandler(
                 },
             };
 
-            // Log authorization failures at warn level
-            logger?.('warn', 'Authorization failure', {
+            logWarn('Authorization failure', {
                 ...context,
                 errorCode: 'FORBIDDEN',
             });
+        } else if (error instanceof ProductNotFoundException) {
+            // 404 Not Found - Product not found (specific)
+            statusCode = 404;
+            errorResponse = {
+                error: {
+                    code: 'PRODUCT_NOT_FOUND',
+                    message: error.message,
+                },
+            };
+
+            logInfo('Product not found', {
+                ...context,
+                errorCode: 'PRODUCT_NOT_FOUND',
+            });
         } else if (error instanceof NotFoundException) {
-            // 404 Not Found - Resource not found
+            // 404 Not Found - Resource not found (generic)
             statusCode = 404;
             errorResponse = {
                 error: {
@@ -148,8 +161,7 @@ export function createErrorHandler(
                 },
             };
 
-            // Log not found at info level (expected behavior)
-            logger?.('info', 'Resource not found', {
+            logInfo('Resource not found', {
                 ...context,
                 errorCode: 'NOT_FOUND',
             });
@@ -163,8 +175,7 @@ export function createErrorHandler(
                 },
             };
 
-            // Log conflicts at warn level
-            logger?.('warn', 'Conflict error', {
+            logWarn('Conflict error', {
                 ...context,
                 errorCode: 'CONFLICT',
             });
@@ -178,13 +189,9 @@ export function createErrorHandler(
                 },
             };
 
-            // Log unexpected errors at error level with stack trace
-            logger?.('error', 'Unexpected error', {
+            logError('Unexpected error', error, {
                 ...context,
                 errorCode: 'INTERNAL_SERVER_ERROR',
-                errorName: error.name,
-                errorMessage: error.message,
-                stack: error.stack,
             });
         }
 
@@ -196,17 +203,6 @@ export function createErrorHandler(
 }
 
 /**
- * Default error handler instance with console logging
+ * Default error handler instance with structured logging
  */
-export const defaultErrorHandler = createErrorHandler((level, message, meta) => {
-    const timestamp = new Date().toISOString();
-    const logMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
-
-    if (level === 'error') {
-        console.error(logMessage, meta);
-    } else if (level === 'warn') {
-        console.warn(logMessage, meta);
-    } else {
-        console.log(logMessage, meta);
-    }
-});
+export const defaultErrorHandler = createErrorHandler();

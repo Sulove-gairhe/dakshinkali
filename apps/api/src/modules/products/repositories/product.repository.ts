@@ -18,7 +18,7 @@
  */
 
 import { ProductEntity } from '../entities/product.entity';
-import { Pagination, PaginatedResult, RepositoryFilters } from '../types/product.types';
+import { Pagination, PaginatedResult, RepositoryFilters, CursorPagination, CursorPaginatedResult } from '../types/product.types';
 
 /**
  * ProductRepository interface
@@ -172,4 +172,37 @@ export interface ProductRepository {
      * **Validates: Requirements 1.5, 3.5**
      */
     existsByNameAndCategory(name: string, category: string, excludeId?: string): Promise<boolean>;
+
+    /**
+     * Find all products using cursor-based pagination (OPTIONAL ENHANCEMENT)
+     * 
+     * @param filters - RepositoryFilters for query conditions
+     * @param cursorPagination - Cursor pagination parameters
+     * @returns Promise resolving to CursorPaginatedResult with products and next cursor
+     * 
+     * @remarks
+     * **Why Cursor-Based Pagination?**
+     * - More efficient for large datasets (>10k rows)
+     * - Consistent results even when data changes between requests
+     * - O(1) performance regardless of page depth (vs O(n) for offset)
+     * - Prevents "page drift" when items are added/removed
+     * 
+     * **How It Works:**
+     * - Cursor encodes the position of the last item (created_at + id)
+     * - Next query uses WHERE (created_at, id) < (cursor_created_at, cursor_id)
+     * - Leverages composite index for efficient seeking
+     * - No COUNT query needed (better performance)
+     * 
+     * **Cursor Format:**
+     * - Base64-encoded JSON: { "created_at": "ISO8601", "id": "UUID" }
+     * - Opaque to clients (implementation can change)
+     * 
+     * **Trade-offs:**
+     * - Cannot jump to arbitrary pages (only next/previous)
+     * - No total count or page numbers
+     * - Best for infinite scroll UIs
+     * 
+     * **Validates: Requirements 15.4**
+     */
+    findAllCursor?(filters: RepositoryFilters, cursorPagination: CursorPagination): Promise<CursorPaginatedResult<ProductEntity>>;
 }

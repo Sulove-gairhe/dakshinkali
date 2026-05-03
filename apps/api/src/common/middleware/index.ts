@@ -22,6 +22,27 @@ export {
     JWTVerifier,
 } from './auth.middleware';
 
+// Supabase Authentication
+export {
+    createSupabaseJWTVerifier,
+    createSupabaseJWTVerifierLocal,
+    extractJWTSecret,
+    SupabaseJWTPayload,
+} from './supabase-auth.middleware';
+
+// Role-Based Authorization
+export {
+    createRoleMiddleware,
+    requireAdmin as requireAdminRole,
+    requireCustomer,
+    requireAuthenticated,
+    hasRole,
+    hasAnyRole,
+    getUserRole,
+    UserRole,
+    RoleRequirement,
+} from './role.middleware';
+
 // Authorization
 export {
     createAdminAuthMiddleware,

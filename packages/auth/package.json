@@ -1,0 +1,23 @@
+{
+    "name": "@dakshinkali/auth",
+    "version": "0.1.0",
+    "private": true,
+    "main": "./index.ts",
+    "types": "./index.ts",
+    "scripts": {
+        "lint": "eslint .",
+        "type-check": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@supabase/ssr": "^0.5.2",
+        "@supabase/supabase-js": "^2.45.4"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.0",
+        "react": "^18.2.0",
+        "typescript": "^5.0.0"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0"
+    }
+}

@@ -25,6 +25,7 @@ export {
     MAX_IMAGES_PER_PRODUCT,
     PRODUCT_IMAGES_BUCKET_CONFIG,
     type StorageBucketConfig,
+    type StoredFile,
     type FileValidationResult,
     validateImageFile,
     generateUniqueFilename,

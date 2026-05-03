@@ -10,6 +10,17 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
 /**
+ * Standardized file upload contract for backend
+ * No unions, no browser types, no confusion
+ */
+export interface StoredFile {
+    buffer: Buffer;
+    size: number;
+    mimetype: string;
+    originalName: string;
+}
+
+/**
  * Storage bucket configuration
  */
 export interface StorageBucketConfig {
@@ -205,14 +216,14 @@ export function getPublicUrl(
  * @param supabase - Supabase client
  * @param bucketName - Storage bucket name
  * @param filePath - Destination path in bucket
- * @param file - File to upload
+ * @param file - File buffer to upload
  * @returns Upload result with public URL
  */
 export async function uploadFile(
     supabase: SupabaseClient,
     bucketName: string,
     filePath: string,
-    file: File | Buffer | Blob
+    file: Buffer
 ): Promise<{ url: string; path: string }> {
     const { data, error } = await supabase.storage
         .from(bucketName)
@@ -322,25 +333,21 @@ export class ProductImageStorage {
      * Upload product image
      * 
      * @param productId - Product UUID
-     * @param file - Image file to upload
-     * @param originalFilename - Original filename
+     * @param file - Image file to upload (backend Buffer format)
      * @returns Upload result with public URL and storage path
      */
     async uploadImage(
         productId: string,
-        file: File | Buffer | Blob,
-        originalFilename: string
+        file: StoredFile
     ): Promise<{ url: string; path: string }> {
-        // Validate file if it's a File object
-        if (file instanceof File) {
-            const validation = validateImageFile(file);
-            if (!validation.valid) {
-                throw new Error(validation.error);
-            }
+        // Validate file
+        const validation = validateImageFile({ type: file.mimetype, size: file.size });
+        if (!validation.valid) {
+            throw new Error(validation.error);
         }
 
         // Generate unique filename
-        const filename = generateUniqueFilename(originalFilename);
+        const filename = generateUniqueFilename(file.originalName);
         const filePath = getProductImagePath(productId, filename);
 
         // Upload to storage
@@ -348,7 +355,7 @@ export class ProductImageStorage {
             this.supabase,
             PRODUCT_IMAGES_BUCKET_CONFIG.name,
             filePath,
-            file
+            file.buffer
         );
     }
 

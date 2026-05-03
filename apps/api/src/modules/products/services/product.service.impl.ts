@@ -17,6 +17,7 @@
 import { ProductEntity, ProductImage } from '../entities/product.entity';
 import { ProductRepository } from '../repositories/product.repository';
 import { ImageStorageService } from './image-storage.service';
+import type { StoredFile } from '@dakshinkali/database';
 import {
     ProductService,
     CreateProductData,
@@ -50,7 +51,7 @@ export class ProductServiceImpl implements ProductService {
      */
     async createProduct(data: CreateProductData, images?: File[]): Promise<ProductEntity> {
         // Validate business rules
-        ProductValidator.validateProductData(data);
+        ProductValidator.validateCreateProduct(data);
         ProductValidator.validateImageCount(images?.length || 0);
 
         // Check name uniqueness within category
@@ -69,17 +70,18 @@ export class ProductServiceImpl implements ProductService {
             for (let i = 0; i < images.length; i++) {
                 const file = images[i];
 
-                // Validate each image file
-                this.imageStorage.validateImageFile({
-                    mimetype: file.type,
+                // Convert File to StoredFile
+                const storedFile: StoredFile = {
+                    buffer: await this.fileToBuffer(file),
                     size: file.size,
-                });
+                    mimetype: file.type,
+                    originalName: file.name,
+                };
 
-                // Upload image
+                // Upload image (validation happens inside)
                 const result = await this.imageStorage.uploadImage(
-                    await this.fileToBuffer(file),
-                    productId,
-                    file.name
+                    storedFile,
+                    productId
                 );
 
                 uploadedImages.push({
@@ -134,10 +136,8 @@ export class ProductServiceImpl implements ProductService {
             throw new Error(`Product with ID '${id}' not found.`);
         }
 
-        // Validate price if being updated
-        if (data.price !== undefined) {
-            ProductValidator.validatePrice(data.price);
-        }
+        // Validate update data
+        ProductValidator.validateUpdateProduct(data);
 
         // Check name uniqueness if name is being changed
         if (data.name && data.name !== existing.name) {
@@ -170,17 +170,18 @@ export class ProductServiceImpl implements ProductService {
             for (let i = 0; i < images.length; i++) {
                 const file = images[i];
 
-                // Validate each image file
-                this.imageStorage.validateImageFile({
-                    mimetype: file.type,
+                // Convert File to StoredFile
+                const storedFile: StoredFile = {
+                    buffer: await this.fileToBuffer(file),
                     size: file.size,
-                });
+                    mimetype: file.type,
+                    originalName: file.name,
+                };
 
-                // Upload image
+                // Upload image (validation happens inside)
                 const result = await this.imageStorage.uploadImage(
-                    await this.fileToBuffer(file),
-                    id,
-                    file.name
+                    storedFile,
+                    id
                 );
 
                 uploadedImages.push({

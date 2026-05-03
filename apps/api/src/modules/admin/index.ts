@@ -1,0 +1,1 @@
+export { registerAdminSupportRoutes } from './routes';

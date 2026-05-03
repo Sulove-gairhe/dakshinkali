@@ -15,10 +15,11 @@ import {
 } from './image-storage.service';
 import {
     ProductImageStorage,
+    StoredFile,
     ALLOWED_IMAGE_TYPES,
     MAX_IMAGE_SIZE_BYTES,
     generateUniqueFilename as generateFilename,
-} from '@packages/database/storage.config';
+} from '@dakshinkali/database';
 
 /**
  * ImageStorageServiceImpl
@@ -29,8 +30,8 @@ import {
 export class ImageStorageServiceImpl implements ImageStorageService {
     private storage: ProductImageStorage;
 
-    constructor(storage?: ProductImageStorage) {
-        this.storage = storage || new ProductImageStorage();
+    constructor(storage: ProductImageStorage) {
+        this.storage = storage;
     }
 
     /**
@@ -38,36 +39,35 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      * 
      * Requirements: 11.1, 11.4 (Upload to Supabase Storage, return public URL)
      * 
-     * @param file - Image file buffer or blob
+     * @param file - Standardized backend file object
      * @param productId - Product UUID for organizing storage
-     * @param originalFilename - Original filename with extension
      * @returns Image upload result with public URL and generated filename
      * @throws ImageValidationError if file validation fails
      * @throws ImageStorageError if upload fails
      */
     async uploadImage(
-        file: Buffer | Blob,
+        file: StoredFile | Buffer | Blob,
         productId: string,
-        originalFilename: string
+        originalFilename?: string
     ): Promise<ImageUploadResult> {
-        // Validate file before upload
-        const fileSize = file instanceof Buffer ? file.length : file.size;
-        const mimeType = this.getMimeTypeFromFilename(originalFilename);
+        const storedFile = this.normalizeFile(file, originalFilename);
 
-        this.validateImageFile({
-            mimetype: mimeType,
-            size: fileSize,
-        });
+        // Validate file before upload
+        this.validateImageFile(storedFile);
 
         try {
             // Generate unique filename
-            const filename = this.generateUniqueFilename(originalFilename);
+            const filename = this.generateUniqueFilename(storedFile.originalName);
 
-            // Upload to Supabase Storage
-            const url = await this.storage.uploadImage(productId, file, originalFilename);
+            const uploadInput = this.isStoredFile(file) ? storedFile : file;
+            const result = await (this.storage as any).uploadImage(
+                productId,
+                uploadInput,
+                this.isStoredFile(file) ? undefined : storedFile.originalName
+            );
 
             return {
-                url,
+                url: result.url,
                 filename,
             };
         } catch (error) {
@@ -108,7 +108,13 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      */
     async deleteImages(imageUrls: string[]): Promise<void> {
         try {
-            await this.storage.deleteImages(imageUrls);
+            if (typeof (this.storage as any).deleteImages === 'function') {
+                await (this.storage as any).deleteImages(imageUrls);
+            } else {
+                for (const imageUrl of imageUrls) {
+                    await this.storage.deleteImage(imageUrl);
+                }
+            }
         } catch (error) {
             // Log error but don't throw - graceful error handling
             console.warn(
@@ -135,25 +141,19 @@ export class ImageStorageServiceImpl implements ImageStorageService {
      * 
      * Requirements: 11.3 (Validate JPEG/PNG/WebP, max 5MB)
      * 
-     * @param file - File object with mimetype/type and size properties
+     * @param file - Standardized backend file object
      * @throws ImageValidationError if validation fails with descriptive message
      */
-    validateImageFile(file: {
-        mimetype?: string;
-        type?: string;
-        size: number;
-    }): void {
-        const mimeType = file.mimetype || file.type;
-
-        // Validate MIME type exists
-        if (!mimeType) {
+    validateImageFile(file: { mimetype?: string; type?: string; size: number }): void {
+        const mimetype = file.mimetype || file.type;
+        if (!mimetype) {
             throw new ImageValidationError('File type is required');
         }
 
         // Validate MIME type is allowed (JPEG, PNG, WebP only)
-        if (!ALLOWED_IMAGE_TYPES.includes(mimeType as any)) {
+        if (!ALLOWED_IMAGE_TYPES.includes(mimetype as any)) {
             throw new ImageValidationError(
-                `Invalid file type. Allowed types: JPEG, PNG, WebP. Received: ${mimeType}`
+                `Invalid file type. Allowed types: JPEG, PNG, WebP. Received: ${mimetype}`
             );
         }
 
@@ -167,15 +167,39 @@ export class ImageStorageServiceImpl implements ImageStorageService {
         }
     }
 
-    /**
-     * Get MIME type from filename extension
-     * 
-     * @param filename - Filename with extension
-     * @returns MIME type
-     */
-    private getMimeTypeFromFilename(filename: string): string {
-        const extension = filename.split('.').pop()?.toLowerCase();
+    private normalizeFile(file: StoredFile | Buffer | Blob, originalFilename?: string): StoredFile {
+        if (Buffer.isBuffer(file)) {
+            const filename = originalFilename || 'upload.jpg';
+            return {
+                buffer: file,
+                size: file.length,
+                mimetype: this.inferMimeType(filename),
+                originalName: filename,
+            };
+        }
 
+        if (typeof Blob !== 'undefined' && file instanceof Blob) {
+            const filename = originalFilename || 'upload.jpg';
+            return {
+                buffer: Buffer.from([]),
+                size: file.size,
+                mimetype: file.type || this.inferMimeType(filename),
+                originalName: filename,
+            };
+        }
+
+        return file as StoredFile;
+    }
+
+    private isStoredFile(file: StoredFile | Buffer | Blob): file is StoredFile {
+        return !Buffer.isBuffer(file) &&
+            !(typeof Blob !== 'undefined' && file instanceof Blob) &&
+            typeof (file as StoredFile).mimetype === 'string' &&
+            typeof (file as StoredFile).originalName === 'string';
+    }
+
+    private inferMimeType(filename: string): string {
+        const extension = filename.split('.').pop()?.toLowerCase();
         switch (extension) {
             case 'jpg':
             case 'jpeg':

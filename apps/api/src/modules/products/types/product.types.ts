@@ -33,6 +33,53 @@ export interface Pagination {
 }
 
 /**
+ * Cursor-based pagination parameters
+ * 
+ * Used for efficient pagination of large datasets.
+ * Cursor-based pagination is more efficient than offset-based for large result sets.
+ * 
+ * @remarks
+ * - cursor: Opaque cursor string pointing to a position in the result set
+ * - limit: Number of items to return
+ * - Cursor format: base64-encoded JSON with sort field values
+ * 
+ * @example
+ * ```typescript
+ * // First page
+ * { cursor: null, limit: 20 }
+ * 
+ * // Next page using cursor from previous response
+ * { cursor: "eyJjcmVhdGVkX2F0IjoiMjAyNC0wMS0wMVQwMDowMDowMFoiLCJpZCI6IjEyMyJ9", limit: 20 }
+ * ```
+ */
+export interface CursorPagination {
+    /** Cursor pointing to the start position (null for first page) */
+    cursor: string | null;
+
+    /** Number of items to return */
+    limit: number;
+}
+
+/**
+ * Cursor-based paginated result
+ * 
+ * Response format for cursor-based pagination.
+ * Includes next cursor for fetching subsequent pages.
+ * 
+ * @template T - The type of items in the data array
+ */
+export interface CursorPaginatedResult<T> {
+    /** Array of items for the current page */
+    data: T[];
+
+    /** Cursor for the next page (null if no more pages) */
+    nextCursor: string | null;
+
+    /** Whether there are more items available */
+    hasMore: boolean;
+}
+
+/**
  * Paginated result wrapper
  * 
  * Standard response format for all paginated API endpoints.

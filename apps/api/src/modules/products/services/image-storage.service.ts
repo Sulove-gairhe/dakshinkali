@@ -7,6 +7,8 @@
  * Requirements: 11.1 (Image Storage Integration)
  */
 
+import type { StoredFile } from '@dakshinkali/database';
+
 /**
  * Image upload result containing the public URL
  */
@@ -47,17 +49,15 @@ export interface ImageStorageService {
      * 
      * Requirements: 11.1, 11.4 (Upload to Supabase Storage, return public URL)
      * 
-     * @param file - Image file buffer or blob
+     * @param file - Standardized backend file object
      * @param productId - Product UUID for organizing storage
-     * @param originalFilename - Original filename with extension
      * @returns Image upload result with public URL and generated filename
      * @throws ImageValidationError if file validation fails
      * @throws ImageStorageError if upload fails
      */
     uploadImage(
-        file: Buffer | Blob,
-        productId: string,
-        originalFilename: string
+        file: StoredFile,
+        productId: string
     ): Promise<ImageUploadResult>;
 
     /**
@@ -92,16 +92,12 @@ export interface ImageStorageService {
     generateUniqueFilename(originalFilename: string): string;
 
     /**
-     * Validate image file type and size
+     * Validate image file
      * 
      * Requirements: 11.3 (Validate JPEG/PNG/WebP, max 5MB)
      * 
-     * @param file - File object with mimetype/type and size properties
+     * @param file - Standardized backend file object
      * @throws ImageValidationError if validation fails with descriptive message
      */
-    validateImageFile(file: {
-        mimetype?: string;
-        type?: string;
-        size: number;
-    }): void;
+    validateImageFile(file: StoredFile): void;
 }
