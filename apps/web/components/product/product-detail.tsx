@@ -104,7 +104,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     {product.currentPrice}
                   </span>
                   {product.oldPrice && (
-                    <span className="text-lg text-muted-foreground line-through">
+                    <span className="text-lg font-bold text-foreground/55 line-through">
                       {product.oldPrice}
                     </span>
                   )}

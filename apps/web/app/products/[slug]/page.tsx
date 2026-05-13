@@ -15,6 +15,7 @@ const PRODUCT_DATA: ProductDetailData = {
   badge: 'Global No.1 TV',
   ratingText: '',
   currentPrice: 'Rs 89,000',
+  oldPrice: 'Rs 95,000',
   features: [
     '55-inch Crystal Ultra HD 4K display',
     '3840 x 2160 screen resolution',
