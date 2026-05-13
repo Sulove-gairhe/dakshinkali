@@ -45,7 +45,7 @@ export interface UpdateProductRequest {
     status?: ProductStatus;
 
     /** New images to add (optional, 5MB each, JPEG/PNG/WebP) */
-    images?: File[];
+    images?: Express.Multer.File[];
 
     /** Image IDs to remove (optional, array of image UUIDs) */
     removeImages?: string[];

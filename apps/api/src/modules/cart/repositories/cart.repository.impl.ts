@@ -1,160 +1,68 @@
 /**
- * CartRepositoryImpl - Concrete implementation of CartRepository
+ * CartRepository Implementation
  * 
- * This class implements all database operations for the Cart Module using Supabase.
- * It handles SQL query construction, execution, and row-to-entity mapping.
+ * Implements cart data access using Supabase PostgreSQL.
+ * Uses parameterized queries to prevent SQL injection.
  * 
- * @remarks
- * - Uses Supabase client for database access
- * - Maps database rows (snake_case) to CartEntity (camelCase)
- * - Converts timestamps to Date objects
- * - Translates database errors to domain exceptions
- * - Implements efficient JOIN queries for cart with items
- * 
- * **QUERY OPTIMIZATION & SECURITY:**
- * 
- * 1. SQL Injection Prevention:
- *    - All queries use Supabase query builder with parameterized values
- *    - Methods like .eq(), .is() automatically escape and parameterize inputs
- *    - NO string concatenation or interpolation in SQL queries
- * 
- * 2. Index Usage:
- *    - Partial indexes on user_id and session_id for fast cart lookup
- *    - Index on cart_id for efficient cart items retrieval
- *    - All queries leverage database indexes created in migrations
- * 
- * 3. Performance Optimizations:
- *    - Single JOIN query for findWithItems (no N+1 queries)
- *    - Parameterized queries for all operations
- *    - Efficient WHERE clauses using indexed columns
- * 
- * 4. Available Indexes:
- *    - idx_carts_user_id: Partial index on user_id WHERE user_id IS NOT NULL
- *    - idx_carts_session_id: Partial index on session_id WHERE session_id IS NOT NULL
- *    - idx_cart_items_cart_id: Index on cart_id for fast item lookup
- *    - idx_cart_items_product_id: Index on product_id for product references
- * 
- * **Validates: Requirements AR-5, AR-7, AR-8, NFR-1**
+ * Requirements: AR-5, AR-7, AR-8, NFR-1 (Supabase integration, connection pooling, security, performance)
  */
 
 import { SupabaseClient } from '@supabase/supabase-js';
-import { CartEntity } from '../entities/cart.entity';
-import { CartWithItemsEntity, CartItemWithProductEntity } from '../entities/cart-item.entity';
 import { CartRepository } from './cart.repository';
+import {
+    CartEntity,
+    CartWithItemsEntity,
+    CartRow,
+    mapRowToCartEntity,
+    CartItemWithProductRow,
+    mapRowToCartItemWithProductEntity,
+} from '../entities';
 
 /**
- * Database row interface for carts table
- * Represents the raw structure returned from Supabase queries
- * Uses snake_case to match PostgreSQL naming conventions
- */
-interface CartRow {
-    id: string;
-    user_id: string | null;
-    session_id: string | null;
-    created_at: string;
-    updated_at: string;
-}
-
-/**
- * Database row interface for cart_items table with joined product data
- * Used for efficient retrieval of cart with items and product information
- */
-interface CartItemWithProductRow {
-    id: string;
-    cart_id: string;
-    product_id: string;
-    quantity: number;
-    price_at_addition: string | number;
-    created_at: string;
-    updated_at: string;
-    product_name: string;
-    product_price: string | number;
-    product_status: string;
-    product_images: any;
-    product_deleted_at: string | null;
-}
-
-/**
- * CartRepositoryImpl
- * 
- * Concrete implementation of CartRepository interface using Supabase.
+ * Supabase implementation of CartRepository
  */
 export class CartRepositoryImpl implements CartRepository {
     constructor(private readonly supabase: SupabaseClient) { }
 
     /**
-     * Create a new cart for a user or session
-     * 
-     * @param userId - Authenticated user identifier (UUID, nullable)
-     * @param sessionId - Anonymous session identifier (TEXT, nullable)
-     * @returns Promise resolving to the created CartEntity with generated id and timestamps
-     * 
-     * @throws Error if cart already exists for user or session
-     * @throws Error if both userId and sessionId are null or both are provided
-     * @throws Error for database errors
-     * 
-     * @remarks
-     * - Generates UUID for id if not provided
-     * - Sets created_at and updated_at to NOW()
-     * - Either userId OR sessionId must be set (enforced by CHECK constraint)
-     * - A user can have only one cart (enforced by unique constraint on user_id)
-     * - A session can have only one cart (enforced by unique constraint on session_id)
-     * 
-     * **Validates: Requirements AR-5, AR-7, AR-8, NFR-1**
+     * Create a new cart
      */
     async create(userId: string | null, sessionId: string | null): Promise<CartEntity> {
-        // Validate that exactly one of userId or sessionId is provided
+        // Validate: either userId OR sessionId must be set
         if ((userId === null && sessionId === null) || (userId !== null && sessionId !== null)) {
             throw new Error('Either userId or sessionId must be provided, but not both.');
         }
 
-        // Convert to database row format (snake_case)
-        const row = {
-            user_id: userId,
-            session_id: sessionId,
-        };
-
-        // Execute INSERT query
         const { data, error } = await this.supabase
             .from('carts')
-            .insert(row)
+            .insert({
+                user_id: userId,
+                session_id: sessionId,
+            })
             .select()
             .single();
 
         if (error) {
-            // Translate database errors to domain exceptions
+            // Check for unique constraint violation
             if (error.code === '23505') {
-                // Unique constraint violation
-                const identifier = userId ? `user '${userId}'` : `session '${sessionId}'`;
-                throw new Error(`A cart already exists for ${identifier}.`);
+                if (userId) {
+                    throw new Error(`A cart already exists for user '${userId}'.`);
+                } else {
+                    throw new Error(`A cart already exists for session '${sessionId}'.`);
+                }
             }
+            // Check for check constraint violation
             if (error.code === '23514') {
-                // Check constraint violation
                 throw new Error('Either userId or sessionId must be provided, but not both.');
             }
             throw new Error(`Failed to create cart: ${error.message}`);
         }
 
-        if (!data) {
-            throw new Error('Failed to create cart: No data returned');
-        }
-
-        // Map database row to CartEntity
-        return this.mapRowToEntity(data);
+        return mapRowToCartEntity(data as CartRow);
     }
 
     /**
-     * Find a cart by its unique identifier
-     * 
-     * @param cartId - Cart UUID to find
-     * @returns Promise resolving to CartEntity or null if not found
-     * 
-     * @remarks
-     * - Returns null if cart not found
-     * - Maps database row to CartEntity with proper type conversions
-     * - Does not include cart items (use findWithItems for that)
-     * 
-     * **Validates: Requirements AR-5, AR-7, AR-8**
+     * Find cart by ID
      */
     async findById(cartId: string): Promise<CartEntity | null> {
         const { data, error } = await this.supabase
@@ -165,30 +73,17 @@ export class CartRepositoryImpl implements CartRepository {
 
         if (error) {
             if (error.code === 'PGRST116') {
+                // Not found
                 return null;
             }
             throw new Error(`Failed to find cart: ${error.message}`);
         }
 
-        if (!data) {
-            return null;
-        }
-
-        return this.mapRowToEntity(data);
+        return mapRowToCartEntity(data as CartRow);
     }
 
     /**
-     * Find a cart by authenticated user ID
-     * 
-     * @param userId - User UUID to find cart for
-     * @returns Promise resolving to CartEntity or null if not found
-     * 
-     * @remarks
-     * - Returns null if user has no cart
-     * - Uses partial index on user_id for fast lookup
-     * - A user can have only one cart (enforced by unique constraint)
-     * 
-     * **Validates: Requirements AR-5, AR-7, AR-8, NFR-1**
+     * Find cart by user ID
      */
     async findByUserId(userId: string): Promise<CartEntity | null> {
         const { data, error } = await this.supabase
@@ -199,30 +94,17 @@ export class CartRepositoryImpl implements CartRepository {
 
         if (error) {
             if (error.code === 'PGRST116') {
+                // Not found
                 return null;
             }
-            throw new Error(`Failed to find cart by user ID: ${error.message}`);
+            throw new Error(`Failed to find cart by user: ${error.message}`);
         }
 
-        if (!data) {
-            return null;
-        }
-
-        return this.mapRowToEntity(data);
+        return mapRowToCartEntity(data as CartRow);
     }
 
     /**
-     * Find a cart by anonymous session ID
-     * 
-     * @param sessionId - Session identifier to find cart for
-     * @returns Promise resolving to CartEntity or null if not found
-     * 
-     * @remarks
-     * - Returns null if session has no cart
-     * - Uses partial index on session_id for fast lookup
-     * - A session can have only one cart (enforced by unique constraint)
-     * 
-     * **Validates: Requirements AR-5, AR-7, AR-8, NFR-1**
+     * Find cart by session ID
      */
     async findBySessionId(sessionId: string): Promise<CartEntity | null> {
         const { data, error } = await this.supabase
@@ -233,115 +115,73 @@ export class CartRepositoryImpl implements CartRepository {
 
         if (error) {
             if (error.code === 'PGRST116') {
+                // Not found
                 return null;
             }
-            throw new Error(`Failed to find cart by session ID: ${error.message}`);
+            throw new Error(`Failed to find cart by session: ${error.message}`);
         }
 
-        if (!data) {
-            return null;
-        }
-
-        return this.mapRowToEntity(data);
+        return mapRowToCartEntity(data as CartRow);
     }
 
     /**
-     * Find a cart with all its items and product details in a single query
+     * Find cart with all items and product details
      * 
-     * @param cartId - Cart UUID to find
-     * @returns Promise resolving to CartWithItemsEntity or null if not found
-     * 
-     * @remarks
-     * - Returns null if cart not found
-     * - Uses efficient JOIN query to fetch cart + items + products in one round-trip
-     * - Includes product information (name, price, status, images, deletedAt)
-     * - Service layer uses this to calculate totals and check product availability
-     * - Leverages indexes on cart_id and product_id for performance
-     * 
-     * **Query Pattern:**
-     * Fetches cart data, then fetches cart items with product data using JOIN.
-     * This is a two-query approach due to Supabase PostgREST limitations,
-     * but still more efficient than N+1 queries.
-     * 
-     * **Validates: Requirements AR-5, AR-7, AR-8, NFR-1**
+     * Performs efficient JOIN query to retrieve cart with items
+     * and associated product information in a single query.
      */
     async findWithItems(cartId: string): Promise<CartWithItemsEntity | null> {
-        // First, fetch the cart
-        const { data: cartData, error: cartError } = await this.supabase
-            .from('carts')
-            .select()
-            .eq('id', cartId)
-            .single();
-
-        if (cartError) {
-            if (cartError.code === 'PGRST116') {
-                return null;
-            }
-            throw new Error(`Failed to find cart: ${cartError.message}`);
-        }
-
-        if (!cartData) {
+        // First, get the cart
+        const cart = await this.findById(cartId);
+        if (!cart) {
             return null;
         }
 
-        // Then, fetch cart items with product data using JOIN
-        // Supabase PostgREST syntax for joining tables
-        const { data: itemsData, error: itemsError } = await this.supabase
+        // Then, get cart items with product details using JOIN
+        const { data, error } = await this.supabase
             .from('cart_items')
             .select(`
-                id,
-                cart_id,
-                product_id,
-                quantity,
-                price_at_addition,
-                created_at,
-                updated_at,
-                products:product_id (
-                    id,
-                    name,
-                    price,
-                    status,
-                    images,
-                    deleted_at
-                )
-            `)
+        id,
+        cart_id,
+        product_id,
+        quantity,
+        price_at_addition,
+        created_at,
+        updated_at,
+        products:product_id (
+          id,
+          name,
+          price,
+          status,
+          images,
+          deleted_at
+        )
+      `)
             .eq('cart_id', cartId);
 
-        if (itemsError) {
-            throw new Error(`Failed to find cart items: ${itemsError.message}`);
+        if (error) {
+            throw new Error(`Failed to find cart items: ${error.message}`);
         }
 
-        // Map cart data
-        const cart = this.mapRowToEntity(cartData);
-
-        // Map cart items with product data
-        const items: CartItemWithProductEntity[] = (itemsData || []).map(item => {
-            const product = Array.isArray(item.products) ? item.products[0] : item.products;
-
-            return {
-                id: item.id,
-                cartId: item.cart_id,
-                productId: item.product_id,
-                quantity: item.quantity,
-                priceAtAddition: typeof item.price_at_addition === 'string'
-                    ? parseFloat(item.price_at_addition)
-                    : item.price_at_addition,
-                createdAt: new Date(item.created_at),
-                updatedAt: new Date(item.updated_at),
-                product: {
-                    id: product.id,
-                    name: product.name,
-                    price: typeof product.price === 'string'
-                        ? parseFloat(product.price)
-                        : product.price,
-                    status: product.status,
-                    images: this.parseImages(product.images),
-                    deletedAt: product.deleted_at ? new Date(product.deleted_at) : null,
-                },
-            };
+        // Map items with product details
+        const items = (data || []).map((row: any) => {
+            const product = row.products;
+            return mapRowToCartItemWithProductEntity({
+                id: row.id,
+                cart_id: row.cart_id,
+                product_id: row.product_id,
+                quantity: row.quantity,
+                price_at_addition: row.price_at_addition,
+                created_at: row.created_at,
+                updated_at: row.updated_at,
+                product_name: product?.name || '',
+                product_price: product?.price || '0',
+                product_status: product?.status || 'inactive',
+                product_images: product?.images || [],
+                product_deleted_at: product?.deleted_at || null,
+            } as CartItemWithProductRow);
         });
 
-        // Return cart with items
         return {
             ...cart,
             items,
@@ -349,77 +189,49 @@ export class CartRepositoryImpl implements CartRepository {
     }
 
     /**
-     * Update a cart with partial data
-     * 
-     * @param cartId - Cart UUID to update
-     * @param data - Partial CartEntity with fields to update
-     * @returns Promise resolving to the updated CartEntity
-     * 
-     * @throws Error if cart not found
-     * @throws Error if attempting to set both userId and sessionId
-     * @throws Error for database errors
-     * 
-     * @remarks
-     * - Only updates provided fields (partial update)
-     * - updated_at is automatically set by database trigger
-     * - Cannot update id or created_at through this method
-     * - Commonly used to convert guest cart to user cart (set userId, clear sessionId)
-     * 
-     * **Validates: Requirements AR-5, AR-7, AR-8**
+     * Update cart
      */
     async update(cartId: string, data: Partial<CartEntity>): Promise<CartEntity> {
-        // Convert updates to database row format
-        const row: any = {};
+        const updateData: any = {};
 
-        if (data.userId !== undefined) row.user_id = data.userId;
-        if (data.sessionId !== undefined) row.session_id = data.sessionId;
+        if (data.userId !== undefined) {
+            updateData.user_id = data.userId;
+        }
+        if (data.sessionId !== undefined) {
+            updateData.session_id = data.sessionId;
+        }
 
-        // Execute UPDATE query
-        const { data: updatedData, error } = await this.supabase
+        const { data: updated, error } = await this.supabase
             .from('carts')
-            .update(row)
+            .update(updateData)
             .eq('id', cartId)
             .select()
             .single();
 
         if (error) {
+            // Check for not found error
             if (error.code === 'PGRST116') {
                 throw new Error(`Cart with ID '${cartId}' not found.`);
             }
+            // Check for unique constraint violation
             if (error.code === '23505') {
-                // Unique constraint violation
-                const identifier = data.userId ? `user '${data.userId}'` : `session '${data.sessionId}'`;
-                throw new Error(`A cart already exists for ${identifier}.`);
+                const userId = data.userId;
+                throw new Error(`A cart already exists for user '${userId}'.`);
             }
+            // Check for check constraint violation
             if (error.code === '23514') {
-                // Check constraint violation
                 throw new Error('Either userId or sessionId must be provided, but not both.');
             }
             throw new Error(`Failed to update cart: ${error.message}`);
         }
 
-        if (!updatedData) {
-            throw new Error(`Cart with ID '${cartId}' not found.`);
-        }
-
-        return this.mapRowToEntity(updatedData);
+        return mapRowToCartEntity(updated as CartRow);
     }
 
     /**
-     * Delete a cart and all its items
+     * Delete cart
      * 
-     * @param cartId - Cart UUID to delete
-     * @returns Promise resolving when deletion is complete
-     * 
-     * @throws Error if cart not found
-     * @throws Error for database errors
-     * 
-     * @remarks
-     * - Hard delete (not soft delete)
-     * - Cascades to delete all cart items (ON DELETE CASCADE)
-     * - Used when merging carts (delete guest cart after merge)
-     * 
-     * **Validates: Requirements AR-5, AR-7, AR-8**
+     * Deletes cart and all associated items (CASCADE DELETE).
      */
     async delete(cartId: string): Promise<void> {
         const { data, error } = await this.supabase
@@ -431,59 +243,6 @@ export class CartRepositoryImpl implements CartRepository {
 
         if (error || !data) {
             throw new Error(`Cart with ID '${cartId}' not found or could not be deleted.`);
-        }
-    }
-
-    /**
-     * Map database row to CartEntity
-     * 
-     * Handles all type conversions:
-     * - string timestamps to Date objects
-     * - snake_case to camelCase
-     * 
-     * @param row - Raw database row
-     * @returns CartEntity with proper types
-     * 
-     * @remarks
-     * This is a critical method that ensures type safety between database and domain layers.
-     * All database rows MUST pass through this mapping function.
-     * 
-     * **Validates: Requirements AR-8**
-     */
-    private mapRowToEntity(row: CartRow): CartEntity {
-        return {
-            id: row.id,
-            userId: row.user_id,
-            sessionId: row.session_id,
-            createdAt: new Date(row.created_at),
-            updatedAt: new Date(row.updated_at),
-        };
-    }
-
-    /**
-     * Parse JSONB images field to string array
-     * 
-     * @param images - JSONB images field from database
-     * @returns Array of image URLs
-     * 
-     * @remarks
-     * Handles both string and already-parsed object formats.
-     * Returns empty array if parsing fails.
-     */
-    private parseImages(images: any): string[] {
-        if (!images) {
-            return [];
-        }
-
-        try {
-            // Handle both string and already-parsed object
-            const parsed = typeof images === 'string'
-                ? JSON.parse(images)
-                : images;
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-            console.error('Failed to parse images JSONB:', error);
-            return [];
         }
     }
 }

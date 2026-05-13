@@ -2,40 +2,74 @@
  * CartEntity - Domain model representing a shopping cart in the database
  * 
  * This entity maps directly to the carts table in Supabase PostgreSQL.
- * It includes all fields from the database schema with proper TypeScript typing.
+ * Supports both authenticated users (user_id) and anonymous users (session_id).
  * 
- * @remarks
- * - Either userId OR sessionId must be set (enforced by CHECK constraint in DB)
- * - userId is set for authenticated users (references auth.users)
- * - sessionId is set for guest/anonymous users (client-generated UUID)
- * - updatedAt is automatically managed by database trigger
+ * Requirements: AR-1 (Repository layer for data access)
  */
 
 /**
- * CartEntity - Complete cart domain model
+ * Cart entity representing a user's shopping cart
  * 
- * Represents a shopping cart with all database fields mapped to TypeScript types.
- * This entity is used internally by the Repository and Service layers.
- * 
- * @remarks
- * - API responses use CartDTO instead of this entity
- * - A user can have only one cart (enforced by unique constraint on user_id)
- * - A session can have only one cart (enforced by unique constraint on session_id)
- * - Cart items are stored in a separate cart_items table
+ * @property id - Unique cart identifier (UUID)
+ * @property userId - Authenticated user ID (NULL for anonymous carts)
+ * @property sessionId - Session ID for anonymous users (NULL for authenticated carts)
+ * @property createdAt - Timestamp when cart was created
+ * @property updatedAt - Timestamp when cart was last updated
  */
 export interface CartEntity {
-    /** Unique cart identifier (UUID v4) */
+    /**
+     * Unique cart identifier (UUID)
+     */
     id: string;
 
-    /** Authenticated user identifier (UUID, nullable, references auth.users) */
+    /**
+     * Authenticated user ID (NULL for anonymous carts)
+     * Either userId OR sessionId must be set, not both
+     */
     userId: string | null;
 
-    /** Anonymous session identifier (TEXT, nullable, client-generated UUID) */
+    /**
+     * Session ID for anonymous users (NULL for authenticated carts)
+     * Either userId OR sessionId must be set, not both
+     */
     sessionId: string | null;
 
-    /** Timestamp when cart was created (auto-generated) */
+    /**
+     * Timestamp when cart was created
+     */
     createdAt: Date;
 
-    /** Timestamp when cart was last updated (auto-updated by trigger) */
+    /**
+     * Timestamp when cart was last updated
+     * Automatically updated by database trigger
+     */
     updatedAt: Date;
+}
+
+/**
+ * Database row type from carts table
+ * Used for mapping database results to CartEntity
+ */
+export interface CartRow {
+    id: string;
+    user_id: string | null;
+    session_id: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+/**
+ * Map database row to CartEntity
+ * 
+ * @param row - Database row from carts table
+ * @returns CartEntity with properly typed and parsed fields
+ */
+export function mapRowToCartEntity(row: CartRow): CartEntity {
+    return {
+        id: row.id,
+        userId: row.user_id,
+        sessionId: row.session_id,
+        createdAt: new Date(row.created_at),
+        updatedAt: new Date(row.updated_at),
+    };
 }

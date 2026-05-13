@@ -49,7 +49,7 @@ export class ProductServiceImpl implements ProductService {
      * 
      * **Validates: Requirements 1.1, 1.2, 1.5, 1.7, 9.1, 9.2, 9.3**
      */
-    async createProduct(data: CreateProductData, images?: File[]): Promise<ProductEntity> {
+    async createProduct(data: CreateProductData, images?: Express.Multer.File[]): Promise<ProductEntity> {
         // Validate business rules
         ProductValidator.validateCreateProduct(data);
         ProductValidator.validateImageCount(images?.length || 0);
@@ -70,12 +70,12 @@ export class ProductServiceImpl implements ProductService {
             for (let i = 0; i < images.length; i++) {
                 const file = images[i];
 
-                // Convert File to StoredFile
+                // Convert Multer file to StoredFile
                 const storedFile: StoredFile = {
-                    buffer: await this.fileToBuffer(file),
+                    buffer: file.buffer, // Multer already provides buffer
                     size: file.size,
-                    mimetype: file.type,
-                    originalName: file.name,
+                    mimetype: file.mimetype,
+                    originalName: file.originalname,
                 };
 
                 // Upload image (validation happens inside)
@@ -127,7 +127,7 @@ export class ProductServiceImpl implements ProductService {
     async updateProduct(
         id: string,
         data: UpdateProductData,
-        images?: File[],
+        images?: Express.Multer.File[],
         removeImages?: string[]
     ): Promise<ProductEntity> {
         // Validate product exists
@@ -170,12 +170,12 @@ export class ProductServiceImpl implements ProductService {
             for (let i = 0; i < images.length; i++) {
                 const file = images[i];
 
-                // Convert File to StoredFile
+                // Convert Multer file to StoredFile
                 const storedFile: StoredFile = {
-                    buffer: await this.fileToBuffer(file),
+                    buffer: file.buffer, // Multer already provides buffer
                     size: file.size,
-                    mimetype: file.type,
-                    originalName: file.name,
+                    mimetype: file.mimetype,
+                    originalName: file.originalname,
                 };
 
                 // Upload image (validation happens inside)
@@ -302,6 +302,14 @@ export class ProductServiceImpl implements ProductService {
         filters: PublicProductFilters,
         pagination: Pagination
     ): Promise<PaginatedResult<ProductEntity>> {
+        // Map camelCase sortBy to snake_case for database
+        const sortByMap: Record<string, string> = {
+            'createdAt': 'created_at',
+            'price': 'price',
+            'name': 'name',
+        };
+        const dbSortBy = filters.sortBy ? sortByMap[filters.sortBy] : 'created_at';
+
         // Convert PublicProductFilters to RepositoryFilters
         // Force status to "active" and exclude deleted products
         const repoFilters: RepositoryFilters = {
@@ -311,21 +319,10 @@ export class ProductServiceImpl implements ProductService {
             maxPrice: filters.maxPrice,
             search: filters.search,
             includeDeleted: false, // Never include deleted products in public API
-            sortBy: filters.sortBy || 'createdAt',
+            sortBy: dbSortBy,
             sortOrder: filters.sortOrder || 'desc',
         };
 
         return await this.repository.findAll(repoFilters, pagination);
-    }
-
-    /**
-     * Convert File object to Buffer
-     * 
-     * @param file - File object
-     * @returns Promise resolving to Buffer
-     */
-    private async fileToBuffer(file: File): Promise<Buffer> {
-        const arrayBuffer = await file.arrayBuffer();
-        return Buffer.from(arrayBuffer);
     }
 }

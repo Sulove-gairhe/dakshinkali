@@ -24,7 +24,10 @@
     "auth:create-admin": "node scripts/create-admin-user.js",
     "auth:update-role": "node scripts/update-user-role.js",
     "auth:test": "node scripts/test-auth.js",
-    "auth:token": "node scripts/get-auth-token.js"
+    "auth:token": "node scripts/get-auth-token.js",
+    "auth:tokens": "node scripts/get-auth-tokens.js",
+    "auth:list-users": "node scripts/list-users.js",
+    "db:check": "node check-database.js"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^1.0.0",
@@ -38,7 +41,9 @@
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.105.1",
     "dotenv": "^17.4.2",
+    "framer-motion": "^12.38.0",
     "swagger-ui-express": "^5.0.1",
+    "tailwindcss-animate": "^1.0.7",
     "yamljs": "^0.3.0"
   }
 }

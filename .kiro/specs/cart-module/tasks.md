@@ -26,8 +26,8 @@ The detailed task checklist below is historical and still contains stale "Pendin
 Following the strict layer-by-layer execution policy from Steering.md:
 
 1. ✅ **Requirements & Design** → Complete
-2. ⏳ **Database Schema & Migrations** → Next
-3. ⏳ **Repository Layer** → After DB
+2. ✅ **Database Schema & Migrations** → Complete
+3. ⏳ **Repository Layer** → Next
 4. ⏳ **Repository Audit** → MANDATORY
 5. ⏳ **Service Layer** → After Repository Audit PASS
 6. ⏳ **Service Audit** → MANDATORY
@@ -37,59 +37,75 @@ Following the strict layer-by-layer execution policy from Steering.md:
 
 ---
 
-## Phase 1: Database Schema & Migrations
+## Phase 1: Database Schema & Migrations ✅
 
 ### Task 1.1: Create carts table migration
-- **Status:** ⏳ Pending
-- **File:** `supabase/migrations/20260503100000_create_carts_table.sql`
+- **Status:** ✅ Complete
+- **File:** `supabase/migrations/20260503110000_create_carts_table.sql`
 - **Requirements:** BR-6, BR-8, BR-13, NFR-12
+- **Completed:** 2026-05-03
 - **Details:**
-  - Create `carts` table with UUID primary key
-  - Add `user_id` (UUID, nullable) for authenticated users
-  - Add `session_id` (TEXT, nullable) for anonymous users
-  - Add `created_at` and `updated_at` timestamps
-  - Add CHECK constraint: either user_id OR session_id must be set
-  - Add comments to table and columns
-  - Create trigger for auto-updating `updated_at`
+  - ✅ Created `carts` table with UUID primary key
+  - ✅ Added `user_id` (UUID, nullable) for authenticated users
+  - ✅ Added `session_id` (TEXT, nullable) for anonymous users
+  - ✅ Added `created_at` and `updated_at` timestamps
+  - ✅ Added CHECK constraint: either user_id OR session_id must be set
+  - ✅ Added comments to table and columns
+  - ✅ Created trigger for auto-updating `updated_at`
 
 ### Task 1.2: Create cart indexes
-- **Status:** ⏳ Pending
-- **File:** `supabase/migrations/20260503100000_create_carts_table.sql` (same file)
+- **Status:** ✅ Complete
+- **File:** `supabase/migrations/20260503110000_create_carts_table.sql` (same file)
 - **Requirements:** NFR-1, NFR-4, NFR-13
+- **Completed:** 2026-05-03
 - **Details:**
-  - Create partial index on `user_id` (WHERE user_id IS NOT NULL)
-  - Create partial index on `session_id` (WHERE session_id IS NOT NULL)
-  - Add comments to indexes
+  - ✅ Created partial index on `user_id` (WHERE user_id IS NOT NULL)
+  - ✅ Created partial index on `session_id` (WHERE session_id IS NOT NULL)
+  - ✅ Added comments to indexes
 
 ### Task 1.3: Create cart_items table migration
-- **Status:** ⏳ Pending
-- **File:** `supabase/migrations/20260503100100_create_cart_items_table.sql`
+- **Status:** ✅ Complete
+- **File:** `supabase/migrations/20260503110100_create_cart_items_table.sql`
 - **Requirements:** BR-1, BR-10, NFR-8, NFR-9, NFR-10
+- **Completed:** 2026-05-03
 - **Details:**
-  - Create `cart_items` table with UUID primary key
-  - Add `cart_id` (UUID, NOT NULL, foreign key to carts)
-  - Add `product_id` (UUID, NOT NULL, foreign key to products)
-  - Add `quantity` (INTEGER, NOT NULL, default 1)
-  - Add `price_at_addition` (NUMERIC(10,2), NOT NULL)
-  - Add `created_at` and `updated_at` timestamps
-  - Add CHECK constraint: quantity > 0 AND quantity <= 99
-  - Add CHECK constraint: price_at_addition > 0
-  - Add UNIQUE constraint: (cart_id, product_id)
-  - Add foreign key with ON DELETE CASCADE
-  - Add comments to table and columns
-  - Create trigger for auto-updating `updated_at`
+  - ✅ Created `cart_items` table with UUID primary key
+  - ✅ Added `cart_id` (UUID, NOT NULL, foreign key to carts)
+  - ✅ Added `product_id` (UUID, NOT NULL, foreign key to products)
+  - ✅ Added `quantity` (INTEGER, NOT NULL, default 1)
+  - ✅ Added `price_snapshot` (NUMERIC(10,2), NOT NULL)
+  - ✅ Added `created_at` and `updated_at` timestamps
+  - ✅ Added CHECK constraint: quantity >= 1 AND quantity <= 99
+  - ✅ Added CHECK constraint: price_snapshot > 0
+  - ✅ Added UNIQUE constraint: (cart_id, product_id)
+  - ✅ Added foreign key with ON DELETE CASCADE
+  - ✅ Added comments to table and columns
+  - ✅ Created trigger for auto-updating `updated_at`
 
 ### Task 1.4: Create cart_items indexes
-- **Status:** ⏳ Pending
-- **File:** `supabase/migrations/20260503100100_create_cart_items_table.sql` (same file)
+- **Status:** ✅ Complete
+- **File:** `supabase/migrations/20260503110100_create_cart_items_table.sql` (same file)
 - **Requirements:** NFR-1, NFR-4
+- **Completed:** 2026-05-03
 - **Details:**
-  - Create index on `cart_id`
-  - Create index on `product_id`
-  - Add comments to indexes
+  - ✅ Created index on `cart_id`
+  - ✅ Created index on `product_id`
+  - ✅ Added comments to indexes
 
-### Task 1.5: Test migrations locally
-- **Status:** ⏳ Pending
+### Task 1.5: Create migration documentation
+- **Status:** ✅ Complete
+- **File:** `supabase/migrations/CART_MIGRATIONS_README.md`
+- **Completed:** 2026-05-03
+- **Details:**
+  - ✅ Deployment instructions (local & production)
+  - ✅ Verification queries (tables, indexes, constraints, triggers)
+  - ✅ Test scripts for all constraints
+  - ✅ Rollback instructions
+  - ✅ Performance considerations
+  - ✅ Security recommendations (RLS policies)
+
+### Task 1.6: Test migrations locally
+- **Status:** ⏳ Pending (Ready for deployment)
 - **Requirements:** All database requirements
 - **Details:**
   - Run migrations on local Supabase instance
@@ -98,6 +114,9 @@ Following the strict layer-by-layer execution policy from Steering.md:
   - Verify triggers work (updated_at auto-updates)
   - Verify constraints work (quantity range, uniqueness, CHECK)
   - Verify foreign key cascades work
+  - Use verification queries from CART_MIGRATIONS_README.md
+
+**Phase 1 Status:** ✅ Migration files complete, ready for deployment testing
 
 ---
 
@@ -509,23 +528,37 @@ Following the strict layer-by-layer execution policy from Steering.md:
 ## Summary
 
 **Total Tasks:** 40+  
+**Completed Tasks:** 5 (Phase 1)  
 **Estimated Effort:** 2-3 days  
 **Dependencies:** Product Module (complete ✅)
 
+**Phase Status:**
+- ✅ Phase 1: Database Schema & Migrations (5/5 tasks complete)
+- ⏳ Phase 2: Repository Layer (0/9 tasks)
+- ⏳ Phase 3: Repository Audit (pending)
+- ⏳ Phase 4: Service Layer (pending)
+- ⏳ Phase 5: Service Audit (pending)
+- ⏳ Phase 6: API Layer (pending)
+- ⏳ Phase 7: API Audit (pending)
+- ⏳ Phase 8: Documentation (pending)
+- ⏳ Phase 9: Final Validation (pending)
+
 **Critical Path:**
-1. Database migrations → Repository → Service → API
-2. Each layer must pass audit before proceeding
-3. Documentation and testing throughout
+1. ✅ Database migrations → Complete
+2. ⏳ Repository → Next
+3. Each layer must pass audit before proceeding
+4. Documentation and testing throughout
 
 **Success Criteria:**
-- ✅ All layers implemented and tested
-- ✅ All audits passed (Repository, Service, API)
-- ✅ Test coverage > 80%
-- ✅ API documentation complete
-- ✅ Performance targets met
+- ⏳ All layers implemented and tested
+- ⏳ All audits passed (Repository, Service, API)
+- ⏳ Test coverage > 80%
+- ⏳ API documentation complete
+- ⏳ Performance targets met
 
 ---
 
 **Tasks Created:** 2026-05-03  
-**Ready for Execution:** Yes  
-**Next Step:** Task 1.1 (Create carts table migration)
+**Phase 1 Completed:** 2026-05-03  
+**Current Status:** Ready for Phase 2 (Repository Layer)  
+**Next Step:** Task 2.1 (Create Cart entity)

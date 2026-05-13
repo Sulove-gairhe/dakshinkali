@@ -1,116 +1,197 @@
 /**
- * CartItemEntity - Domain model representing a cart item in the database
+ * CartItemEntity - Domain model representing an item in a shopping cart
  * 
  * This entity maps directly to the cart_items table in Supabase PostgreSQL.
- * It includes all fields from the database schema with proper TypeScript typing.
+ * Includes price snapshot for historical pricing and product reference.
  * 
- * @remarks
- * - priceAtAddition is a price snapshot captured when the item was added to cart
- * - This prevents price manipulation and preserves the price at time of adding
- * - updatedAt is automatically managed by database trigger
- * - Quantity is constrained to 1-99 by database CHECK constraint
+ * Requirements: AR-1 (Repository layer for data access)
  */
+
+import { CartEntity } from './cart.entity';
 
 /**
- * CartItemEntity - Complete cart item domain model
+ * Cart item entity representing a product in a cart
  * 
- * Represents a single item within a shopping cart with all database fields
- * mapped to TypeScript types. This entity is used internally by the Repository
- * and Service layers.
- * 
- * @remarks
- * - API responses use CartItemDTO instead of this entity
- * - A cart can have only one entry per product (enforced by unique constraint)
- * - Deleting a cart cascades to delete all its items
- * - Deleting a product cascades to delete all cart items referencing it
+ * @property id - Unique cart item identifier (UUID)
+ * @property cartId - Reference to parent cart
+ * @property productId - Reference to product
+ * @property quantity - Quantity of product (1-99)
+ * @property priceAtAddition - Product price at time of adding to cart (alias for priceSnapshot)
+ * @property priceSnapshot - Product price at time of adding to cart
+ * @property createdAt - Timestamp when item was added to cart
+ * @property updatedAt - Timestamp when item was last updated
  */
 export interface CartItemEntity {
-    /** Unique cart item identifier (UUID v4) */
+    /**
+     * Unique cart item identifier (UUID)
+     */
     id: string;
 
-    /** Cart identifier (UUID, foreign key to carts table) */
+    /**
+     * Reference to parent cart (foreign key)
+     */
     cartId: string;
 
-    /** Product identifier (UUID, foreign key to products table) */
+    /**
+     * Reference to product (foreign key)
+     */
     productId: string;
 
-    /** Item quantity (INTEGER, must be 1-99, enforced by CHECK constraint) */
+    /**
+     * Quantity of product (1-99)
+     * Enforced by database CHECK constraint
+     */
     quantity: number;
 
-    /** Product price at time of adding to cart (NUMERIC(10,2), price snapshot) */
+    /**
+     * Product price at time of adding to cart
+     * Prevents price manipulation and shows price changes
+     */
+    priceSnapshot: number;
+
+    /**
+     * Alias for priceSnapshot - Product price at time of adding to cart
+     * Prevents price manipulation and shows price changes
+     */
     priceAtAddition: number;
 
-    /** Timestamp when item was added to cart (auto-generated) */
+    /**
+     * Timestamp when item was added to cart
+     */
     createdAt: Date;
 
-    /** Timestamp when item was last updated (auto-updated by trigger) */
+    /**
+     * Timestamp when item was last updated
+     * Automatically updated by database trigger
+     */
     updatedAt: Date;
 }
 
 /**
- * CartWithItemsEntity - Aggregate root combining cart with its items
- * 
- * Extends CartEntity to include the full collection of cart items with
- * enriched product information. Used for efficient retrieval of complete
- * cart data in a single query.
- * 
- * @remarks
- * - This aggregate is typically returned by Repository.findWithItems()
- * - Uses JOIN queries to fetch cart + items + product data efficiently
- * - Service layer transforms this to CartDTO for API responses
+ * Cart item with product details (for joined queries)
+ * Used when retrieving cart with full product information
  */
-export interface CartWithItemsEntity {
-    /** Unique cart identifier (UUID v4) */
-    id: string;
+export interface CartItemWithProductEntity extends CartItemEntity {
+    /**
+     * Product details joined from products table
+     */
+    product: {
+        id: string;
+        name: string;
+        price: number;
+        status: string;
+        images: string[];
+        deletedAt: Date | null;
+    };
+}
 
-    /** Authenticated user identifier (UUID, nullable, references auth.users) */
-    userId: string | null;
-
-    /** Anonymous session identifier (TEXT, nullable, client-generated UUID) */
-    sessionId: string | null;
-
-    /** Timestamp when cart was created (auto-generated) */
-    createdAt: Date;
-
-    /** Timestamp when cart was last updated (auto-updated by trigger) */
-    updatedAt: Date;
-
-    /** Array of cart items with enriched product information */
+/**
+ * Cart with all items (aggregate root)
+ * Used when retrieving complete cart with items
+ */
+export interface CartWithItemsEntity extends CartEntity {
+    /**
+     * All items in the cart with product details
+     */
     items: CartItemWithProductEntity[];
 }
 
 /**
- * CartItemWithProductEntity - Cart item enriched with product details
- * 
- * Extends CartItemEntity to include essential product information needed
- * for displaying cart items in the UI. This avoids N+1 queries by joining
- * with the products table.
- * 
- * @remarks
- * - Product data is fetched via JOIN in Repository layer
- * - Product fields are denormalized for read performance
- * - deletedAt indicates if the product has been soft-deleted
- * - Service layer uses this to determine product availability
+ * Database row type from cart_items table
+ * Used for mapping database results to CartItemEntity
  */
-export interface CartItemWithProductEntity extends CartItemEntity {
-    /** Enriched product information from products table */
-    product: {
-        /** Product identifier (UUID) */
-        id: string;
+export interface CartItemRow {
+    id: string;
+    cart_id: string;
+    product_id: string;
+    quantity: number;
+    price_at_addition: string | number; // NUMERIC comes as string from PostgreSQL, but can also be number
+    created_at: string;
+    updated_at: string;
+}
 
-        /** Product name (for display in cart) */
-        name: string;
+/**
+ * Database row type for cart items with product details (joined query)
+ */
+export interface CartItemWithProductRow extends CartItemRow {
+    product_id: string;
+    product_name: string;
+    product_price: string | number;
+    product_status: string;
+    product_images: any; // JSONB
+    product_deleted_at: string | null;
+}
 
-        /** Current product price (may differ from priceAtAddition) */
-        price: number;
+/**
+ * Map database row to CartItemEntity
+ * 
+ * @param row - Database row from cart_items table
+ * @returns CartItemEntity with properly typed and parsed fields
+ */
+export function mapRowToCartItemEntity(row: CartItemRow | null): CartItemEntity | null {
+    if (!row) {
+        return null;
+    }
 
-        /** Product availability status ('active', 'inactive', 'out_of_stock') */
-        status: string;
+    const price = typeof row.price_at_addition === 'string'
+        ? parseFloat(row.price_at_addition)
+        : row.price_at_addition;
 
-        /** Array of product image URLs (JSONB in DB) */
-        images: string[];
+    return {
+        id: row.id,
+        cartId: row.cart_id,
+        productId: row.product_id,
+        quantity: row.quantity,
+        priceSnapshot: price,
+        priceAtAddition: price,
+        createdAt: new Date(row.created_at),
+        updatedAt: new Date(row.updated_at),
+    };
+}
 
-        /** Soft deletion timestamp (null = active, timestamp = deleted) */
-        deletedAt: Date | null;
+/**
+ * Map database row to CartItemWithProductEntity
+ * 
+ * @param row - Database row from joined query (cart_items + products)
+ * @returns CartItemWithProductEntity with product details
+ */
+export function mapRowToCartItemWithProductEntity(
+    row: CartItemWithProductRow
+): CartItemWithProductEntity {
+    // Parse images from JSONB
+    let images: string[] = [];
+    if (row.product_images) {
+        try {
+            images = typeof row.product_images === 'string'
+                ? JSON.parse(row.product_images)
+                : row.product_images;
+        } catch {
+            images = [];
+        }
+    }
+
+    const price = typeof row.price_at_addition === 'string'
+        ? parseFloat(row.price_at_addition)
+        : row.price_at_addition;
+
+    return {
+        id: row.id,
+        cartId: row.cart_id,
+        productId: row.product_id,
+        quantity: row.quantity,
+        priceSnapshot: price,
+        priceAtAddition: price,
+        createdAt: new Date(row.created_at),
+        updatedAt: new Date(row.updated_at),
+        product: {
+            id: row.product_id,
+            name: row.product_name,
+            price: typeof row.product_price === 'string'
+                ? parseFloat(row.product_price)
+                : row.product_price,
+            status: row.product_status,
+            images,
+            deletedAt: row.product_deleted_at ? new Date(row.product_deleted_at) : null,
+        },
     };
 }

@@ -1,231 +1,115 @@
 /**
- * CartRepository - Repository Layer Interface
+ * CartRepository Interface
  * 
- * This interface defines the contract for all database operations related to shopping carts.
- * It encapsulates SQL query construction, execution, and row-to-entity mapping.
+ * Defines the contract for cart data access operations.
+ * Provides abstraction over Supabase database for loose coupling.
  * 
- * @remarks
- * - This is the ONLY layer that directly interacts with Supabase client for cart operations
- * - Service Layer calls these methods and SHALL NOT access database directly
- * - All methods return CartEntity domain objects (not raw database rows)
- * - Database-specific errors are translated to domain exceptions
- * - Supports both authenticated users (userId) and guest users (sessionId)
- * 
- * @see CartEntity for the domain model structure
- * @see CartWithItemsEntity for the aggregate with items
- * 
- * **Validates: Requirements AR-1, AR-6**
+ * Requirements: AR-1, AR-6 (Repository layer with abstraction)
  */
 
-import { CartEntity } from '../entities/cart.entity';
-import { CartWithItemsEntity } from '../entities/cart-item.entity';
+import { CartEntity, CartWithItemsEntity } from '../entities';
 
 /**
- * CartRepository interface
+ * Repository interface for cart data access
  * 
- * Defines all database operations for the Cart Module.
- * Implementations must handle:
- * - SQL query construction with parameterized values
- * - Database row to CartEntity mapping
- * - Timestamp to Date object conversion
- * - Efficient JOIN queries for cart with items
- * - Database error translation to domain exceptions
- * - Enforcement of business rules (one cart per user/session)
+ * Provides CRUD operations for carts with support for both
+ * authenticated users (user_id) and anonymous users (session_id).
  */
 export interface CartRepository {
     /**
-     * Create a new cart for a user or session
+     * Create a new cart
      * 
-     * @param userId - Authenticated user identifier (UUID, nullable)
-     * @param sessionId - Anonymous session identifier (TEXT, nullable)
-     * @returns Promise resolving to the created CartEntity with generated id and timestamps
+     * @param userId - Authenticated user ID (NULL for anonymous)
+     * @param sessionId - Session ID for anonymous users (NULL for authenticated)
+     * @returns Created cart entity
+     * @throws Error if both userId and sessionId are NULL or both are set
      * 
-     * @throws ConflictException if cart already exists for user or session
-     * @throws ValidationException if both userId and sessionId are null or both are provided
-     * @throws RepositoryException for database errors
-     * 
-     * @remarks
-     * - Generates UUID for id if not provided
-     * - Sets created_at and updated_at to NOW()
-     * - Either userId OR sessionId must be set (enforced by CHECK constraint)
-     * - A user can have only one cart (enforced by unique constraint on user_id)
-     * - A session can have only one cart (enforced by unique constraint on session_id)
-     * 
-     * **Example:**
-     * ```typescript
+     * @example
      * // Create cart for authenticated user
-     * const cart = await cartRepo.create('user-uuid-123', null);
+     * const cart = await repository.create('user-uuid', null);
      * 
-     * // Create cart for guest user
-     * const guestCart = await cartRepo.create(null, 'session-uuid-456');
-     * ```
-     * 
-     * **Validates: Requirements AR-1, BR-6, NFR-12**
+     * @example
+     * // Create cart for anonymous user
+     * const cart = await repository.create(null, 'session-uuid');
      */
     create(userId: string | null, sessionId: string | null): Promise<CartEntity>;
 
     /**
-     * Find a cart by its unique identifier
+     * Find cart by ID
      * 
-     * @param cartId - Cart UUID to find
-     * @returns Promise resolving to CartEntity or null if not found
+     * @param cartId - Cart ID to find
+     * @returns Cart entity or null if not found
      * 
-     * @remarks
-     * - Returns null if cart not found
-     * - Maps database row to CartEntity with proper type conversions
-     * - Does not include cart items (use findWithItems for that)
-     * 
-     * **Example:**
-     * ```typescript
-     * const cart = await cartRepo.findById('cart-uuid-123');
-     * if (cart) {
-     *   console.log(`Cart belongs to user: ${cart.userId}`);
-     * }
-     * ```
-     * 
-     * **Validates: Requirements AR-1, AR-6**
+     * @example
+     * const cart = await repository.findById('cart-uuid');
      */
     findById(cartId: string): Promise<CartEntity | null>;
 
     /**
-     * Find a cart by authenticated user ID
+     * Find cart by user ID
      * 
-     * @param userId - User UUID to find cart for
-     * @returns Promise resolving to CartEntity or null if not found
+     * @param userId - User ID to find cart for
+     * @returns Cart entity or null if not found
      * 
-     * @remarks
-     * - Returns null if user has no cart
-     * - Uses index on user_id for fast lookup
-     * - A user can have only one cart (enforced by unique constraint)
-     * 
-     * **Example:**
-     * ```typescript
-     * const cart = await cartRepo.findByUserId('user-uuid-123');
-     * if (!cart) {
-     *   // User has no cart, create one
-     *   cart = await cartRepo.create('user-uuid-123', null);
-     * }
-     * ```
-     * 
-     * **Validates: Requirements AR-1, AR-6, NFR-1**
+     * @example
+     * const cart = await repository.findByUserId('user-uuid');
      */
     findByUserId(userId: string): Promise<CartEntity | null>;
 
     /**
-     * Find a cart by anonymous session ID
+     * Find cart by session ID
      * 
-     * @param sessionId - Session identifier to find cart for
-     * @returns Promise resolving to CartEntity or null if not found
+     * @param sessionId - Session ID to find cart for
+     * @returns Cart entity or null if not found
      * 
-     * @remarks
-     * - Returns null if session has no cart
-     * - Uses index on session_id for fast lookup
-     * - A session can have only one cart (enforced by unique constraint)
-     * 
-     * **Example:**
-     * ```typescript
-     * const cart = await cartRepo.findBySessionId('session-uuid-456');
-     * if (!cart) {
-     *   // Session has no cart, create one
-     *   cart = await cartRepo.create(null, 'session-uuid-456');
-     * }
-     * ```
-     * 
-     * **Validates: Requirements AR-1, AR-6, NFR-1**
+     * @example
+     * const cart = await repository.findBySessionId('session-uuid');
      */
     findBySessionId(sessionId: string): Promise<CartEntity | null>;
 
     /**
-     * Find a cart with all its items and product details in a single query
+     * Find cart with all items and product details
      * 
-     * @param cartId - Cart UUID to find
-     * @returns Promise resolving to CartWithItemsEntity or null if not found
+     * Performs efficient JOIN query to retrieve cart with items
+     * and associated product information in a single query.
      * 
-     * @remarks
-     * - Returns null if cart not found
-     * - Uses efficient JOIN query to fetch cart + items + products in one round-trip
-     * - Includes product information (name, price, status, images, deletedAt)
-     * - Service layer uses this to calculate totals and check product availability
-     * - Leverages indexes on cart_id and product_id for performance
+     * @param cartId - Cart ID to find
+     * @returns Cart with items or null if not found
      * 
-     * **Query Pattern:**
-     * ```sql
-     * SELECT 
-     *   c.id, c.user_id, c.session_id, c.created_at, c.updated_at,
-     *   ci.id as item_id, ci.product_id, ci.quantity, ci.price_at_addition,
-     *   p.name, p.price, p.status, p.images, p.deleted_at
-     * FROM carts c
-     * LEFT JOIN cart_items ci ON ci.cart_id = c.id
-     * LEFT JOIN products p ON p.id = ci.product_id
-     * WHERE c.id = $1;
-     * ```
-     * 
-     * **Example:**
-     * ```typescript
-     * const cartWithItems = await cartRepo.findWithItems('cart-uuid-123');
-     * if (cartWithItems) {
-     *   const subtotal = cartWithItems.items.reduce(
-     *     (sum, item) => sum + (item.quantity * item.priceAtAddition), 0
-     *   );
-     * }
-     * ```
-     * 
-     * **Validates: Requirements AR-1, AR-6, NFR-1, NFR-4**
+     * @example
+     * const cartWithItems = await repository.findWithItems('cart-uuid');
+     * console.log(cartWithItems.items.length); // Number of items
+     * console.log(cartWithItems.items[0].product.name); // Product name
      */
     findWithItems(cartId: string): Promise<CartWithItemsEntity | null>;
 
     /**
-     * Update a cart with partial data
+     * Update cart
      * 
-     * @param cartId - Cart UUID to update
-     * @param data - Partial CartEntity with fields to update
-     * @returns Promise resolving to the updated CartEntity
+     * @param cartId - Cart ID to update
+     * @param data - Partial cart data to update
+     * @returns Updated cart entity
+     * @throws Error if cart not found
      * 
-     * @throws NotFoundException if cart not found
-     * @throws ValidationException if attempting to set both userId and sessionId
-     * @throws RepositoryException for database errors
-     * 
-     * @remarks
-     * - Only updates provided fields (partial update)
-     * - updated_at is automatically set by database trigger
-     * - Cannot update id or created_at through this method
-     * - Commonly used to convert guest cart to user cart (set userId, clear sessionId)
-     * 
-     * **Example:**
-     * ```typescript
-     * // Convert guest cart to user cart after login
-     * const updatedCart = await cartRepo.update('cart-uuid-123', {
-     *   userId: 'user-uuid-789',
-     *   sessionId: null
+     * @example
+     * // Transfer anonymous cart to authenticated user
+     * const cart = await repository.update('cart-uuid', {
+     *   userId: 'user-uuid',
+     *   sessionId: null,
      * });
-     * ```
-     * 
-     * **Validates: Requirements AR-1, AR-6**
      */
     update(cartId: string, data: Partial<CartEntity>): Promise<CartEntity>;
 
     /**
-     * Delete a cart and all its items
+     * Delete cart
      * 
-     * @param cartId - Cart UUID to delete
-     * @returns Promise resolving when deletion is complete
+     * Deletes cart and all associated items (CASCADE DELETE).
      * 
-     * @throws NotFoundException if cart not found
-     * @throws RepositoryException for database errors
+     * @param cartId - Cart ID to delete
+     * @returns void
      * 
-     * @remarks
-     * - Hard delete (not soft delete)
-     * - Cascades to delete all cart items (ON DELETE CASCADE)
-     * - Used when merging carts (delete guest cart after merge)
-     * - Idempotent: calling on non-existent cart throws NotFoundException
-     * 
-     * **Example:**
-     * ```typescript
-     * // Delete guest cart after merging into user cart
-     * await cartRepo.delete('guest-cart-uuid-456');
-     * ```
-     * 
-     * **Validates: Requirements AR-1, AR-6**
+     * @example
+     * await repository.delete('cart-uuid');
      */
     delete(cartId: string): Promise<void>;
 }

@@ -33,12 +33,12 @@ info:
     name: Proprietary
 
 servers:
-  - url: https://api.dakshinkali-electronics.com/api/v1
-    description: Production server
+  - url: http://localhost:3002/api/v1
+    description: Local development server (default)
   - url: https://staging-api.dakshinkali-electronics.com/api/v1
     description: Staging server
-  - url: http://localhost:3002/api/v1
-    description: Local development server
+  - url: https://api.dakshinkali-electronics.com/api/v1
+    description: Production 
 
 tags:
   - name: Admin Products
@@ -80,7 +80,43 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CreateProductRequest'
+              type: object
+              required:
+                - name
+                - price
+                - category
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                  description: Product name (unique within category)
+                  example: iPhone 15 Pro
+                description:
+                  type: string
+                  maxLength: 2000
+                  description: Product description
+                  example: Latest iPhone with A17 Pro chip
+                price:
+                  type: number
+                  format: double
+                  minimum: 0.01
+                  description: Product price (must be > 0)
+                  example: 999.99
+                category:
+                  type: string
+                  minLength: 1
+                  description: Product category
+                  example: electronics
+                status:
+                  $ref: '#/components/schemas/ProductStatus'
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 5
+                  description: Product images (max 5 files, 5MB each, JPEG/PNG/WebP)
       responses:
         '201':
           description: Product created successfully
