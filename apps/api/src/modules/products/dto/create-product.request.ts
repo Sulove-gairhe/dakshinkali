@@ -45,5 +45,5 @@ export interface CreateProductRequest {
     status?: ProductStatus;
 
     /** Product images (optional, max 5 files, 5MB each, JPEG/PNG/WebP) */
-    images?: File[];
+    images?: Express.Multer.File[];
 }

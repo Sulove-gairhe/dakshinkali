@@ -5,6 +5,7 @@
  */
 
 import { Express, Request, Response, NextFunction } from 'express';
+import multer from 'multer';
 import { createSupabaseClient, ProductImageStorage } from '@dakshinkali/database';
 import { ProductRepositoryImpl } from '../repositories/product.repository.impl';
 import { ProductServiceImpl } from '../services/product.service.impl';
@@ -12,6 +13,24 @@ import { ImageStorageServiceImpl } from '../services/image-storage.service.impl'
 import { AdminProductController } from '../controllers/admin-product.controller';
 import { PublicProductController } from '../controllers/public-product.controller';
 import { authMiddleware, adminAuthMiddleware, rateLimitMiddleware } from '../../../common/middleware/express-adapters';
+
+// Configure multer for memory storage
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB max file size
+        files: 5, // Max 5 files
+    },
+    fileFilter: (req, file, cb) => {
+        // Only allow image files
+        const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only JPEG, PNG, and WebP images are allowed.'));
+        }
+    },
+});
 
 /**
  * Register product routes with Express app
@@ -35,9 +54,20 @@ export function registerProductRoutes(app: Express): void {
         authMiddleware,
         adminAuthMiddleware,
         rateLimitMiddleware({ maxRequests: 100, windowSeconds: 60 }),
+        upload.array('images', 5), // Handle up to 5 image files
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const result = await adminController.createProduct(req.body);
+                // Parse JSON fields from multipart form data
+                const productData = {
+                    name: req.body.name,
+                    description: req.body.description,
+                    price: parseFloat(req.body.price),
+                    category: req.body.category,
+                    status: req.body.status,
+                    images: req.files as Express.Multer.File[], // Multer files
+                };
+
+                const result = await adminController.createProduct(productData);
                 res.status(result.status).json(result.data);
             } catch (error) {
                 next(error);
@@ -84,9 +114,21 @@ export function registerProductRoutes(app: Express): void {
         authMiddleware,
         adminAuthMiddleware,
         rateLimitMiddleware({ maxRequests: 100, windowSeconds: 60 }),
+        upload.array('images', 5), // Handle up to 5 image files
         async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const result = await adminController.updateProduct(req.params.id, req.body);
+                // Parse JSON fields from multipart form data
+                const updateData = {
+                    name: req.body.name,
+                    description: req.body.description,
+                    price: req.body.price ? parseFloat(req.body.price) : undefined,
+                    category: req.body.category,
+                    status: req.body.status,
+                    images: req.files as Express.Multer.File[], // Multer files
+                    removeImages: req.body.removeImages ? JSON.parse(req.body.removeImages) : undefined,
+                };
+
+                const result = await adminController.updateProduct(req.params.id, updateData);
                 res.status(result.status).json(result.data);
             } catch (error) {
                 next(error);

@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   YourStore — Global CSS Variables
+   Cozy Electronics · Light + Dark Mode
+   ============================================ */
+
+@layer base {
+
+  /* ---- LIGHT MODE ---- */
+  :root {
+    /* Brand Colors */
+    --color-primary: #3A5A40;
+    --color-secondary: #FAF3E0;
+    --color-accent: #E76F51;
+    --color-highlight: #F4A261;
+    --color-text: #2B2B2B;
+    --color-text-muted: #6B7280;
+    --color-border: #E5D9C3;
+    --color-surface: #FFFFFF;
+
+    /* shadcn/ui HSL Variables (mapped to our palette) */
+    --background: 42 70% 96%;          /* #FAF3E0 */
+    --foreground: 0 0% 17%;            /* #2B2B2B */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 17%;
+    --primary: 130 22% 30%;            /* #3A5A40 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 42 70% 96%;           /* #FAF3E0 */
+    --secondary-foreground: 130 22% 30%;
+    --muted: 42 30% 90%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 14 74% 60%;              /* #E76F51 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 38 43% 84%;              /* #E5D9C3 */
+    --input: 38 43% 84%;
+    --ring: 14 74% 60%;                /* accent as focus ring */
+    --radius: 0.75rem;
+  }
+
+  /* ---- DARK MODE ---- */
+  .dark {
+    /* Brand Colors */
+    --color-primary: #5C8A63;
+    --color-secondary: #1C1A17;
+    --color-accent: #E76F51;
+    --color-highlight: #F4A261;
+    --color-text: #F0EAD6;
+    --color-text-muted: #9CA3AF;
+    --color-border: #2E2B26;
+    --color-surface: #242018;
+
+    /* shadcn/ui HSL Variables */
+    --background: 36 8% 10%;           /* #1C1A17 */
+    --foreground: 42 50% 90%;          /* #F0EAD6 */
+    --card: 36 10% 13%;                /* #242018 */
+    --card-foreground: 42 50% 90%;
+    --popover: 36 10% 13%;
+    --popover-foreground: 42 50% 90%;
+    --primary: 130 20% 45%;            /* #5C8A63 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 36 8% 10%;
+    --secondary-foreground: 42 50% 90%;
+    --muted: 36 8% 18%;
+    --muted-foreground: 220 9% 64%;
+    --accent: 14 74% 60%;              /* unchanged */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 36 9% 16%;               /* #2E2B26 */
+    --input: 36 9% 16%;
+    --ring: 14 74% 60%;
+  }
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  /* Smooth theme transitions */
+  html {
+    transition: background-color 0.3s ease, color 0.2s ease;
+  }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+@layer utilities {
+  /* Text using brand vars */
+  .text-brand-primary   { color: var(--color-primary); }
+  .text-brand-accent    { color: var(--color-accent); }
+  .text-brand-highlight { color: var(--color-highlight); }
+  .text-brand-muted     { color: var(--color-text-muted); }
+
+  /* Backgrounds */
+  .bg-brand-primary   { background-color: var(--color-primary); }
+  .bg-brand-secondary { background-color: var(--color-secondary); }
+  .bg-brand-accent    { background-color: var(--color-accent); }
+  .bg-brand-surface   { background-color: var(--color-surface); }
+
+  /* Card style shorthand */
+  .card-cozy {
+    @apply bg-brand-surface rounded-2xl border border-border shadow-card
+           transition-shadow duration-200 hover:shadow-card-hover;
+  }
+
+  /* CTA Button shorthand */
+  .btn-cta {
+    @apply bg-accent text-white rounded-full px-6 py-2.5
+           font-body font-semibold text-sm
+           transition-transform duration-150
+           hover:scale-[1.03] active:scale-[0.97];
+  }
+
+  /* Focus ring using accent */
+  .focus-brand {
+    @apply focus-visible:outline-none focus-visible:ring-2
+           focus-visible:ring-accent focus-visible:ring-offset-2;
+  }
+}

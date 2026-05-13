@@ -1,302 +1,317 @@
-# Authentication Scripts
+# 🔐 Authentication Scripts
 
-**Automated scripts for Supabase Auth setup and management**
+This directory contains scripts to help you work with Supabase authentication.
 
 ---
 
 ## 📋 Available Scripts
 
-### 1. Apply Auth Migration
-
-Applies the profiles table migration to your Supabase database.
-
-**Usage**:
+### 1. Get Access Token
 ```bash
-pnpm run auth:migrate
+pnpm auth:token <email> <password>
 ```
 
-**What it does**:
-- Links to your Supabase project
-- Pushes all migrations to database
-- Creates profiles table with RLS policies
-- Sets up automatic profile creation trigger
+**What it does:**
+- Signs in to Supabase with your credentials
+- Returns your access token and refresh token
+- Shows ready-to-use curl commands
+- Displays user info (email, role, expiry)
 
-**Files**:
-- `apply-auth-migration.sh` (Unix/Mac/Linux)
-- `apply-auth-migration.ps1` (Windows PowerShell)
+**Example:**
+```bash
+pnpm auth:token testadmin@example.com TestAdmin123!
+```
+
+**Output:**
+- ✅ User information
+- 🔑 Access token (copy this!)
+- 📝 Ready-to-paste curl commands
+- 🔄 Refresh token
 
 ---
 
 ### 2. Create Admin User
-
-Creates a new user with admin role.
-
-**Usage**:
 ```bash
-pnpm run auth:create-admin <email> <password>
+pnpm auth:create-admin <email> <password>
 ```
 
-**Example**:
+**What it does:**
+- Creates a new user in Supabase
+- Sets their role to 'admin'
+- Confirms email automatically
+
+**Example:**
 ```bash
-pnpm run auth:create-admin admin@example.com SecurePass123!
+pnpm auth:create-admin admin@example.com SecurePass123!
 ```
-
-**What it does**:
-- Creates user in auth.users
-- Auto-confirms email
-- Creates profile in public.profiles
-- Sets role to 'admin'
-
-**File**: `create-admin-user.js`
 
 ---
 
 ### 3. Update User Role
-
-Updates an existing user's role.
-
-**Usage**:
 ```bash
-pnpm run auth:update-role <email> <role>
+pnpm auth:update-role <email> <role>
 ```
 
-**Example**:
+**What it does:**
+- Updates an existing user's role
+- Valid roles: `admin`, `user`
+
+**Example:**
 ```bash
-pnpm run auth:update-role user@example.com admin
+pnpm auth:update-role user@example.com admin
 ```
-
-**Valid roles**: `admin`, `customer`
-
-**File**: `update-user-role.js`
 
 ---
 
 ### 4. Test Authentication
-
-Tests the complete authentication flow.
-
-**Usage**:
 ```bash
-# Start API first
+pnpm auth:test <email> <password>
+```
+
+**What it does:**
+- Tests sign-in functionality
+- Verifies token is valid
+- Checks user role
+
+**Example:**
+```bash
+pnpm auth:test testadmin@example.com TestAdmin123!
+```
+
+---
+
+## 🚀 Quick Start Guide
+
+### Step 1: Create an Admin User
+
+```bash
+pnpm auth:create-admin testadmin@example.com TestAdmin123!
+```
+
+### Step 2: Get Access Token
+
+```bash
+pnpm auth:token testadmin@example.com TestAdmin123!
+```
+
+### Step 3: Save Token to Variable
+
+**Bash/Zsh:**
+```bash
+export TOKEN="<paste-token-here>"
+```
+
+**PowerShell:**
+```powershell
+$TOKEN="<paste-token-here>"
+```
+
+### Step 4: Test API
+
+```bash
+# Start API server
 pnpm --filter @dakshinkali/api run dev
 
-# In another terminal
-pnpm run auth:test <email> <password>
+# Test authenticated endpoint
+curl http://localhost:3002/api/v1/admin/products \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
-**Example**:
+---
+
+## 📖 Detailed Guides
+
+| Guide | Description |
+|-------|-------------|
+| **QUICK_START.md** | Fast setup with copy-paste commands |
+| **TOKEN_USAGE_GUIDE.md** | Complete guide to using access tokens |
+| **../agent/docs/AUTH_NEXT_STEPS.md** | Full authentication setup guide |
+
+---
+
+## 🔑 Understanding Access Tokens
+
+### What is an Access Token?
+
+An access token is a **JWT (JSON Web Token)** that proves you're authenticated. It contains:
+- User ID
+- Email
+- Role (admin/user)
+- Expiration time (~1 hour)
+
+### Where to Use It
+
+**In curl commands:**
 ```bash
-pnpm run auth:test admin@example.com SecurePass123!
+curl http://localhost:3002/api/v1/admin/products \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-**What it tests**:
-1. User login
-2. JWT token generation
-3. Profile retrieval
-4. API authentication
-
-**File**: `test-auth.js`
-
----
-
-## 🚀 Quick Start
-
-```bash
-# 1. Apply migration
-pnpm run auth:migrate
-
-# 2. Create admin user
-pnpm run auth:create-admin admin@example.com password
-
-# 3. Test authentication
-pnpm run auth:test admin@example.com password
+**In JavaScript/TypeScript:**
+```typescript
+fetch('http://localhost:3002/api/v1/admin/products', {
+  headers: {
+    'Authorization': `Bearer ${token}`
+  }
+});
 ```
 
----
-
-## 📝 Requirements
-
-### Environment Variables
-
-All scripts require these environment variables in `.env`:
-
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-```
-
-### Dependencies
-
-- Node.js 18+
-- pnpm
-- Supabase CLI (already in package.json)
-- @supabase/supabase-js
-- node-fetch
+**In Postman/Insomnia:**
+1. Go to **Authorization** tab
+2. Select **Bearer Token**
+3. Paste your token
 
 ---
 
-## 🔧 Script Details
+## 🎯 Common Use Cases
 
-### apply-auth-migration.sh / .ps1
-
-**Platform**: Cross-platform (auto-detected)
-
-**Requirements**:
-- Supabase CLI installed
-- .env file with credentials
-- Internet connection
-
-**Process**:
-1. Loads environment variables from .env
-2. Extracts project ref from SUPABASE_URL
-3. Links to Supabase project
-4. Pushes migrations to database
-
-**Error handling**:
-- Checks for .env file
-- Validates required variables
-- Exits on link/push failure
-
----
-
-### create-admin-user.js
-
-**Platform**: Cross-platform (Node.js)
-
-**Requirements**:
-- @supabase/supabase-js installed
-- Service role key in .env
-
-**Process**:
-1. Validates email and password
-2. Creates user with admin.createUser()
-3. Auto-confirms email
-4. Updates profile role to 'admin'
-
-**Validation**:
-- Email must contain '@'
-- Password must be 6+ characters
-- Role defaults to 'admin'
-
----
-
-### update-user-role.js
-
-**Platform**: Cross-platform (Node.js)
-
-**Requirements**:
-- @supabase/supabase-js installed
-- Service role key in .env
-
-**Process**:
-1. Validates role (admin or customer)
-2. Finds user by email
-3. Updates profile role
-
-**Error handling**:
-- User not found
-- Invalid role
-- Database errors
-
----
-
-### test-auth.js
-
-**Platform**: Cross-platform (Node.js)
-
-**Requirements**:
-- @supabase/supabase-js installed
-- node-fetch installed
-- API server running
-
-**Process**:
-1. Logs in with credentials
-2. Extracts access token
-3. Fetches user profile
-4. Calls protected API endpoint
-
-**Tests**:
-- ✅ Login successful
-- ✅ Token generated
-- ✅ Profile exists with role
-- ✅ API accepts token
-
----
-
-## 🐛 Troubleshooting
-
-### "Project not linked"
+### Testing Admin Endpoints
 
 ```bash
-# Link manually
-supabase link --project-ref your-project-ref
+# Get token
+pnpm auth:token admin@example.com password
+
+# Save to variable
+export TOKEN="<token>"
+
+# Test endpoints
+curl http://localhost:3002/api/v1/admin/products -H "Authorization: Bearer $TOKEN"
+curl http://localhost:3002/api/v1/admin/products/123 -H "Authorization: Bearer $TOKEN"
 ```
 
-### "User already exists"
+### Creating Multiple Users
 
 ```bash
-# Update existing user instead
-pnpm run auth:update-role existing@example.com admin
+# Create admin
+pnpm auth:create-admin admin@example.com AdminPass123!
+
+# Create regular user
+pnpm auth:create-admin user@example.com UserPass123!
+
+# Update to regular user role
+pnpm auth:update-role user@example.com user
 ```
 
-### "Cannot connect to database"
+### Debugging Auth Issues
 
 ```bash
-# Check Supabase status
-supabase status
+# Test if credentials work
+pnpm auth:test admin@example.com password
 
-# Verify .env credentials
-cat .env | grep SUPABASE
-```
+# Get fresh token
+pnpm auth:token admin@example.com password
 
-### "Test fails with ECONNREFUSED"
-
-```bash
-# Make sure API is running
-pnpm --filter @dakshinkali/api run dev
+# Check user role in Supabase Dashboard
+# Go to: Authentication > Users > Click user > Check raw_user_meta_data.role
 ```
 
 ---
 
-## 📚 Documentation
+## ❓ FAQ
 
-For detailed guides, see:
-- `agent/docs/AUTH_CLI_GUIDE.md` - Complete CLI guide
-- `agent/docs/AUTH_QUICK_REFERENCE.md` - Code snippets
-- `agent/docs/AUTH_SETUP_COMPLETE.md` - Setup overview
+### Q: Where do I paste the token in terminal?
+
+**A:** You have two options:
+
+**Option 1: Direct paste (one-time use)**
+```bash
+curl http://localhost:3002/api/v1/admin/products \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+**Option 2: Save to variable (reusable)**
+```bash
+# Save it
+export TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+# Use it multiple times
+curl http://localhost:3002/api/v1/admin/products -H "Authorization: Bearer $TOKEN"
+curl http://localhost:3002/api/v1/admin/products/123 -H "Authorization: Bearer $TOKEN"
+```
+
+### Q: Why can't I see tokens in Supabase Dashboard?
+
+**A:** Tokens are **not stored in the database**. They are:
+- Generated on-demand during sign-in
+- Session-based (temporary)
+- Only visible in the authentication response
+
+Use the `pnpm auth:token` script to get tokens for testing.
+
+### Q: How long do tokens last?
+
+**A:** Access tokens expire after **1 hour**. When expired, run the script again:
+```bash
+pnpm auth:token admin@example.com password
+```
+
+### Q: What's the difference between access token and refresh token?
+
+| Token Type | Purpose | Lifetime | Usage |
+|------------|---------|----------|-------|
+| **Access Token** | Authenticate API requests | ~1 hour | Include in Authorization header |
+| **Refresh Token** | Get new access tokens | ~7 days | Used by Supabase client to refresh |
+
+For manual testing, you only need the **access token**.
+
+### Q: Can I use the same token for multiple requests?
+
+**A:** Yes! Until it expires (~1 hour), you can reuse the same token for all requests.
+
+### Q: What if I get "Invalid JWT" error?
+
+**Possible causes:**
+1. Token expired → Get a new one
+2. Token malformed → Copy the full token
+3. Wrong environment → Check SUPABASE_URL in .env
+
+**Solution:**
+```bash
+# Get fresh token
+pnpm auth:token admin@example.com password
+```
+
+---
+
+## 🛠️ Script Files
+
+| File | Purpose |
+|------|---------|
+| `get-auth-token.js` | Get access token with formatted output |
+| `create-admin-user.js` | Create new admin user |
+| `update-user-role.js` | Change user role |
+| `test-auth.js` | Test authentication flow |
+| `save-token.sh` | Auto-save token to variable (bash) |
+| `save-token.ps1` | Auto-save token to variable (PowerShell) |
 
 ---
 
 ## 🔒 Security Notes
 
-1. **Never commit .env** - Contains sensitive keys
-2. **Use strong passwords** - Generate with `openssl rand -base64 32`
-3. **Service role key** - Keep secret, never expose to frontend
-4. **Test locally first** - Use local Supabase before production
+⚠️ **Important:**
+- Never commit tokens to git
+- Don't share tokens publicly
+- Tokens expire after 1 hour
+- Use environment variables in production
+- Don't log tokens in production code
 
 ---
 
-## 🎯 Best Practices
+## 📚 Additional Resources
 
-1. **Version control migrations** - Commit migration files
-2. **Test before production** - Always test locally first
-3. **Backup before migrations** - Backup production database
-4. **Use environment variables** - Never hardcode credentials
-5. **Strong passwords** - Use password generators
+- **Supabase Auth Docs**: https://supabase.com/docs/guides/auth
+- **JWT.io**: https://jwt.io (decode tokens to see contents)
+- **Project Auth Guide**: `../agent/docs/AUTH_NEXT_STEPS.md`
 
 ---
 
-## 📊 Script Status
+## 🆘 Need Help?
 
-| Script | Status | Platform |
-|--------|--------|----------|
-| apply-auth-migration.sh | ✅ Ready | Unix/Mac/Linux |
-| apply-auth-migration.ps1 | ✅ Ready | Windows |
-| create-admin-user.js | ✅ Ready | Cross-platform |
-| update-user-role.js | ✅ Ready | Cross-platform |
-| test-auth.js | ✅ Ready | Cross-platform |
+1. Check **TOKEN_USAGE_GUIDE.md** for detailed examples
+2. Check **QUICK_START.md** for fast setup
+3. Check **../agent/docs/** for architecture docs
+4. Run `pnpm auth:test` to verify your setup
 
 ---
 
-**All scripts are production-ready and tested!** 🚀
+**Happy authenticating! 🚀**

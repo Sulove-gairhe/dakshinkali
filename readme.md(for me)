@@ -1,0 +1,181 @@
+Recommended Start Order
+Phase 1
+
+Build:
+
+apps/web
+apps/admin
+packages/ui
+packages/types
+packages/database
+Phase 2
+
+Add:
+
+packages/utils
+packages/config
+docs
+scripts
+Phase 3
+
+Add:
+
+apps/api
+mobile app
+workers
+
+---------------------------------------------------------------------------
+
+apps/
+
+Contains runnable applications.
+
+apps/web
+
+Customer-facing ecommerce website.
+
+Responsibilities
+Homepage
+Product listing
+Product detail pages
+Search / filters
+Cart
+Checkout
+User login/signup
+Order history
+Order tracking
+Suggested Structure
+apps/web/
+│── app/
+│── components/
+│── lib/
+│── hooks/
+│── public/
+│── styles/
+apps/admin
+
+Business operating dashboard.
+
+Responsibilities
+Dashboard overview
+Product CRUD
+Category CRUD
+Order management
+Expense tracking
+Inventory management
+Analytics
+Customer records
+Settings
+Suggested Structure
+apps/admin/
+│── app/
+│── components/
+│── lib/
+│── hooks/
+│── styles/
+apps/api (optional future)
+
+Backend service (NestJS later if needed).
+
+Use Cases
+Complex business logic
+Webhooks
+Third-party integrations
+Mobile API
+Background jobs
+packages/
+
+Reusable shared code.
+
+packages/ui
+
+Shared UI components used by both web and admin.
+
+Examples:
+
+Button
+Input
+Modal
+Card
+Table
+Sidebar
+Navbar
+ProductCard
+
+Why?
+
+Build once, use everywhere.
+
+packages/types
+
+Shared TypeScript types.
+
+Examples:
+
+Product
+Order
+User
+Expense
+Category
+InventoryMovement
+
+Why?
+
+Keeps frontend/admin consistent.
+
+packages/utils
+
+Reusable helper functions.
+
+Examples:
+
+formatCurrency()
+formatDate()
+generateSlug()
+calculateProfit()
+calculateDiscount()
+packages/database
+
+Database-related logic.
+
+Contains:
+
+Supabase client
+Query helpers
+DB utilities
+Validation helpers
+Shared data access logic
+packages/config
+
+Shared configuration files.
+
+Contains:
+
+tsconfig
+eslint config
+prettier config
+
+Why?
+
+All apps follow same coding standards.
+
+docs/
+
+Project documentation.
+
+Examples:
+
+database-schema.md
+api-plan.md
+feature-roadmap.md
+deployment-guide.md
+scripts/
+
+Automation scripts.
+
+Examples:
+
+seed.ts
+backup.ts
+generate-types.ts
+cleanup.ts

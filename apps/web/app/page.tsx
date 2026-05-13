@@ -1,9 +1,14 @@
-'use client';
+"use client";
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import type { CSSProperties } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
+import Link from "next/link";
+import { Navbar } from "@/components/navbar";
+import { HeroGrid } from "@/components/hero-grid";
+import { ApplianceStrip } from "@/components/appliance-strip";
+import { TrendingProducts } from "@/components/trending-products";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
 
 type Product = {
   id: string;
@@ -49,7 +54,7 @@ type Profile = {
 };
 
 function getSessionId() {
-  const key = 'dakshinkali_session_id';
+  const key = "dakshinkali_session_id";
   let value = window.localStorage.getItem(key);
   if (!value) {
     value = crypto.randomUUID();
@@ -59,148 +64,72 @@ function getSessionId() {
 }
 
 export default function WebStorePage() {
-  const [token, setToken] = useState('');
-  const [sessionId, setSessionId] = useState('');
-  const [products, setProducts] = useState<Product[]>([]);
+  // Only keep cart and sessionId for Navbar
   const [cart, setCart] = useState<Cart | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [status, setStatus] = useState('Ready');
-  const [checkout, setCheckout] = useState({
-    customerEmail: '',
-    customerName: '',
-    customerPhone: '',
-    line1: '',
-    city: 'Kathmandu',
-    state: 'Bagmati',
-    postalCode: '44600',
-  });
+  const [sessionId, setSessionId] = useState("");
 
-  const headers = useMemo(() => {
-    const result: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) result.Authorization = `Bearer ${token}`;
-    if (sessionId) result['X-Session-ID'] = sessionId;
-    return result;
-  }, [token, sessionId]);
-
+  // Only set sessionId in effect, do not call setState and another function in the same effect
   useEffect(() => {
-    const currentSessionId = getSessionId();
-    setSessionId(currentSessionId);
-    void loadProducts();
+    setSessionId(getSessionId());
   }, []);
-
-  useEffect(() => {
-    if (sessionId) void loadCart();
-  }, [sessionId, token]);
-
-  async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const response = await fetch(`${API_URL}${path}`, {
-      ...options,
-      headers: { ...headers, ...(options.headers as Record<string, string> | undefined) },
-    });
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(text || `Request failed with ${response.status}`);
-    }
-    if (response.status === 204) return undefined as T;
-    return response.json();
-  }
-
-  async function run(label: string, action: () => Promise<void>) {
-    setStatus(`${label}...`);
-    try {
-      await action();
-      setStatus(`${label} complete`);
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Request failed');
-    }
-  }
-
-  async function loadProducts() {
-    await run('Loading products', async () => {
-      const result = await request<{ data: Product[] }>('/api/v1/products');
-      setProducts(result.data || []);
-    });
-  }
-
-  async function loadCart() {
-    await run('Loading cart', async () => {
-      const result = await request<Cart>('/api/v1/cart');
-      setCart(result);
-    });
-  }
-
-  async function loadOrders() {
-    await run('Loading orders', async () => {
-      const result = await request<{ data: Order[] }>('/api/v1/orders');
-      setOrders(result.data || []);
-    });
-  }
-
-  async function loadProfile() {
-    await run('Loading profile', async () => {
-      const result = await request<Profile>('/api/v1/profile');
-      setProfile(result);
-      setCheckout((current) => ({
-        ...current,
-        customerEmail: current.customerEmail || result.email || '',
-        customerName: current.customerName || result.fullName || '',
-        customerPhone: current.customerPhone || result.phone || '',
-      }));
-    });
-  }
-
-  async function addToCart(productId: string) {
-    await run('Adding item', async () => {
-      const result = await request<Cart>('/api/v1/cart/items', {
-        method: 'POST',
-        body: JSON.stringify({ productId, quantity: 1 }),
-      });
-      setCart(result);
-    });
-  }
-
-  async function updateQuantity(itemId: string, quantity: number) {
-    await run('Updating cart', async () => {
-      const result = await request<Cart>(`/api/v1/cart/items/${itemId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ quantity }),
-      });
-      setCart(result);
-    });
-  }
-
-  async function createOrder(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    await run('Creating order', async () => {
-      await request<Order>('/api/v1/orders', {
-        method: 'POST',
-        body: JSON.stringify({
-          customerEmail: checkout.customerEmail,
-          customerName: checkout.customerName,
-          customerPhone: checkout.customerPhone || null,
-          shippingAddress: {
-            line1: checkout.line1,
-            city: checkout.city,
-            state: checkout.state,
-            postalCode: checkout.postalCode,
-            country: 'Nepal',
-          },
-          paymentMethod: 'cash_on_delivery',
-        }),
-      });
-      await loadCart();
-      await loadOrders();
-    });
-  }
 
   return (
     <main style={styles.shell}>
-      <section style={styles.toolbar}>
+      <Navbar
+        cartCount={cart?.itemCount || 0}
+        accountHref="/login"
+        cartHref="/cart"
+        compareHref="/compare"
+        wishlistHref="/wishlist"
+        onSearch={(query) => {
+          console.log(query);
+        }}
+      />
+
+      <HeroGrid
+        primary={{
+          badge: "Featured",
+          title: "Electric Water Geysers",
+          description: "Best-in-class electric geysers for your home.",
+          imageSrc:
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-t1zMDTmOXCqYi5KZgzS3W1gxrmQ9jp.png",
+          imageAlt: "Electric Water Geyser",
+          href: "/products?category=water-geyser",
+          buttonLabel: "Shop Now",
+        }}
+        secondary={{
+          badge: "Home Appliance",
+          title: "Multi-Door Refrigerators",
+          description: "Same Footprint, Bigger Capacity",
+          imageSrc:
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-PsjUNUHtncntuInPrgCJWwKyk9YdUL.png",
+          imageAlt: "Refrigerator",
+          href: "/products?category=refrigerators",
+        }}
+        tertiary={{
+          badge: "Entertainment",
+          title: "Neo QLED 8K TVs",
+          description: "Incredible Picture & Sound",
+          imageSrc:
+            "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image.png-gzDJ5qQIla4LF2T2O6pQDgwQpmOuIx.jpeg",
+          imageAlt: "TV",
+          href: "/products?category=televisions",
+        }}
+      />
+
+      <ApplianceStrip />
+
+      {/* Render all main components for verification */}
+      <div className="mt-12 space-y-12">
+        {/* Trending/Featured Products */}
+        <TrendingProducts />
+      </div>
+      {/* <section style={styles.toolbar}>
         <div>
           <h1 style={styles.title}>Dakshinkali Store</h1>
           <p style={styles.status}>{status}</p>
         </div>
+        <Link href="/login" style={styles.link}>Login Page</Link>
         <input
           style={styles.token}
           value={token}
@@ -268,26 +197,94 @@ export default function WebStorePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 }
 
 const styles: Record<string, CSSProperties> = {
-  shell: { minHeight: '100vh', padding: 24, background: '#f6f7f9', color: '#17202a', fontFamily: 'system-ui, sans-serif' },
-  toolbar: { display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, flexWrap: 'wrap' },
+  shell: {
+    minHeight: "100vh",
+    padding: 24,
+    background: "#f6f7f9",
+    color: "#17202a",
+    fontFamily: "system-ui, sans-serif",
+  },
+  toolbar: {
+    display: "flex",
+    gap: 12,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+    flexWrap: "wrap",
+  },
   title: { margin: 0, fontSize: 28 },
-  status: { margin: '4px 0 0', color: '#52616f' },
-  token: { minWidth: 280, flex: 1, maxWidth: 520, padding: 10, border: '1px solid #c9d1d9', borderRadius: 6 },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 },
-  panel: { background: '#ffffff', border: '1px solid #d8dee4', borderRadius: 8, padding: 16 },
-  heading: { margin: '0 0 12px', fontSize: 18 },
-  subheading: { margin: '16px 0 8px', fontSize: 15 },
-  list: { display: 'grid', gap: 10 },
-  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderBottom: '1px solid #eef1f4', paddingBottom: 10 },
-  muted: { margin: 0, color: '#667085', fontSize: 13 },
-  actions: { display: 'flex', gap: 6 },
-  input: { width: '100%', boxSizing: 'border-box', padding: 10, border: '1px solid #c9d1d9', borderRadius: 6, marginBottom: 10 },
-  button: { border: '1px solid #9aa6b2', background: '#ffffff', color: '#17202a', borderRadius: 6, padding: '8px 10px', cursor: 'pointer' },
-  primary: { border: '1px solid #14532d', background: '#166534', color: '#ffffff', borderRadius: 6, padding: '10px 12px', cursor: 'pointer', width: '100%' },
+  status: { margin: "4px 0 0", color: "#52616f" },
+  token: {
+    minWidth: 280,
+    flex: 1,
+    maxWidth: 520,
+    padding: 10,
+    border: "1px solid #c9d1d9",
+    borderRadius: 6,
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: 16,
+  },
+  panel: {
+    background: "#ffffff",
+    border: "1px solid #d8dee4",
+    borderRadius: 8,
+    padding: 16,
+  },
+  heading: { margin: "0 0 12px", fontSize: 18 },
+  subheading: { margin: "16px 0 8px", fontSize: 15 },
+  list: { display: "grid", gap: 10 },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    borderBottom: "1px solid #eef1f4",
+    paddingBottom: 10,
+  },
+  muted: { margin: 0, color: "#667085", fontSize: 13 },
+  actions: { display: "flex", gap: 6 },
+  input: {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: 10,
+    border: "1px solid #c9d1d9",
+    borderRadius: 6,
+    marginBottom: 10,
+  },
+  button: {
+    border: "1px solid #9aa6b2",
+    background: "#ffffff",
+    color: "#17202a",
+    borderRadius: 6,
+    padding: "8px 10px",
+    cursor: "pointer",
+  },
+  primary: {
+    border: "1px solid #14532d",
+    background: "#166534",
+    color: "#ffffff",
+    borderRadius: 6,
+    padding: "10px 12px",
+    cursor: "pointer",
+    width: "100%",
+  },
+  link: {
+    border: "1px solid #14532d",
+    background: "#166534",
+    color: "#ffffff",
+    borderRadius: 6,
+    padding: "8px 14px",
+    cursor: "pointer",
+    textDecoration: "none",
+    display: "inline-block",
+  },
 };

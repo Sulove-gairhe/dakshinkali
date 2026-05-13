@@ -1,22 +1,22 @@
 /**
- * PublicProductController - API Layer for Public Product Access
- * 
- * Handles HTTP requests for public product browsing operations.
- * No authentication required - open to all users.
- * 
- * @remarks
- * - All endpoints are public (no authentication required)
- * - Returns only active, non-deleted products
- * - Request validation performed before service calls
- * - Entity → DTO transformation for all responses
- * - Consistent error response formatting
- * 
- * **Endpoints:**
- * - GET /api/v1/products          - List active products with filters
- * - GET /api/v1/products/:id      - Get active product by ID
- * 
- * **Validates: Requirements 5.1-5.6, 6.1-6.5, 7.1, 10.1**
- */
+* PublicProductController - API Layer for Public Product Access
+* 
+* Handles HTTP requests for public product browsing operations.
+* No authentication required - open to all users.
+* 
+* @remarks
+* - All endpoints are public (no authentication required)
+* - Returns only active, non-deleted products
+* - Request validation performed before service calls
+* - Entity → DTO transformation for all responses
+* - Consistent error response formatting
+* 
+* **Endpoints:**
+* - GET /api/v1/products          - List active products with filters
+* - GET /api/v1/products/:id      - Get active product by ID
+* 
+* **Validates: Requirements 5.1-5.6, 6.1-6.5, 7.1, 10.1**
+*/
 
 import { ProductService } from '../services/product.service';
 import { mapEntityToDTO, ProductDTO } from '../dto/product.dto';

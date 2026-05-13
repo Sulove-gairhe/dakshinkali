@@ -102,7 +102,7 @@ export interface ProductService {
      * 
      * **Validates: Requirements 1.1, 1.2, 1.5, 1.7, 9.1, 9.2, 9.3**
      */
-    createProduct(data: CreateProductData, images?: File[]): Promise<ProductEntity>;
+    createProduct(data: CreateProductData, images?: Express.Multer.File[]): Promise<ProductEntity>;
 
     /**
      * Update an existing product with optional image management
@@ -137,7 +137,7 @@ export interface ProductService {
     updateProduct(
         id: string,
         data: UpdateProductData,
-        images?: File[],
+        images?: Express.Multer.File[],
         removeImages?: string[]
     ): Promise<ProductEntity>;
 
