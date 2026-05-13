@@ -6,3 +6,5 @@ dist
 .env.local
 turbo
 .md
+coverage
+*.ts.html
