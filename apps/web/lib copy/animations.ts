@@ -5,9 +5,9 @@
 import type { Variants } from 'framer-motion'
 
 // ---- Easing Curves ----
-export const spring = [0.34, 1.56, 0.64, 1]   // springy overshoot (buttons, cards)
-export const easeOut = [0.0, 0.0, 0.2, 1]     // smooth settle (sections, modals)
-export const easeInOut = [0.4, 0, 0.2, 1]     // standard (drawers, transitions)
+export const spring = [0.34, 1.56, 0.64, 1] as const   // springy overshoot (buttons, cards)
+export const easeOut = [0.0, 0.0, 0.2, 1] as const     // smooth settle (sections, modals)
+export const easeInOut = [0.4, 0, 0.2, 1] as const     // standard (drawers, transitions)
 
 // ---- Page / Section Variants ----
 
