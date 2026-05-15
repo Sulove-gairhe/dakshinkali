@@ -9,6 +9,11 @@ const nunito = Nunito({ subsets: ['latin'], variable: '--font-body' });
 export const metadata = {
   title: 'Dakshinkali Electronics',
   description: 'E-commerce storefront',
+  icons: {
+    icon: '/images/logo-placeholder.jpeg',
+    shortcut: '/images/logo-placeholder.jpeg',
+    apple: '/images/logo-placeholder.jpeg',
+  },
 };
 
 export default function RootLayout({
