@@ -1,6 +1,8 @@
 "use client";
 
-import { Link } from "lucide-react";
+import Link from "next/link";
+import { useCart } from "@/components/cart-provider";
+import { useWishlist } from "@/components/wishlist-provider";
 import { ProductCard } from "./product-card";
 
 interface Product {
@@ -21,8 +23,7 @@ const mockProducts: Product[] = [
     slug: "samsung-253l-double-door-refrigerator",
     name: "Samsung 253L Double Door Frost Free Refrigerator RT28A3022GS/IM",
     shortDescription: "Digital Inverter | Energy Efficient | 10 Year Warranty",
-    image:
-      "https://images.unsplash.com/photo-1584568694244-14fbbc50d737?w=500&h=500&fit=crop",
+    image: "/images/Samsung Double door 245 Litres.png",
     currentPrice: "Rs 51,999",
     oldPrice: "Rs 56,000",
     badge: "Rs 4,001 Off",
@@ -34,8 +35,7 @@ const mockProducts: Product[] = [
     name: "Samsung 192L Single Door Refrigerator RR20M282ZS8",
     shortDescription:
       "Digital Inverter | Fast Direct Cooling | Stabilizer Free",
-    image:
-      "https://images.unsplash.com/photo-1584568694244-14fbbc50d737?w=500&h=500&fit=crop",
+    image: "/images/Samsung 192Litre Single door refrigerator.jpeg",
     currentPrice: "Rs 32,980",
     oldPrice: "Rs 36,500",
     badge: "New Arrival / Rs 3,520 Off",
@@ -46,8 +46,7 @@ const mockProducts: Product[] = [
     slug: "himstar-chest-freezer-170",
     name: "Himstar Chest Freezer 170 Ltr HC-17H55SWG/WB",
     shortDescription: "High Capacity | Energy Efficient | Reliable Cooling",
-    image:
-      "https://images.unsplash.com/photo-1584568694244-14fbbc50d737?w=500&h=500&fit=crop",
+    image: "/images/himstal 165 Litre deepfreezer.png",
     currentPrice: "Rs 37,900",
     oldPrice: "Rs 41,200",
     badge: "Rs 3,300 Off",
@@ -58,8 +57,7 @@ const mockProducts: Product[] = [
     slug: "samsung-65-crystal-uhd-tv",
     name: "Samsung 65 inch Crystal UHD 4K Smart TV UA65U8500F",
     shortDescription: "Metal Stream Design | 4K Resolution | Smart Features",
-    image:
-      "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&h=500&fit=crop",
+    image: "/images/Samsung 65 inch tv.png",
     currentPrice: "Rs 1,29,000",
     oldPrice: "Rs 1,35,000",
     badge: "New Arrival / Rs 6,000 Off",
@@ -68,9 +66,11 @@ const mockProducts: Product[] = [
 ];
 
 export function TrendingProducts() {
+  const { addItem, getQuantity } = useCart();
+  const { hasItem, toggleItem } = useWishlist();
+
   const handleAddToCart = (product: Product) => {
-    console.log("[v0] Added to cart:", product.name);
-    // TODO: Implement add to cart functionality
+    addItem(product);
   };
 
   return (
@@ -95,7 +95,10 @@ export function TrendingProducts() {
             <ProductCard
               key={product.id}
               {...product}
+              quantityInCart={getQuantity(product.id)}
+              isWishlisted={hasItem(product.id)}
               onAddToCart={() => handleAddToCart(product)}
+              onToggleWishlist={() => toggleItem(product)}
             />
           ))}
         </div>

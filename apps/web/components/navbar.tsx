@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import type { CartItem } from "@/components/cart-provider";
 import {
   Search,
   GitCompareArrows,
@@ -29,6 +31,8 @@ type NavbarProps = {
   brandLogoSrc?: string;
   searchPlaceholder?: string;
   cartCount?: number;
+  wishlistCount?: number;
+  cartPreviewItems?: CartItem[];
   brands?: BrandItem[];
   menuItems?: MenuItem[];
   onSearch?: (query: string) => void;
@@ -57,16 +61,18 @@ const defaultMenuItems: MenuItem[] = [
 
 export function Navbar({
   brandName = "Dakshinkali Electronics",
-  brandLogoSrc = "/images/logo-placeholder.jpeg",
+  brandLogoSrc = "/images/logo-placeholder-transparent.png",
   searchPlaceholder = "Search for TVs, refrigerators, appliances...",
   cartCount = 0,
+  wishlistCount = 0,
+  cartPreviewItems = [],
   brands = defaultBrands,
   menuItems = defaultMenuItems,
   onSearch,
   compareHref = "#",
   wishlistHref = "#",
   cartHref = "#",
-  accountHref = "#",
+  accountHref = "/account",
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBrandsOpen, setIsBrandsOpen] = useState(false);
@@ -136,22 +142,34 @@ export function Navbar({
               label="Compare"
               href={compareHref}
             />
-            <IconButton icon={Heart} label="Wishlist" href={wishlistHref} />
             <IconButton
+              icon={Heart}
+              label="Wishlist"
+              href={wishlistHref}
+              badge={wishlistCount}
+            />
+            <CartPreviewButton
+              href={cartHref}
+              badge={cartCount}
+              items={cartPreviewItems}
+            />
+            <IconButton icon={User} label="Account" href={accountHref} />
+          </nav>
+
+          <div className="flex items-center gap-1 md:hidden">
+            <MobileIconButton
+              icon={Heart}
+              label="Wishlist"
+              href={wishlistHref}
+              badge={wishlistCount}
+            />
+            <MobileIconButton
               icon={ShoppingCart}
               label="Cart"
               href={cartHref}
               badge={cartCount}
             />
-            <IconButton icon={User} label="Account" href={accountHref} />
-          </nav>
-
-          <a
-            href={cartHref}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted md:hidden"
-          >
-            <ShoppingCart className="h-5 w-5" />
-          </a>
+          </div>
         </div>
       </div>
       <div
@@ -246,6 +264,143 @@ function IconButton({
       </div>
       <span className="text-[10px] font-medium uppercase tracking-wide text-foreground">
         {label}
+      </span>
+    </a>
+  );
+}
+
+function CartPreviewButton({
+  href = "#",
+  badge,
+  items,
+}: {
+  href?: string;
+  badge?: number;
+  items: CartItem[];
+}) {
+  const previewItems = items.slice(0, 2);
+
+  return (
+    <div className="group/cart relative">
+      <a href={href} className="group flex flex-col items-center gap-1 text-foreground">
+        <div className="relative">
+          <ShoppingCart className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
+          {typeof badge === "number" && badge > 0 && (
+            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+              {badge}
+            </span>
+          )}
+        </div>
+        <span className="text-[10px] font-medium uppercase tracking-wide text-foreground">
+          Cart
+        </span>
+      </a>
+
+      <div className="pointer-events-none absolute right-0 top-full z-[90] hidden w-80 pt-4 opacity-0 transition-all duration-200 group-hover/cart:block group-hover/cart:pointer-events-auto group-hover/cart:opacity-100 group-focus-within/cart:block group-focus-within/cart:pointer-events-auto group-focus-within/cart:opacity-100">
+        <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-2xl">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wide">
+                Cart Preview
+              </h3>
+              {typeof badge === "number" && badge > 0 && (
+                <span className="mt-1 inline-flex rounded-full bg-yellow-200 px-2.5 py-1 text-xs font-bold text-black">
+                  {badge} {badge === 1 ? "item" : "items"}
+                </span>
+              )}
+            </div>
+            <Link
+              href={href}
+              className="inline-flex items-center justify-center rounded-md border border-border px-3 py-2 text-xs font-bold transition-colors hover:bg-muted"
+            >
+              View Cart
+            </Link>
+          </div>
+
+          {previewItems.length > 0 ? (
+            <>
+              <div className="space-y-3">
+                {previewItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="grid grid-cols-[60px_minmax(0,1fr)] gap-3 rounded-md border border-border/70 p-2 transition-colors hover:bg-muted/50"
+                  >
+                    <Link
+                      href={item.href}
+                      className="relative aspect-square overflow-hidden rounded-md bg-muted"
+                    >
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </Link>
+
+                    <div className="min-w-0">
+                      <Link
+                        href={item.href}
+                        className="line-clamp-2 text-xs font-bold transition-colors hover:text-primary"
+                      >
+                        {item.name}
+                      </Link>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Quantity: {item.quantity}
+                      </p>
+                      <p className="mt-1 text-sm font-bold">{item.currentPrice}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4">
+                <Link
+                  href="/cart"
+                  className="group/checkout relative inline-flex w-full items-center justify-center overflow-hidden rounded-md bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg"
+                >
+                  <span className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-18deg] bg-white/30 transition-transform duration-500 group-hover/checkout:translate-x-[420%]" />
+                  <span className="relative">Proceed to Checkout</span>
+                </Link>
+              </div>
+            </>
+          ) : (
+            <div className="rounded-md border border-dashed border-border p-4 text-center">
+              <p className="text-sm font-semibold">Your cart is empty</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Add a product to preview it here.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileIconButton({
+  icon: Icon,
+  label,
+  badge,
+  href = "#",
+}: {
+  icon: React.ElementType;
+  label: string;
+  badge?: number;
+  href?: string;
+}) {
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      className="flex h-10 w-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"
+    >
+      <span className="relative">
+        <Icon className="h-5 w-5" />
+        {typeof badge === "number" && badge > 0 && (
+          <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+            {badge}
+          </span>
+        )}
       </span>
     </a>
   );
