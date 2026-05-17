@@ -1,5 +1,6 @@
 "use client";
 
+import { ClearanceDeals } from "@/components/clearance-deals";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
@@ -123,6 +124,7 @@ export default function WebStorePage() {
       <div className="mt-12 space-y-12">
         {/* Trending/Featured Products */}
         <TrendingProducts />
+        <ClearanceDeals />
       </div>
       {/* <section style={styles.toolbar}>
         <div>

@@ -11,6 +11,7 @@ interface ProductCardProps {
   currentPrice: string;
   oldPrice?: string;
   badge?: string;
+  badges?: string[];
   href: string;
   onAddToCart?: (e: React.MouseEvent) => void;
 }
@@ -22,18 +23,26 @@ export function ProductCard({
   currentPrice,
   oldPrice,
   badge,
+  badges,
   href,
   onAddToCart,
 }: ProductCardProps) {
+  const badgeItems = badges ?? (badge ? [badge] : []);
+
   return (
     <Link href={href}>
       <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer">
         {/* Badge */}
-        {badge && (
-          <div className="absolute left-4 top-4 z-10">
-            <span className="inline-block rounded-md bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
-              {badge}
-            </span>
+        {badgeItems.length > 0 && (
+          <div className="absolute left-4 top-4 z-10 flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
+            {badgeItems.map((badgeItem) => (
+              <span
+                key={badgeItem}
+                className="inline-block rounded-md bg-primary px-3 py-1 text-xs font-bold text-primary-foreground"
+              >
+                {badgeItem}
+              </span>
+            ))}
           </div>
         )}
 
