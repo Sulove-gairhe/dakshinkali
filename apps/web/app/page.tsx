@@ -1,6 +1,7 @@
 "use client";
 
 import { ApplianceStrip } from "@/components/appliance-strip";
+import { ClearanceDeals } from "@/components/clearance-deals";
 import { HeroGrid } from "@/components/hero-grid";
 import { SiteNavbar } from "@/components/site-navbar";
 import { TrendingProducts } from "@/components/trending-products";
@@ -40,6 +41,7 @@ export default function WebStorePage() {
 
       <ApplianceStrip />
       <TrendingProducts />
+      <ClearanceDeals />
     </main>
   );
 }
