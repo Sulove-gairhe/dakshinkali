@@ -1,48 +1,49 @@
-import Image from "next/image"
+import Image from "next/image";
 
 type HeroCard = {
-  badge: string
-  title: string
-  description: string
-  imageSrc: string
-  imageAlt: string
-  href?: string
-  buttonLabel?: string
-}
+  badge: string;
+  title: string;
+  description: string;
+  imageSrc: string;
+  imageAlt: string;
+  href?: string;
+  buttonLabel?: string;
+};
 
 type HeroGridProps = {
-  primary?: HeroCard
-  secondary?: HeroCard
-  tertiary?: HeroCard
-}
+  primary?: HeroCard;
+  secondary?: HeroCard;
+  tertiary?: HeroCard;
+};
 
 const defaultPrimary: HeroCard = {
   badge: "Featured",
   title: "Electric Water Geysers",
-  description: "Best-in-class electric geysers for your home. Efficient heating, superior insulation.",
-  imageSrc: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-t1zMDTmOXCqYi5KZgzS3W1gxrmQ9jp.png",
+  description:
+    "Best-in-class electric geysers for your home. Efficient heating, superior insulation.",
+  imageSrc: "public/images/geyeser(hero grid-1).png",
   imageAlt: "Electric Water Geyser - Best electric geysers in Nepal",
   href: "#",
   buttonLabel: "Shop Now",
-}
+};
 
 const defaultSecondary: HeroCard = {
   badge: "Home Appliance",
   title: "Multi-Door Refrigerators",
   description: "Same Footprint, Bigger Capacity",
-  imageSrc: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-PsjUNUHtncntuInPrgCJWwKyk9YdUL.png",
+  imageSrc: "public/images/fridge-hero grid(2).png",
   imageAlt: "Multi-door Refrigerator - Ultra Space Technology",
   href: "#",
-}
+};
 
 const defaultTertiary: HeroCard = {
   badge: "Entertainment",
   title: "Neo QLED 8K TVs",
   description: "Incredible Picture & Sound",
-  imageSrc: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image.png-gzDJ5qQIla4LF2T2O6pQDgwQpmOuIx.jpeg",
+  imageSrc: "public/images/tcl tv(hero-grid).jpeg",
   imageAlt: "Samsung Neo QLED 8K TV - Incredible picture and sound",
   href: "#",
-}
+};
 
 export function HeroGrid({
   primary = defaultPrimary,
@@ -101,9 +102,7 @@ export function HeroGrid({
             <h3 className="mb-1 text-lg font-bold text-white sm:text-xl">
               {secondary.title}
             </h3>
-            <p className="text-sm text-gray-300">
-              {secondary.description}
-            </p>
+            <p className="text-sm text-gray-300">{secondary.description}</p>
           </div>
         </a>
 
@@ -125,12 +124,10 @@ export function HeroGrid({
             <h3 className="mb-1 text-lg font-bold text-white sm:text-xl">
               {tertiary.title}
             </h3>
-            <p className="text-sm text-gray-300">
-              {tertiary.description}
-            </p>
+            <p className="text-sm text-gray-300">{tertiary.description}</p>
           </div>
         </a>
       </div>
     </section>
-  )
+  );
 }
