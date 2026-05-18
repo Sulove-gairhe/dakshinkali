@@ -96,7 +96,7 @@ const clearanceProducts: ClearanceProduct[] = [
     name: "Himstar 8KG Front Load Fully Automatic Washing Machine HW-80FS8BTKGZ",
     shortDescription:
       "Inverter motor | 1400 RPM | Built-in heater | LED display | 10 years motor warranty",
-    image: "/images/Himstar 8kg washing machine(clearance-7).png",
+    image: "/images/Himstar 8kg washing machine (clearance-7).png",
     currentPrice: "Rs. 44,990",
     oldPrice: "Rs. 74,990",
     badge: "41% Off",
@@ -108,7 +108,7 @@ const clearanceProducts: ClearanceProduct[] = [
     name: "TCL 43V6B 43 inch 4K Smart TV",
     shortDescription:
       "Google TV | HDR10/HLG | Metallic bezel-less design | HDMI 2.1 with eARC",
-    image: "/images/TCL 43 inch 43V6B(clearance-8).png",
+    image: "/images/TCL 43 inch 43V6B 4k(clearance-8).png",
     currentPrice: "Rs. 45,000",
     oldPrice: "Rs. 56,000",
     badges: ["2024 Model", "20% Off"],
