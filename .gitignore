@@ -3,3 +3,6 @@ node_modules
 dist
 .md
 coverage
+.env
+.env.local
+.env.example
