@@ -1,12 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import type { CSSProperties } from "react";
-import Link from "next/link";
-import { Navbar } from "@/components/navbar";
 import { HeroGrid } from "@/components/hero-grid";
 import { ApplianceStrip } from "@/components/appliance-strip";
 import { ClearanceDeals } from "@/components/clearance-deals";
+import { HomeTrustSection } from "@/components/home-trust-section";
 import { SiteNavbar } from "@/components/site-navbar";
 import { TrendingProducts } from "@/components/trending-products";
 
@@ -46,10 +43,11 @@ export default function WebStorePage() {
       <ApplianceStrip />
 
       {/* Render all main components for verification */}
-      <div className="mt-12 space-y-12">
+      <div className="mt-12">
+        <ClearanceDeals />
+        <HomeTrustSection />
         {/* Trending/Featured Products */}
         <TrendingProducts />
-        <ClearanceDeals />
       </div>
       {/* <section style={styles.toolbar}>
         <div>
