@@ -18,6 +18,7 @@ interface ProductCardProps {
   onToggleWishlist?: (e: React.MouseEvent) => void;
   quantityInCart?: number;
   isWishlisted?: boolean;
+  renderCompare?: React.ReactNode;
 }
 
 export function ProductCard({
@@ -33,6 +34,7 @@ export function ProductCard({
   onToggleWishlist,
   quantityInCart = 0,
   isWishlisted = false,
+  renderCompare,
 }: ProductCardProps) {
   const badgeItems = badges ?? (badge ? [badge] : []);
 
@@ -120,6 +122,11 @@ export function ProductCard({
             </span>
           )}
         </div>
+
+        {/* Compare Toggle */}
+        {renderCompare && (
+          <div className="mt-3">{renderCompare}</div>
+        )}
 
         {/* Add to Cart Button */}
         <button
