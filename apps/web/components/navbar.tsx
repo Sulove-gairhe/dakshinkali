@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CartItem } from "@/components/cart-provider";
+import { SearchBar } from "@/components/SearchBar";
+import { storeProducts } from "@/lib/store-products";
+import { normalizeBrandSlug } from "@/lib/search-products";
 import {
-  Search,
-  GitCompareArrows,
   Heart,
   ShoppingCart,
   User,
@@ -35,26 +36,24 @@ type NavbarProps = {
   cartPreviewItems?: CartItem[];
   brands?: BrandItem[];
   menuItems?: MenuItem[];
-  onSearch?: (query: string) => void;
-  compareHref?: string;
   wishlistHref?: string;
   cartHref?: string;
   accountHref?: string;
 };
 
 const defaultBrands: BrandItem[] = [
-  { label: "Samsung", href: "#" },
-  { label: "Himstar", href: "#" },
-  { label: "Godrej", href: "#" },
-  { label: "TCL", href: "#" },
-  { label: "CG", href: "#" },
-  { label: "Whirlpool", href: "#" },
-];
+  ...new Set(storeProducts.map((product) => product.brand).filter(Boolean)),
+]
+  .sort((left, right) => left.localeCompare(right))
+  .map((brand) => ({
+    label: brand,
+    href: `/search?brand=${normalizeBrandSlug(brand)}`,
+  }));
 
 const defaultMenuItems: MenuItem[] = [
-  { label: "HOME APPLIANCES", href: "#" },
+  { label: "HOME APPLIANCES", href: "/search" },
   { label: "PARTS", href: "#" },
-  { label: "TELEVISIONS", href: "#" },
+  { label: "TELEVISIONS", href: "/search?category=televisions" },
   { label: "DEALS", href: "#" },
   { label: "REQUEST TECHNICIAN", href: "#", highlighted: true, icon: Wrench },
 ];
@@ -68,15 +67,12 @@ export function Navbar({
   cartPreviewItems = [],
   brands = defaultBrands,
   menuItems = defaultMenuItems,
-  onSearch,
-  compareHref = "#",
   wishlistHref = "#",
   cartHref = "#",
   accountHref = "/account",
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBrandsOpen, setIsBrandsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,7 +95,7 @@ export function Navbar({
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex-shrink-0">
-            <a href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-border bg-white">
                 <Image
                   src={brandLogoSrc}
@@ -114,34 +110,14 @@ export function Navbar({
               <span className="hidden text-lg font-bold text-foreground sm:block lg:hidden">
                 {mobileBrandName}
               </span>
-            </a>
+            </Link>
           </div>
 
-          <div className="flex max-w-2xl flex-1 items-center">
-            <div className="relative w-full">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={searchPlaceholder}
-                className="h-11 w-full rounded-l-lg border border-r-0 border-gray-300 bg-white px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => onSearch?.(searchQuery)}
-              className="flex h-11 items-center justify-center rounded-r-lg bg-primary px-5 transition-colors duration-300 hover:bg-primary/90"
-            >
-              <Search className="h-5 w-5 text-primary-foreground" />
-            </button>
+          <div className="flex min-w-0 max-w-2xl flex-1 items-center">
+            <SearchBar placeholder={searchPlaceholder} />
           </div>
 
-          <nav className="hidden items-center gap-6 md:flex">
-            <IconButton
-              icon={GitCompareArrows}
-              label="Compare"
-              href={compareHref}
-            />
+          <nav className="hidden items-center gap-8 md:flex">
             <IconButton
               icon={Heart}
               label="Wishlist"
