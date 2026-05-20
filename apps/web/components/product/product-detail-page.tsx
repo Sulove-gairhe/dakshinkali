@@ -6,7 +6,7 @@ import { useState } from "react";
 const product = {
   name: "Samsung 55 DU 4K UHD Smart TV",
   slug: "samsung-55-du-4k-uhd-smart-tv",
-  category: "Smart TV",
+  category: "Televisions",
   price: 62000,
   oldPrice: 78000,
   rating: 4.8,

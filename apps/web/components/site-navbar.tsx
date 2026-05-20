@@ -15,11 +15,7 @@ export function SiteNavbar() {
       cartPreviewItems={cartItems}
       accountHref="/account"
       cartHref="/cart"
-      compareHref="/compare"
       wishlistHref="/wishlist"
-      onSearch={(query) => {
-        console.log(query);
-      }}
     />
   );
 }

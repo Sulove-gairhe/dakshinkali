@@ -219,3 +219,30 @@
   background-color: var(--color-surface);
   border-color: var(--color-border);
 }
+
+.trust-socials-popover {
+  inset: 0;
+  margin: auto;
+  max-height: calc(100vh - 2rem);
+}
+
+.trust-socials-popover::backdrop {
+  background: rgba(17, 17, 17, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.trust-socials-popover:popover-open {
+  animation: trust-socials-pop 180ms ease-out;
+}
+
+@keyframes trust-socials-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
