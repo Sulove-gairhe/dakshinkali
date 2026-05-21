@@ -173,7 +173,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "SAMSUNG 55 Inch Crystal UHD 4K Smart TV UA55U8500F",
     shortDescription:
       "Crystal Processor 4K | Samsung Knox Security | Solar Cell Remote | Metal Stream Design",
-    image: "/images/samsung 55' inch tv (bestseller-2).png",
+    image: "/images/samsung 55 inch tv (bestseller-2).png",
     currentPrice: "Rs. 91,999",
     oldPrice: "Rs. 139,990",
     warranty: "3 Years Full Parts Warranty",
@@ -292,20 +292,87 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
 export const clearanceProducts: StoreProduct[] = withProductHrefs([
   {
     id: "clearance-1",
-    slug: "godrej-rdedge-205bxp-190l",
-    name: "Godrej 190 Liter Single Door Refrigerator - RDEDGE 205BXP THF BR WN",
+    slug: "samsung-rt40h30wnpim-275l",
+    name: "RT40H30WNPIM Samsung Double Door Refrigerator, 275L",
     shortDescription:
-      "Direct Cool | 190L gross capacity | Toughened glass shelves | 10 years compressor warranty",
-    image: "/images/godrej 184 L(clearance-4).png",
-    currentPrice: "Rs. 26,390",
-    oldPrice: "Rs. 32,390",
+      "275L | Frost-Free | Digital Inverter | 10-Year Compressor Warranty | Adjustable Toughened Glass Shelves | Power Cool | Inox Silver Finish",
+    image: "/images/Samsung double door 275L RT40H30W2PHL(clearance-1).png",
+    currentPrice: "Rs. 56,000",
+    oldPrice: "Rs. 68,990",
     warranty: "10 Years Compressor Warranty",
-    badge: "19% Off",
-    href: "/products/godrej-rdedge-205bxp-190l",
-    brand: "Godrej",
-    category: "Refrigerators",
+    badge: "17% Off",
+    href: "/products/samsung-rt40h30wnpim-275l",
+    brand: "Samsung",
+    category: "Double-Door Refrigerators",
     status: "Low Stock",
-    searchTerms: ["fridge", "direct cool"],
+    searchTerms: [
+      "fridge",
+      "double door refrigerator",
+      "frost free",
+      "digital inverter",
+      "power cool",
+      "inox silver"
+    ],
+    highlights: [
+      "275 Litres Gross Capacity (255L Net Storage)",
+      "Frost-Free Cooling Technology",
+      "Digital Inverter Technology",
+      "10-Year Compressor Warranty",
+      "Adjustable Toughened Glass Shelves",
+      "Movable Twist Ice Maker",
+      "Power Cool Rapid Cooling Function",
+      "Deodorization System",
+      "Elegant Inox Silver Finish"
+    ],
+    specifications: [
+      {
+        title: "Capacity",
+        specs: [
+          { label: "Capacity (Ltr)", value: "275 Ltr" }
+        ]
+      },
+      {
+        title: "General Feature",
+        specs: [
+          { label: "Cooling Features", value: "Frost Free Cooling, Power Cool" },
+          { label: "Compressor", value: "Digital Inverter Compressor" },
+          { label: "Deodorizing Filter", value: "Yes" }
+        ]
+      },
+      {
+        title: "Freezer Feature",
+        specs: [
+          { label: "Manual Twist Ice Maker", value: "Yes" },
+          { label: "2-Door Pockets", value: "Yes" },
+          { label: "1-Plastic Shelf", value: "Yes" }
+        ]
+      },
+      {
+        title: "Refrigerator Features",
+        specs: [
+          { label: "2-Glass Shelf", value: "Yes" },
+          { label: "1-Vegetable Box", value: "Yes" },
+          { label: "Egg Tray", value: "Yes" },
+          { label: "Toughened Glass", value: "Yes" }
+        ]
+      },
+      {
+        title: "Design and Material",
+        specs: [
+          { label: "Design", value: "Refined Inox Color, Bar Door Handle, Slim Mold Design" }
+        ]
+      }
+    ],
+    boxContents: [
+      "1 Refrigerator",
+      "1 Manual",
+      "1 Egg Tray",
+      "1 Ice Maker"
+    ],
+    deliveryInfo: [
+      "Delivery and installation support available in serviceable areas.",
+      "Warranty support available through Dakshinkali Electronics."
+    ]
   },
   {
     id: "clearance-2",
