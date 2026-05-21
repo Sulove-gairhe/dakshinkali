@@ -85,13 +85,14 @@ export function ProductCard({
       {/* Product Image */}
       <Link
         href={href}
-        className="relative block h-64 w-full overflow-hidden bg-muted"
+        className="relative block aspect-square w-full overflow-hidden bg-white p-4"
       >
         <Image
           src={image}
           alt={name}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-contain transition-transform duration-300 group-hover:scale-[1.03]"
         />
       </Link>
 

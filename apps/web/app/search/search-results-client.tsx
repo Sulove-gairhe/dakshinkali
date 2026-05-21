@@ -36,6 +36,7 @@ const emptyStateLinks = [
   { label: "Televisions", href: "/search?category=televisions" },
   { label: "Refrigerators", href: "/search?category=refrigerator" },
   { label: "Washing Machines", href: "/search?category=washing-machine" },
+  { label: "Kitchen Appliances", href: "/search?category=kitchen-appliances" },
 ];
 
 export function SearchResultsClient() {

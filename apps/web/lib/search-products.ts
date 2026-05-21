@@ -8,8 +8,10 @@ export type IndexedProduct = {
   slug: string;
   brand?: string;
   category?: string;
+  collection?: string;
   normalizedBrand?: string;
   normalizedCategory?: string;
+  normalizedCollection?: string;
   price?: number;
   originalPrice?: number;
   salePrice?: number;
@@ -50,6 +52,12 @@ export type FilterOption = {
   slug: string;
   count: number;
   synonyms?: string[];
+};
+
+type FilterEntry = {
+  name: string;
+  slug: string;
+  synonyms: string[];
 };
 
 type ScoredProduct = {
@@ -115,6 +123,7 @@ const CATEGORY_ALIASES: Record<string, string> = {
   "rice cooker": "kitchen-appliance",
   "kitchen appliance": "kitchen-appliance",
   "kitchen appliances": "kitchen-appliance",
+  "kitchen-appliances": "kitchen-appliance",
 };
 
 const BRAND_ALIASES: Record<string, string> = {
@@ -135,6 +144,9 @@ export const indexedProducts: IndexedProduct[] = storeProducts.map(
     const salePrice = parsePrice(product.currentPrice);
     const originalPrice = parsePrice(product.oldPrice);
     const normalizedCategory = normalizeCategorySlug(product.category);
+    const normalizedCollection = product.collection
+      ? normalizeCategorySlug(product.collection)
+      : undefined;
     const normalizedBrand = normalizeBrandSlug(product.brand);
 
     return {
@@ -143,8 +155,10 @@ export const indexedProducts: IndexedProduct[] = storeProducts.map(
       slug: product.slug,
       brand: product.brand,
       category: getCategoryDisplayName(normalizedCategory),
+      collection: product.collection,
       normalizedBrand,
       normalizedCategory,
+      normalizedCollection,
       price: salePrice ?? originalPrice,
       originalPrice,
       salePrice,
@@ -195,7 +209,7 @@ export function searchProducts(input: SearchProductsInput): SearchProductsResult
 
   if (effectiveCategorySlug) {
     scoredProducts = scoredProducts.filter(
-      ({ product }) => product.normalizedCategory === effectiveCategorySlug,
+      ({ product }) => productMatchesCategory(product, effectiveCategorySlug),
     );
   }
 
@@ -263,15 +277,8 @@ export function getAvailableCategories() {
   return [
     ...new Map(
       indexedProducts
-        .filter((product) => product.category && product.normalizedCategory)
-        .map((product) => [
-          product.normalizedCategory,
-          {
-            name: getCategoryDisplayName(product.normalizedCategory as string),
-            slug: product.normalizedCategory as string,
-            synonyms: getCategorySynonyms(product.normalizedCategory as string),
-          },
-        ]),
+        .flatMap(getProductCategoryEntries)
+        .map((category) => [category.slug, category]),
     ).values(),
   ].sort((left, right) => left.name.localeCompare(right.name));
 }
@@ -489,6 +496,10 @@ function scoreProduct(product: IndexedProduct, terms: string[], rawQuery: string
     score += 95;
   }
 
+  if (product.normalizedCollection === normalizedCategory) {
+    score += 90;
+  }
+
   score += scoreValues(terms, [
     product.title,
     product.brand ?? "",
@@ -525,7 +536,7 @@ function getFilterOptions(
 
   const source = indexedProducts.filter((product) => {
     if (type === "brand" && normalizedCategory) {
-      return product.normalizedCategory === normalizedCategory;
+      return productMatchesCategory(product, normalizedCategory);
     }
 
     if (type === "category" && normalizedBrand) {
@@ -533,7 +544,7 @@ function getFilterOptions(
     }
 
     if (type === "brand" && queryConstraintCategory) {
-      return product.normalizedCategory === queryConstraintCategory;
+      return productMatchesCategory(product, queryConstraintCategory);
     }
 
     if (type === "category" && queryConstraintBrand) {
@@ -546,32 +557,59 @@ function getFilterOptions(
   const counts = new Map<string, FilterOption>();
 
   for (const product of source) {
-    const slug =
-      type === "brand" ? product.normalizedBrand : product.normalizedCategory;
-    const name =
+    const entries =
       type === "brand"
-        ? product.brand
-        : getCategoryDisplayName(product.normalizedCategory || "");
+        ? product.normalizedBrand && product.brand
+          ? [
+              {
+                name: product.brand,
+                slug: product.normalizedBrand,
+                synonyms: getBrandSynonyms(product.brand),
+              },
+            ]
+          : []
+        : getProductCategoryEntries(product);
 
-    if (!slug || !name) {
-      continue;
+    for (const entry of entries) {
+      const existing = counts.get(entry.slug);
+      counts.set(entry.slug, {
+        ...entry,
+        count: (existing?.count || 0) + 1,
+      });
     }
-
-    const existing = counts.get(slug);
-    counts.set(slug, {
-      name,
-      slug,
-      count: (existing?.count || 0) + 1,
-      synonyms:
-        type === "brand"
-          ? getBrandSynonyms(name)
-          : getCategorySynonyms(slug),
-    });
   }
 
   return [...counts.values()].sort((left, right) =>
     left.name.localeCompare(right.name),
   );
+}
+
+function productMatchesCategory(product: IndexedProduct, categorySlug: string) {
+  return (
+    product.normalizedCategory === categorySlug ||
+    product.normalizedCollection === categorySlug
+  );
+}
+
+function getProductCategoryEntries(product: IndexedProduct): FilterEntry[] {
+  const entries = [
+    product.normalizedCategory
+      ? {
+          name: getCategoryDisplayName(product.normalizedCategory),
+          slug: product.normalizedCategory,
+          synonyms: getCategorySynonyms(product.normalizedCategory),
+        }
+      : undefined,
+    product.normalizedCollection
+      ? {
+          name: getCategoryDisplayName(product.normalizedCollection),
+          slug: product.normalizedCollection,
+          synonyms: getCategorySynonyms(product.normalizedCollection),
+        }
+      : undefined,
+  ].filter((entry): entry is FilterEntry => Boolean(entry));
+
+  return [...new Map(entries.map((entry) => [entry.slug, entry])).values()];
 }
 
 function hasPhrase(haystack: string, phrase: string) {
