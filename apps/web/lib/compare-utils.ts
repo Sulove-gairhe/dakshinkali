@@ -184,6 +184,7 @@ export function getSpecValue(product: StoreProduct, specKey: string): string {
   // Generic fallback for brand/category/availability
   if (specKey === "brand") return product.brand;
   if (specKey === "category") return product.category;
+  if (specKey === "warranty") return product.warranty ?? "—";
   if (specKey === "availability") return product.status ?? "—";
   if (specKey === "keyFeature") return product.shortDescription.split("|")[0]?.trim() ?? "—";
 

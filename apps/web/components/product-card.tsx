@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShieldCheck, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ interface ProductCardProps {
   image: string;
   currentPrice: string;
   oldPrice?: string;
+  warranty: string;
   badge?: string;
   badges?: string[];
   href: string;
@@ -27,6 +28,7 @@ export function ProductCard({
   image,
   currentPrice,
   oldPrice,
+  warranty,
   badge,
   badges,
   href,
@@ -108,11 +110,21 @@ export function ProductCard({
           {shortDescription}
         </p>
 
+        <div className="mt-3 flex items-start gap-1.5 border-t border-border/70 pt-3 text-xs font-medium text-muted-foreground">
+          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-700 dark:text-amber-300" />
+          <span className="line-clamp-1">
+            <span className="font-semibold text-stone-700 dark:text-stone-200">
+              Warranty:
+            </span>{" "}
+            {warranty}
+          </span>
+        </div>
+
         {/* Spacer */}
         <div className="flex-1" />
 
         {/* Pricing */}
-        <div className="mt-4 flex items-baseline gap-2">
+        <div className="mt-3 flex items-baseline gap-2">
           <span className="text-xl font-bold text-foreground">
             {currentPrice}
           </span>

@@ -6,6 +6,7 @@ import { ClearanceDeals } from "@/components/clearance-deals";
 import { HomeTrustSection } from "@/components/home-trust-section";
 import { SiteNavbar } from "@/components/site-navbar";
 import { TrendingProducts } from "@/components/trending-products";
+import { BestSellingProducts } from "@/components/best-selling-products";
 import { CompareProvider } from "@/components/compare/CompareProvider";
 import { CompareDrawer } from "@/components/compare/CompareDrawer";
 import { CompareModal } from "@/components/compare/CompareModal";
@@ -48,10 +49,10 @@ export default function WebStorePage() {
 
         {/* Render all main components for verification */}
         <div className="mt-12">
-          {/* Trending/Featured Products */}
+          <BestSellingProducts />
           <TrendingProducts />
-          <ClearanceDeals />
           <HomeTrustSection />
+          <ClearanceDeals />
         </div>
 
         {/* Compare feature - drawer and modal */}
