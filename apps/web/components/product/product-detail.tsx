@@ -1,18 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, Share2, Scale } from "lucide-react";
-import type { ProductDetailData } from "@/types/product";
+import { Heart, Scale } from "lucide-react";
+import type { ProductImage, StoreProduct } from "@/lib/store-products";
 import { ImageGallery } from "./image-gallery";
 import { VariantSelector } from "./variant-selector";
 import { DescriptionTabs } from "./description-tabs";
 
 interface ProductDetailProps {
-  product: ProductDetailData;
+  product: StoreProduct;
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1);
+  const badge = product.badge ?? product.badges?.[0];
+  const images = getProductImages(product);
+  const features =
+    product.highlights && product.highlights.length > 0
+      ? product.highlights
+      : [product.shortDescription].filter(Boolean);
+  const descriptionSections =
+    product.descriptionSections && product.descriptionSections.length > 0
+      ? product.descriptionSections
+      : [
+          {
+            id: "overview",
+            title: "Product Overview",
+            body: [product.shortDescription],
+          },
+        ];
+  const breadcrumbs = [
+    { label: "Home", href: "/" },
+    {
+      label: product.category,
+      href: `/search?category=${encodeURIComponent(product.category)}`,
+    },
+    { label: product.name },
+  ];
 
   return (
     <main className="min-h-screen bg-background">
@@ -20,11 +44,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
       <div className="border-b border-border px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <nav className="flex items-center gap-2 text-sm">
-            {product.breadcrumbs.map((item, index) => (
+            {breadcrumbs.map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 {index > 0 && <span className="text-muted-foreground">/</span>}
                 {item.href ? (
-                <a
+                  <a
                     href={item.href}
                     className="text-foreground hover:text-foreground/80"
                   >
@@ -45,7 +69,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Left Column - Image Gallery */}
             <div>
-              <ImageGallery images={product.images} badge={product.badge} />
+              <ImageGallery images={images} badge={badge} />
             </div>
 
             {/* Right Column - Product Info */}
@@ -67,10 +91,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
               {/* Wishlist & Compare */}
               <div className="flex gap-4 border-b border-border pb-6">
-                  <button className="cursor-pointer flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
-                    <Heart className="h-5 w-5" />
-                    Add to wishlist
-                  </button>
+                <button className="cursor-pointer flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
+                  <Heart className="h-5 w-5" />
+                  Add to wishlist
+                </button>
                 <button className="cursor-pointer flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
                   <Scale className="h-5 w-5" />
                   Compare
@@ -78,13 +102,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
               </div>
 
               {/* Features */}
-              {product.features.length > 0 && (
+              {features.length > 0 && (
                 <div className="border-b border-border pb-6">
                   <p className="mb-3 text-sm font-medium text-foreground">
                     Features:-
                   </p>
                   <ul className="space-y-2">
-                    {product.features.map((feature, i) => (
+                    {features.map((feature, i) => (
                       <li
                         key={i}
                         className="flex gap-2 text-sm text-muted-foreground"
@@ -116,7 +140,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <div className="border-b border-border pb-6">
                   <div className="space-y-4">
                     {product.variants.map((variant) => (
-                    <VariantSelector
+                      <VariantSelector
                         key={variant.label}
                         label={variant.label}
                         options={variant.options}
@@ -166,9 +190,28 @@ export function ProductDetail({ product }: ProductDetailProps) {
       {/* Description Tabs */}
       <div className="px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <DescriptionTabs sections={product.descriptionSections} />
+          <DescriptionTabs
+            sections={descriptionSections}
+            specifications={product.specifications}
+            boxContents={product.boxContents}
+            deliveryInfo={product.deliveryInfo}
+          />
         </div>
       </div>
     </main>
   );
+}
+
+function getProductImages(product: StoreProduct): ProductImage[] {
+  if (product.galleryImages && product.galleryImages.length > 0) {
+    return product.galleryImages;
+  }
+
+  return [
+    {
+      id: `${product.slug}-main`,
+      src: product.image,
+      alt: product.name,
+    },
+  ];
 }
