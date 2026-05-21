@@ -45,6 +45,7 @@ export type StoreProduct = {
   href: string;
   brand: string;
   category: string;
+  collection?: string;
   status?: StoreProductStatus;
   searchTerms?: string[];
   galleryImages?: ProductImage[];
@@ -86,7 +87,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
     slug: "samsung-253l-double-door-refrigerator",
     name: "Samsung 253L Double Door Frost Free Refrigerator RT28A3022GS/IM",
     shortDescription: "Digital Inverter | Energy Efficient | 10 Year Warranty",
-    image: "/images/Samsung Double door 245 Litres.png",
+    image: "/images/trending products/Samsung Double door 245 Litres.png",
     currentPrice: "Rs 51,999",
     oldPrice: "Rs 56,000",
     warranty: "10 Year Warranty",
@@ -103,7 +104,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
     name: "Samsung 192L Single Door Refrigerator RR20M282ZS8",
     shortDescription:
       "Digital Inverter | Fast Direct Cooling | Stabilizer Free",
-    image: "/images/Samsung 192Litre Single door refrigerator.jpeg",
+    image: "/images/trending products/Samsung 192Litre Single door refrigerator.jpeg",
     currentPrice: "Rs 32,980",
     oldPrice: "Rs 36,500",
     warranty: "Warranty support available",
@@ -119,7 +120,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
     slug: "himstar-chest-freezer-170",
     name: "Himstar Chest Freezer 170 Ltr HC-17H55SWG/WB",
     shortDescription: "High Capacity | Energy Efficient | Reliable Cooling",
-    image: "/images/himstal 165 Litre deepfreezer.png",
+    image: "/images/trending products/himstal 165 Litre deepfreezer.png",
     currentPrice: "Rs 37,900",
     oldPrice: "Rs 41,200",
     warranty: "Warranty support available",
@@ -135,7 +136,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
     slug: "samsung-65-crystal-uhd-tv",
     name: "Samsung 65 inch Crystal UHD 4K Smart TV UA65U8500F",
     shortDescription: "Metal Stream Design | 4K Resolution | Smart Features",
-    image: "/images/Samsung 65 inch tv.png",
+    image: "/images/trending products/Samsung 65 inch tv.png",
     currentPrice: "Rs 1,29,000",
     oldPrice: "Rs 1,35,000",
     warranty:
@@ -156,7 +157,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "SAMSUNG 9 Kg Washing Machine With AI Eco Bubble WiFi Embedded WW90DG5U24AXIM",
     shortDescription:
       "9 Kg capacity | 1400 RPM | AI Eco Bubble | WiFi Embedded | Hygiene Steam Wash",
-    image: "/images/Samsung 9kg washing machine( Best Sellers-1).png",
+    image: "/images/bestseller/Samsung 9kg washing machine( Best Sellers-1).png",
     currentPrice: "Rs. 79,998",
     oldPrice: "Rs. 102,990",
     warranty: "10 Years Motor Warranty",
@@ -173,7 +174,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "SAMSUNG 55 Inch Crystal UHD 4K Smart TV UA55U8500F",
     shortDescription:
       "Crystal Processor 4K | Samsung Knox Security | Solar Cell Remote | Metal Stream Design",
-    image: "/images/samsung 55 inch tv (bestseller-2).png",
+    image: "/images/bestseller/samsung 55 inch tv (bestseller-2).png",
     currentPrice: "Rs. 91,999",
     oldPrice: "Rs. 139,990",
     warranty: "3 Years Full Parts Warranty",
@@ -190,7 +191,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "SAMSUNG 192 Litres Single Door Refrigerator RR20C20C2GS/IM",
     shortDescription:
       "192 Litres Capacity | Silver Grey Color | Digital Inverter Technology | Toughened Glass Shelves",
-    image: "/images/Samsung double door 192 Litres single door refrigerators( Best Sellers-3).png",
+    image: "/images/bestseller/Samsung double door 192 Litres single door refrigerators( Best Sellers-3).png",
     currentPrice: "Rs. 29,500",
     oldPrice: "Rs. 34,990",
     warranty: "1 Year Full Product Warranty | 10 Years Compressor Warranty",
@@ -207,7 +208,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "CG Hot & Normal Water Dispenser - CGWD15A02HN",
     shortDescription:
       "Over heating protector | SS heating water tank | 500W heating power | 5 L/hr hot water",
-    image: "/images/CG hot and cold water dispenser (bestseller-4).png",
+    image: "/images/bestseller/CG hot and cold water dispenser (bestseller-4).png",
     currentPrice: "Rs. 3,400",
     oldPrice: "Rs. 4,190",
     warranty: "1 Year Warranty",
@@ -224,7 +225,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "Himstar 43 inch 4k smart TV HT-43F4KSDJ",
     shortDescription:
       "43 Inches | 4K Ultra HD | Google Android 14 | Voice-enabled Bluetooth remote",
-    image: "/images/Himstar 43 inch tv( Best Sellers-5).png",
+    image: "/images/bestseller/Himstar 43 inch tv( Best Sellers-5).png",
     currentPrice: "Rs. 42,000",
     oldPrice: "Rs. 49,000",
     warranty:
@@ -242,7 +243,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "SAMSUNG RR20C2722CR/IM - 192 Litres Direct Cooling Single Door Refrigerator",
     shortDescription:
       "192 Litres Capacity | Bar Chrome Handle | Toughened Glass Shelves | Inverter Compressor",
-    image: "/images/samsung single door 192 liters (bestseller-6).png",
+    image: "/images/bestseller/samsung single door 192 liters (bestseller-6).png",
     currentPrice: "Rs. 33,799",
     oldPrice: "Rs. 38,990",
     warranty: "1 Year Full Product Warranty | 10 Years Compressor Warranty",
@@ -259,7 +260,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "Samsung WT70C3200LL/TL 7Kg Semi Automatic washing Machine",
     shortDescription:
       "7 kg capacity | Semi-Automatic top load | 5 Star rating | Air Turbo Drying | Magic Filter",
-    image: "/images/samsung 7kg semi automatic washingmachine(best sellers-7).png",
+    image: "/images/bestseller/samsung 7kg semi automatic washingmachine(best sellers-7).png",
     currentPrice: "Rs. 22,800",
     oldPrice: "Rs. 25,990",
     warranty: "1 Year Comprehensive Warranty | 5 Years Motor Warranty",
@@ -276,7 +277,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     name: "Samsung 43 Inch Full HD Smart TV UA43F5550FUXXL",
     shortDescription:
       '43" Full HD Smart TV | HDR 10+ | Tizen OS | WiFi & Bluetooth | 2 HDMI, 1 USB',
-    image: "/images/Samsung 43 inch tv 2k( Best Sellers-8).png",
+    image: "/images/bestseller/Samsung 43 inch tv 2k( Best Sellers-8).png",
     currentPrice: "Rs. 49,000",
     oldPrice: "Rs. 68,000",
     warranty: "3 Year Full Warranty",
@@ -296,7 +297,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "RT40H30WNPIM Samsung Double Door Refrigerator, 275L",
     shortDescription:
       "275L | Frost-Free | Digital Inverter | 10-Year Compressor Warranty | Adjustable Toughened Glass Shelves | Power Cool | Inox Silver Finish",
-    image: "/images/Samsung double door 275L RT40H30W2PHL(clearance-1).png",
+    image: "/images/clearance/Samsung double door 275L RT40H30W2PHL(clearance-1).png",
     currentPrice: "Rs. 56,000",
     oldPrice: "Rs. 68,990",
     warranty: "10 Years Compressor Warranty",
@@ -380,7 +381,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "Himstar 190 Ltr Refrigerator HR-21D92BRJ",
     shortDescription:
       "Maroon finish | 190L capacity | Stabilizer free operation | 10 years compressor warranty",
-    image: "/images/Himstar 210BHN (clearance-5)png.png",
+    image: "/images/clearance/Himstar 210BHN (clearance-5)png.png",
     currentPrice: "Rs. 24,990",
     oldPrice: "Rs. 30,490",
     warranty: "10 Years Compressor Warranty",
@@ -397,7 +398,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "Samsung RR20C2Z226U/IM 192 Litres Single Door Refrigerator",
     shortDescription:
       "Stylish Grande design | Mystic Overlay Blue | Digital inverter compressor | Fast ice making",
-    image: "/images/samsung 6U (clearance-4).png",
+    image: "/images/clearance/samsung 6U (clearance-4).png",
     currentPrice: "Rs. 34,000",
     oldPrice: "Rs. 39,590",
     warranty: "Warranty support available",
@@ -414,7 +415,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "Godrej 190 Liter Single Door Refrigerator - RDEMARVEL 207C THF FU WN",
     shortDescription:
       "Anti-bacteria technology | Curve door | Large veg box | 3 toughened glass shelves",
-    image: "/images/godrej 184 L(clearance-4).png",
+    image: "/images/clearance/godrej 184 L(clearance-4).png",
     currentPrice: "Rs. 31,790",
     oldPrice: "Rs. 40,090",
     warranty: "Warranty support available",
@@ -431,7 +432,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "Himstar HR-210BHN Refrigerator",
     shortDescription:
       "192L capacity | Diamond Edge Freezing | 5-star rating | Toughened glass shelves",
-    image: "/images/himstat 192 litres(clerance-2).png",
+    image: "/images/clearance/himstat 192 litres(clerance-2).png",
     currentPrice: "Rs. 27,000",
     oldPrice: "Rs. 32,990",
     warranty: "Warranty support available",
@@ -448,7 +449,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "RT40H28WNPIM Samsung Double Door Refrigerator, 253L",
     shortDescription:
       "236L net capacity | Top mount freezer | Digital inverter | Toughened glass shelves",
-    image: "/images/samsung NPIM 256L double door(clearance-6).png",
+    image: "/images/clearance/samsung NPIM 256L double door(clearance-6).png",
     currentPrice: "Rs. 51,000",
     oldPrice: "Rs. 60,990",
     warranty: "Warranty support available",
@@ -465,7 +466,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "Himstar 8KG Front Load Fully Automatic Washing Machine HW-80FS8BTKGZ",
     shortDescription:
       "Inverter motor | 1400 RPM | Built-in heater | LED display | 10 years motor warranty",
-    image: "/images/Himstar 8kg washing machine (clearance-7).png",
+    image: "/images/clearance/Himstar 8kg washing machine (clearance-7).png",
     currentPrice: "Rs. 44,990",
     oldPrice: "Rs. 74,990",
     warranty: "10 Years Motor Warranty",
@@ -482,7 +483,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     name: "TCL 43V6B 43 inch 4K Smart TV",
     shortDescription:
       "Google TV | HDR10/HLG | Metallic bezel-less design | HDMI 2.1 with eARC",
-    image: "/images/TCL 43 inch 43V6B 4k(clearance-8).png",
+    image: "/images/clearance/TCL 43 inch 43V6B 4k(clearance-8).png",
     currentPrice: "Rs. 45,000",
     oldPrice: "Rs. 56,000",
     warranty:
@@ -494,6 +495,801 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     status: "In Stock",
     searchTerms: ["tv", "television", "google tv", "4k tv"],
   },
+]);
+
+const kitchenImage = (fileName: string) => `/images/kitchen/${fileName}`;
+
+export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
+  {
+    id: "kitchen-1",
+    slug: "samsung-23l-grill-microwave-mg23a3515ak-tl",
+    name: "Samsung 23L Grill Microwave MG23A3515AK/TL",
+    shortDescription:
+      "23L grill microwave | Tact and dial controls | Ceramic enamel cavity | Quick Defrost",
+    image: kitchenImage("samsung 23 L grill microwave(kitchen-1).png"),
+    currentPrice: "Rs. 25,500",
+    oldPrice: "Rs. 31,270",
+    warranty: "Warranty support available",
+    badge: "18% Off",
+    brand: "Samsung",
+    category: "Microwave Oven",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    ratingText: "No ratings yet",
+    searchTerms: [
+      "kitchen appliance",
+      "microwave",
+      "grill microwave",
+      "quick defrost",
+      "ceramic enamel",
+    ],
+    galleryImages: [
+      {
+        id: "samsung-mg23-main",
+        src: kitchenImage("samsung 23 L grill microwave(kitchen-1).png"),
+        alt: "Samsung 23L Grill Microwave front view",
+      },
+      {
+        id: "samsung-mg23-a",
+        src: kitchenImage("samsung 23 L grill microwave(kitchen-1.a).png"),
+        alt: "Samsung 23L Grill Microwave angled view",
+      },
+      {
+        id: "samsung-mg23-b",
+        src: kitchenImage("samsung 23 L grill microwave(kitchen-1.b).png"),
+        alt: "Samsung 23L Grill Microwave door open",
+      },
+      {
+        id: "samsung-mg23-c",
+        src: kitchenImage("samsung 23 L grill microwave(kitchen-1.c).png"),
+        alt: "Samsung 23L Grill Microwave control panel",
+      },
+      {
+        id: "samsung-mg23-d",
+        src: kitchenImage("samsung 23 L grill microwave(kitchen-1.d).png"),
+        alt: "Samsung 23L Grill Microwave detail",
+      },
+    ],
+    highlights: [
+      "23L capacity suitable for 3 to 4 members",
+      "Grill microwave for reheating, defrosting, grilling, and everyday cooking",
+      "Tact and dial control method with LED display",
+      "Eco Mode, Quick Defrost, Keep Warm, and Deodorization",
+      "Ceramic enamel cavity for easier cleaning and hygienic use",
+      "Child Safety Lock for safer family use",
+    ],
+    descriptionSections: [
+      {
+        id: "everyday-family-cooking",
+        title: "Ideal for everyday family cooking",
+        body: [
+          "The Samsung MG23A3515AK/TL combines microwave heating with grill cooking in a practical 23L size, making it suitable for small to medium families. It handles reheating, defrosting, grilling, and quick daily meals without taking over the kitchen counter.",
+        ],
+      },
+      {
+        id: "clean-safe-controls",
+        title: "Easy to clean and safer to use",
+        body: [
+          "A ceramic enamel cavity helps resist stains and supports easier cleaning after daily use. The child safety lock, deodorization mode, and keep warm function make it a reliable fit for busy family routines.",
+        ],
+        bullets: [
+          "6 power levels with microwave, grill, combination, and quick defrost modes",
+          "Browning Plus for improved grill results",
+          "Wire rack included for grilling",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "General",
+        specs: [
+          { label: "Brand", value: "Samsung" },
+          { label: "Model", value: "MG23A3515AK/TL" },
+          { label: "Type", value: "Grill Microwave Oven" },
+          { label: "Capacity", value: "23L" },
+          { label: "Color", value: "Black" },
+        ],
+      },
+      {
+        title: "Controls and Cooking",
+        specs: [
+          { label: "Control Method", value: "Tact + Dial" },
+          { label: "Display", value: "LED Display" },
+          { label: "Power Levels", value: "6" },
+          { label: "Cavity", value: "Ceramic Enamel" },
+          { label: "Programs", value: "Micro, Grill, Combi, Quick Defrost" },
+        ],
+      },
+      {
+        title: "Power",
+        specs: [
+          { label: "Microwave Output", value: "800W" },
+          { label: "Microwave Consumption", value: "1,250W" },
+          { label: "Grill Consumption", value: "1,100W" },
+          { label: "Maximum Consumption", value: "2,300W" },
+        ],
+      },
+    ],
+    boxContents: ["Microwave oven", "Wire rack", "User manual"],
+    deliveryInfo: [
+      "Delivery support available in serviceable areas.",
+      "Warranty support available through Dakshinkali Electronics.",
+    ],
+    relatedProductSlugs: [
+      "godrej-23l-convection-microwave-gme-523-cf1-rm",
+      "himstar-8l-electric-pressure-cooker-hk-8k1epj-za",
+      "cg-2000w-induction-cooktop-cgic20a03",
+    ],
+  },
+  {
+    id: "kitchen-2",
+    slug: "samsung-universal-tv-remote",
+    name: "Samsung Universal TV Remote",
+    shortDescription:
+      "Universal Samsung TV remote | Smart and non-smart TV support | Netflix and Prime buttons",
+    image: kitchenImage("samsung remote(kitechen-2).png"),
+    currentPrice: "Rs. 500",
+    oldPrice: "Rs. 1,200",
+    warranty: "Replacement support available",
+    badge: "62% Off",
+    brand: "Samsung",
+    category: "TV Accessories",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    searchTerms: [
+      "kitchen appliance",
+      "tv remote",
+      "samsung remote",
+      "tv accessories",
+      "universal remote",
+    ],
+    // TODO: Move this product out of Kitchen Appliances if a TV Accessories section is created.
+    galleryImages: [
+      {
+        id: "samsung-remote-main",
+        src: kitchenImage("samsung remote(kitechen-2).png"),
+        alt: "Samsung Universal TV Remote front view",
+      },
+      {
+        id: "samsung-remote-a",
+        src: kitchenImage("samsung remote(kitechen-2.a).png"),
+        alt: "Samsung Universal TV Remote button layout",
+      },
+      {
+        id: "samsung-remote-b",
+        src: kitchenImage("samsung remote(kitechen-2.b).png"),
+        alt: "Samsung Universal TV Remote side view",
+      },
+      {
+        id: "samsung-remote-c",
+        src: kitchenImage("samsung remote(kitechen-2.c).png"),
+        alt: "Samsung Universal TV Remote detail",
+      },
+      {
+        id: "samsung-remote-d",
+        src: kitchenImage("samsung remote(kitechen-2.d).png"),
+        alt: "Samsung Universal TV Remote back view",
+      },
+    ],
+    highlights: [
+      "Compatible with Samsung smart and non-smart TVs",
+      "Supports Samsung TVs from 24 inch to 75 inch",
+      "Dedicated Netflix and Amazon Prime buttons",
+      "Soft responsive keys for daily use",
+      "Lightweight body with comfortable grip",
+      "Works with AAA batteries, not included",
+    ],
+    descriptionSections: [
+      {
+        id: "simple-replacement-remote",
+        title: "Simple replacement for Samsung TVs",
+        body: [
+          "This universal Samsung TV remote is a practical replacement or spare remote for Samsung smart and non-smart TVs. It is designed for easy daily control without a complicated setup process.",
+        ],
+      },
+      {
+        id: "streaming-shortcuts",
+        title: "Quick streaming shortcuts",
+        body: [
+          "Dedicated Netflix and Amazon Prime buttons help you jump straight to common streaming apps, while the soft key layout keeps channel, volume, and menu control straightforward for every age group.",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "Compatibility",
+        specs: [
+          { label: "Product Type", value: "Universal TV Remote Control" },
+          { label: "Compatible Brand", value: "Samsung" },
+          { label: "TV Support", value: "Smart and non-smart Samsung TVs" },
+          { label: "Supported TV Size", value: "24 inch to 75 inch" },
+        ],
+      },
+      {
+        title: "Build",
+        specs: [
+          { label: "Special Buttons", value: "Netflix, Amazon Prime" },
+          { label: "Material", value: "High-quality plastic with soft keys" },
+          { label: "Power Source", value: "AAA batteries, not included" },
+        ],
+      },
+    ],
+    boxContents: ["1 universal remote control"],
+    deliveryInfo: ["Batteries are not included."],
+  },
+  {
+    id: "kitchen-3",
+    slug: "samsung-vcc4540s36-sml-bagless-vacuum-cleaner",
+    name: "Samsung VCC4540S36/SML Bagless Vacuum Cleaner",
+    shortDescription:
+      "1.3L twin chamber dust capacity | 1800W motor | 360W suction | HEPA exhaust filter",
+    image: kitchenImage("samsung vaccum cleaner airtrack(kitchen-3).png"),
+    currentPrice: "Rs. 13,490",
+    warranty: "Warranty support available",
+    badge: "Bagless",
+    brand: "Samsung",
+    category: "Vacuum Cleaner",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    ratingText: "0 customer ratings",
+    searchTerms: [
+      "kitchen appliance",
+      "vacuum cleaner",
+      "bagless vacuum",
+      "samsung vacuum",
+      "home cleaning",
+    ],
+    galleryImages: [
+      {
+        id: "samsung-vacuum-main",
+        src: kitchenImage("samsung vaccum cleaner airtrack(kitchen-3).png"),
+        alt: "Samsung VCC4540S36/SML vacuum cleaner",
+      },
+      {
+        id: "samsung-vacuum-a",
+        src: kitchenImage("samsung vaccum cleaner airtrack(kitchen-3.a).png"),
+        alt: "Samsung vacuum cleaner front detail",
+      },
+      {
+        id: "samsung-vacuum-b",
+        src: kitchenImage("samsung vaccum cleaner airtrack(kitchen-3.b).png"),
+        alt: "Samsung vacuum cleaner accessories",
+      },
+      {
+        id: "samsung-vacuum-c",
+        src: kitchenImage("samsung vaccum cleaner airtrack(kitchen-3.c).png"),
+        alt: "Samsung vacuum cleaner side view",
+      },
+      {
+        id: "samsung-vacuum-d",
+        src: kitchenImage("samsung vaccum cleaner airtrack(kitchen-3.d).png"),
+        alt: "Samsung vacuum cleaner body detail",
+      },
+    ],
+    highlights: [
+      "Bagless twin chamber dust collection system",
+      "1.3L dust capacity for regular home cleaning",
+      "1800W maximum power consumption with 360W suction power",
+      "HEPA exhaust filter with pre-motor filtration",
+      "Auto cord rewinder for easier storage",
+      "2-step NB250 main brush and 2-in-1 accessory",
+    ],
+    descriptionSections: [
+      {
+        id: "cleaning-performance",
+        title: "Reliable everyday home cleaning",
+        body: [
+          "The Samsung VCC4540S36/SML is built for routine household cleaning with a bagless 1.3L twin chamber dust system, strong suction, and practical accessories for floors, corners, and furniture.",
+        ],
+      },
+      {
+        id: "storage-and-filtration",
+        title: "Designed for easier storage and cleaner exhaust",
+        body: [
+          "An auto cord rewinder keeps the cleaner tidy between uses, while HEPA exhaust filtration helps manage dust release during cleaning.",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "Performance",
+        specs: [
+          { label: "Model", value: "VCC4540S36/SML" },
+          { label: "Dust Collection", value: "Bagless Twin Chamber" },
+          { label: "Dust Capacity", value: "1.3L" },
+          { label: "Max Consumption Power", value: "1800W" },
+          { label: "Suction Power", value: "360W" },
+          { label: "Noise Level", value: "83 dBA" },
+        ],
+      },
+      {
+        title: "Accessories and Filters",
+        specs: [
+          { label: "Main Brush", value: "2-Step NB250" },
+          { label: "Accessory", value: "2-in-1 accessory" },
+          { label: "Filter", value: "HEPA exhaust filter with pre-motor" },
+          { label: "Pipe", value: "Stainless pipe" },
+          { label: "Cord", value: "Auto cord rewinder" },
+        ],
+      },
+    ],
+    boxContents: ["Vacuum cleaner", "Main brush", "2-in-1 accessory", "Stainless pipe"],
+    deliveryInfo: ["Delivery support available in serviceable areas."],
+  },
+  {
+    id: "kitchen-4",
+    slug: "godrej-23l-convection-microwave-gme-523-cf1-rm",
+    name: "Godrej 23L Convection Microwave Oven GME 523 CF1 RM",
+    shortDescription:
+      "23L convection microwave | 205 Instacook recipes | Air Fry mode | Stainless steel cavity",
+    image: "/images/logo-placeholder.jpeg",
+    currentPrice: "Rs. 17,990",
+    oldPrice: "Rs. 22,400",
+    warranty: "1 Year Comprehensive Warranty",
+    badge: "21% Off",
+    brand: "Godrej",
+    category: "Microwave Oven",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    searchTerms: [
+      "kitchen appliance",
+      "convection microwave",
+      "godrej microwave",
+      "air fry",
+      "instacook",
+    ],
+    highlights: [
+      "23L capacity suitable for 3 to 4 members",
+      "Convection microwave for baking, grilling, reheating, defrosting, and cooking",
+      "205 Instacook recipes for guided everyday cooking",
+      "Healthy Air Fry mode and oil-free recipe support",
+      "Steam clean, deodoriser, defrost, and express cooking modes",
+      "Stainless steel cavity with pull door design",
+    ],
+    descriptionSections: [
+      {
+        id: "guided-cooking",
+        title: "Guided cooking for busy kitchens",
+        body: [
+          "The Godrej GME 523 CF1 RM combines convection, grill, and microwave cooking in a 23L format. Its recipe programs help families prepare snacks, breakfasts, Indian dishes, desserts, soups, paneer, ghee, curd, and fermented foods with less guesswork.",
+        ],
+      },
+      {
+        id: "healthy-modes",
+        title: "Healthier cooking modes",
+        body: [
+          "Healthy Air Fry, oil-free recipes, steam clean, deodoriser, and 4-step cooking give this microwave more flexibility than a basic reheating appliance.",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "General",
+        specs: [
+          { label: "Brand", value: "Godrej" },
+          { label: "Model", value: "GME 523 CF1 RM" },
+          { label: "Type", value: "Convection Microwave Oven" },
+          { label: "Capacity", value: "23L" },
+          { label: "Color", value: "Floral Black" },
+        ],
+      },
+      {
+        title: "Cooking Features",
+        specs: [
+          { label: "Programs", value: "205 Instacook recipes" },
+          { label: "Cooking Modes", value: "Solo, grill, convection, combination, express cooking" },
+          { label: "Special Modes", value: "Healthy Air Fry, steam clean, deodoriser, defrost, 4-step cooking" },
+          { label: "Power Levels", value: "5" },
+        ],
+      },
+      {
+        title: "Build and Power",
+        specs: [
+          { label: "Output Power", value: "800W" },
+          { label: "Listed Power", value: "1200W" },
+          { label: "Cavity Type", value: "Stainless Steel" },
+          { label: "Door Type", value: "Pull" },
+          { label: "Glass Finish", value: "Plain" },
+        ],
+      },
+    ],
+    boxContents: ["Microwave oven", "User manual"],
+    deliveryInfo: [
+      "Product image will be updated when kitchen-4 assets are added.",
+      "Warranty support available through Dakshinkali Electronics.",
+    ],
+    relatedProductSlugs: [
+      "samsung-23l-grill-microwave-mg23a3515ak-tl",
+      "cg-2000w-induction-cooktop-cgic20a03",
+    ],
+  },
+  {
+    id: "kitchen-5",
+    slug: "himstar-8l-electric-pressure-cooker-hk-8k1epj-za",
+    name: "Himstar 8L Electric Pressure Cooker HK-8K1EPJ/ZA",
+    shortDescription:
+      "8L capacity | 1200W power | Preset cooking modes | Temperature control",
+    image: kitchenImage("Himstar electric pressure cooker(kitchen-5).png"),
+    currentPrice: "Rs. 7,500",
+    oldPrice: "Rs. 10,990",
+    warranty: "1 Year Brand Warranty",
+    badge: "30% Off",
+    brand: "Himstar",
+    category: "Electric Pressure Cooker",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    ratingText: "No ratings yet",
+    searchTerms: [
+      "kitchen appliance",
+      "pressure cooker",
+      "electric cooker",
+      "rice cooker",
+      "himstar cooker",
+    ],
+    galleryImages: [
+      {
+        id: "himstar-cooker-main",
+        src: kitchenImage("Himstar electric pressure cooker(kitchen-5).png"),
+        alt: "Himstar 8L Electric Pressure Cooker",
+      },
+      {
+        id: "himstar-cooker-a",
+        src: kitchenImage("Himstar electric pressure cooker(kitchen-5.a).png"),
+        alt: "Himstar pressure cooker control panel",
+      },
+      {
+        id: "himstar-cooker-b",
+        src: kitchenImage("Himstar electric pressure cooker(kitchen-5.b).png"),
+        alt: "Himstar pressure cooker detail",
+      },
+    ],
+    highlights: [
+      "Large 8L capacity for family meals",
+      "1200W power with intelligent temperature control",
+      "Preset modes for rice, cake, soup, chicken, stew, fry, and more",
+      "Auto keep warm function for ready-to-serve meals",
+      "Includes pot, steamer, measuring cup, spatula, and power cord",
+      "Detachable power cord for easier storage",
+    ],
+    descriptionSections: [
+      {
+        id: "family-capacity",
+        title: "Large capacity for family cooking",
+        body: [
+          "This 8L Himstar electric pressure cooker is built for larger family meals, batch cooking, and everyday rice, soup, porridge, stew, steaming, and warming needs.",
+        ],
+      },
+      {
+        id: "preset-controls",
+        title: "Preset cooking with accurate control",
+        body: [
+          "Preset cooking modes and temperature control help simplify common recipes while reducing the manual attention needed during pressure cooking.",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "General",
+        specs: [
+          { label: "Brand", value: "Himstar" },
+          { label: "Model", value: "HK-8K1EPJ/ZA" },
+          { label: "Capacity", value: "8L" },
+          { label: "Color", value: "Steel / Silver" },
+          { label: "Body Material", value: "Metal" },
+        ],
+      },
+      {
+        title: "Cooking Features",
+        specs: [
+          { label: "Preset Modes", value: "Rice, cake, steam fish, heating rice, porridge, soup, steam bone, steam chicken, stew, fry, preset, intelligent cook" },
+          { label: "Controls", value: "Temperature control, timer, taste selection, warm/cancel" },
+          { label: "Auto Keep Warm", value: "Yes" },
+          { label: "Steamer", value: "Yes" },
+          { label: "Soup Making", value: "Yes" },
+        ],
+      },
+      {
+        title: "Power",
+        specs: [
+          { label: "Power Requirement", value: "220-240V AC, 50-60Hz" },
+          { label: "Power Consumption", value: "1200W" },
+          { label: "Installation and Demo", value: "Not required" },
+        ],
+      },
+    ],
+    boxContents: [
+      "Pressure cooker",
+      "Pot",
+      "Steamer",
+      "Power cord",
+      "Measuring cup",
+      "Spatula",
+    ],
+    deliveryInfo: ["Free shipping where applicable.", "Warranty support available."],
+  },
+  {
+    id: "kitchen-6",
+    slug: "cg-550w-mixer-grinder-cgmg5505a",
+    name: "CG 550W Mixer Grinder CGMG5505A",
+    shortDescription:
+      "550W mixer grinder | 3 stainless steel jars | 3-speed control | Overload protection",
+    image: "/images/logo-placeholder.jpeg",
+    currentPrice: "Rs. 3,800",
+    oldPrice: "Rs. 4,260",
+    warranty: "2 Years Warranty on Motor",
+    badge: "12% Off",
+    brand: "CG",
+    category: "Mixer Grinder",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    searchTerms: [
+      "kitchen appliance",
+      "mixer grinder",
+      "cg mixer",
+      "grinder",
+      "blender",
+    ],
+    highlights: [
+      "550W motor for grinding, blending, and mixing",
+      "3 jars for liquidizing, dry/wet grinding, and chutney preparation",
+      "3-speed control with incher for better texture control",
+      "High-grade stainless steel jars with flow breakers",
+      "Shock-proof ABS and unbreakable polycarbonate body",
+      "Overload protection helps safeguard the motor",
+    ],
+    descriptionSections: [
+      {
+        id: "everyday-prep",
+        title: "Built for everyday food preparation",
+        body: [
+          "The CGMG5505A mixer grinder helps with everyday blending, wet grinding, dry grinding, chutney preparation, and ingredient prep. Its 550W motor and three-jar setup cover the common needs of a family kitchen.",
+        ],
+      },
+      {
+        id: "durable-safe-build",
+        title: "Durable jars and safer operation",
+        body: [
+          "Stainless steel jars, flow breakers, overload protection, and a shock-proof body make it practical for repeated daily use.",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "General",
+        specs: [
+          { label: "Brand", value: "CG" },
+          { label: "Model", value: "CGMG5505A" },
+          { label: "Power", value: "550W" },
+          { label: "Voltage", value: "220V - 50Hz" },
+          { label: "Color", value: "White" },
+        ],
+      },
+      {
+        title: "Jars",
+        specs: [
+          { label: "Liquidizing Jar", value: "1.3L stainless steel" },
+          { label: "Dry/Wet Jar", value: "1.0L stainless steel" },
+          { label: "Chutney Jar", value: "400g" },
+          { label: "Jar Material", value: "High-grade stainless steel" },
+        ],
+      },
+      {
+        title: "Controls and Safety",
+        specs: [
+          { label: "Speed Control", value: "3 speed with incher" },
+          { label: "Grinding System", value: "Flow breakers in jars" },
+          { label: "Body", value: "Unbreakable polycarbonate and shock-proof ABS" },
+          { label: "Motor Protection", value: "Overload protection" },
+        ],
+      },
+    ],
+    boxContents: ["Mixer grinder unit", "Liquidizing jar", "Dry/wet jar", "Chutney jar"],
+    deliveryInfo: [
+      "Product image will be updated when kitchen-6 assets are added.",
+      "Warranty support available through Dakshinkali Electronics.",
+    ],
+  },
+  {
+    id: "kitchen-7",
+    slug: "cg-2000w-induction-cooktop-cgic20a03",
+    name: "CG 2000W Induction Cooktop CGIC20A03",
+    shortDescription:
+      "2000W induction cooktop | Crystal glass plate | Digital display | Timer and child lock",
+    image: kitchenImage("CG induction cooktop(kitchen-7).png"),
+    currentPrice: "Rs. 3,500",
+    oldPrice: "Rs. 5,490",
+    warranty: "1 Year Comprehensive Warranty | 2 Years Glass Plate Warranty",
+    badge: "31% Off",
+    brand: "CG",
+    category: "Induction Cooktop",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    ratingText: "No ratings yet",
+    searchTerms: [
+      "kitchen appliance",
+      "induction cooktop",
+      "induction cooker",
+      "cg induction",
+      "electric cooking",
+    ],
+    galleryImages: [
+      {
+        id: "cg-induction-main",
+        src: kitchenImage("CG induction cooktop(kitchen-7).png"),
+        alt: "CG 2000W Induction Cooktop",
+      },
+      {
+        id: "cg-induction-a",
+        src: kitchenImage("CG induction cooktop(kitchen-7.a).png"),
+        alt: "CG induction cooktop control panel",
+      },
+      {
+        id: "cg-induction-b",
+        src: kitchenImage("CG induction cooktop(kitchen-7.b).png"),
+        alt: "CG induction cooktop side view",
+      },
+    ],
+    highlights: [
+      "2000W power for fast electric cooking",
+      "Super A Grade crystal glass surface",
+      "Touch controls with clear 4-digit LED display",
+      "Adjustable wattage and temperature",
+      "Built-in timer, automatic cookware detection, and child lock",
+      "Cooling fan for internal protection",
+    ],
+    descriptionSections: [
+      {
+        id: "fast-smoke-free-cooking",
+        title: "Fast, clean electric cooking",
+        body: [
+          "The CGIC20A03 induction cooktop is a compact 2000W cooking solution for modern kitchens. It heats compatible cookware quickly while keeping the surface easy to wipe clean after use.",
+        ],
+      },
+      {
+        id: "precise-controls",
+        title: "Controls for everyday meals",
+        body: [
+          "Preset cooking modes, adjustable temperature, a digital display, and timer support make it easy to manage boiling, frying, heating, and regular meal preparation.",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "General",
+        specs: [
+          { label: "Brand", value: "CG" },
+          { label: "Model", value: "CGIC20A03" },
+          { label: "Power", value: "2000W" },
+          { label: "Surface", value: "Super A Grade crystal glass" },
+          { label: "Color", value: "Black" },
+        ],
+      },
+      {
+        title: "Controls and Safety",
+        specs: [
+          { label: "Display", value: "4-digit LED display" },
+          { label: "Controls", value: "Touch / push button control" },
+          { label: "Cooking Functions", value: "8 functions listed" },
+          { label: "Preset Modes", value: "6 preset cooking modes listed" },
+          { label: "Timer", value: "Up to 4 hours" },
+          { label: "Safety", value: "Child lock and automatic cookware detection" },
+        ],
+      },
+    ],
+    boxContents: ["Induction cooktop", "User manual"],
+    deliveryInfo: ["Use only induction-compatible cookware."],
+    relatedProductSlugs: [
+      "cg-550w-mixer-grinder-cgmg5505a",
+      "himstar-8l-electric-pressure-cooker-hk-8k1epj-za",
+    ],
+  },
+  {
+    id: "kitchen-8",
+    slug: "cg-5l-bottom-loading-water-dispenser-cgwdb-lec",
+    name: "CG 5L Bottom Loading Water Dispenser CGWDBLEC",
+    shortDescription:
+      "Bottom loading dispenser | Hot, cold and normal water | 304 stainless steel tank | Child lock",
+    image: kitchenImage("cg water dispensor(kitchen-8).png"),
+    currentPrice: "Rs. 15,490",
+    oldPrice: "Rs. 19,990",
+    warranty: "1 Year Warranty",
+    badge: "24% Off",
+    brand: "CG",
+    category: "Water Dispenser",
+    collection: "Kitchen Appliances",
+    status: "In Stock",
+    ratingText: "3 ratings",
+    searchTerms: [
+      "kitchen appliance",
+      "water dispenser",
+      "bottom loading dispenser",
+      "hot cold normal water",
+      "cgwdb lec",
+      "cgwdb",
+    ],
+    galleryImages: [
+      {
+        id: "cg-dispenser-main",
+        src: kitchenImage("cg water dispensor(kitchen-8).png"),
+        alt: "CG 5L Bottom Loading Water Dispenser",
+      },
+      {
+        id: "cg-dispenser-a",
+        src: kitchenImage("cg water dispensor(kitchen-8.a).png"),
+        alt: "CG bottom loading water dispenser detail",
+      },
+    ],
+    highlights: [
+      "Bottom loading design for easier bottle changes",
+      "Hot, cold, and normal water dispensing",
+      "Food-grade 304 stainless steel water tank",
+      "Child lock safety tap for hot water",
+      "Overheating protection for safer operation",
+      "ABS plastic body with compact 33 x 32 x 105 cm footprint",
+    ],
+    descriptionSections: [
+      {
+        id: "easy-bottom-loading",
+        title: "Easier bottle changes",
+        body: [
+          "The CGWDBLEC bottom loading water dispenser keeps the bottle hidden in the lower cabinet, reducing lifting effort and keeping the setup cleaner for homes and offices.",
+        ],
+      },
+      {
+        id: "hot-cold-normal",
+        title: "Hot, cold, and normal water",
+        body: [
+          "Three tap functionality gives quick access to hot, cold, and normal water. A child lock safety tap and overheating protection add confidence for everyday use.",
+        ],
+      },
+    ],
+    specifications: [
+      {
+        title: "General",
+        specs: [
+          { label: "Brand", value: "CG" },
+          { label: "Model", value: "CGWDBLEC" },
+          { label: "Type", value: "Bottom Loading" },
+          { label: "Function", value: "Hot, cold and normal" },
+          { label: "Color", value: "Black" },
+          { label: "Body Material", value: "ABS Plastic" },
+        ],
+      },
+      {
+        title: "Water and Safety",
+        specs: [
+          { label: "Water Tank", value: "304 stainless steel food-grade tank" },
+          { label: "Tap Type", value: "3 taps with hot tap safety" },
+          { label: "Overheating Protector", value: "Yes" },
+          { label: "Hot Water Temperature", value: "85-95 degree C" },
+          { label: "Cold Water Temperature", value: "12-15 degree C" },
+        ],
+      },
+      {
+        title: "Capacity and Power",
+        specs: [
+          { label: "Hot Water Output", value: "5L per hour" },
+          { label: "Cold Water Output", value: "0.7L per hour" },
+          { label: "Hot Tank Capacity", value: "1L" },
+          { label: "Cold Tank Capacity", value: "0.68L" },
+          { label: "Heating Power", value: "500W" },
+          { label: "Cooling Power", value: "70W" },
+          { label: "Voltage", value: "220-240V, 50-60Hz" },
+        ],
+      },
+      {
+        title: "Dimensions",
+        specs: [
+          { label: "Net Weight", value: "8 kg" },
+          { label: "Gross Weight", value: "9.5 kg" },
+          { label: "Dimensions", value: "33 x 32 x 105 cm (W x D x H)" },
+        ],
+      },
+    ],
+    boxContents: ["Water dispenser", "User manual"],
+    deliveryInfo: ["Delivery support available in serviceable areas."],
+  },
+  // Future kitchen appliance products 9-12 can be added here.
 ]);
 
 export const detailProducts: StoreProduct[] = withProductHrefs([
@@ -724,6 +1520,7 @@ export const storeProducts: StoreProduct[] = dedupeBySlug([
   ...trendingProducts,
   ...bestSellingProducts,
   ...clearanceProducts,
+  ...kitchenApplianceProducts,
   ...detailProducts,
 ]);
 

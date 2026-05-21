@@ -79,17 +79,17 @@ const trustCards = [
 
 const productImages = [
   {
-    src: "/images/Samsung Double door 245 Litres.png",
+    src: "/images/trending products/Samsung Double door 245 Litres.png",
     alt: "Samsung double door refrigerator",
     className: "left-2 top-9 h-[78%] w-[44%] sm:left-8 sm:w-[38%]",
   },
   {
-    src: "/images/Samsung 65 inch tv.png",
+    src: "/images/trending products/Samsung 65 inch tv.png",
     alt: "Samsung smart television",
     className: "right-2 top-8 h-[42%] w-[50%] sm:right-6",
   },
   {
-    src: "/images/Himstar 8kg washing machine (clearance-7).png",
+    src: "/images/clearance/Himstar 8kg washing machine (clearance-7).png",
     alt: "Himstar washing machine",
     className: "bottom-5 right-6 h-[38%] w-[42%] sm:right-12",
   },

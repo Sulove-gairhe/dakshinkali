@@ -60,7 +60,7 @@ const defaultMenuItems: MenuItem[] = [
 
 export function Navbar({
   brandName = "Dakshinkali Electronics",
-  brandLogoSrc = "/images/logo-placeholder-transparent.png",
+  brandLogoSrc = "/images/logo-placeholder.jpeg",
   searchPlaceholder = "Search for TVs, refrigerators, appliances...",
   cartCount = 0,
   wishlistCount = 0,

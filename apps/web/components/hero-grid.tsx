@@ -21,9 +21,9 @@ const defaultPrimary: HeroCard = {
   title: "Electric Water Geysers",
   description:
     "Best-in-class electric geysers for your home. Efficient heating, superior insulation.",
-  imageSrc: "public/images/geyeser(hero grid-1).png",
+  imageSrc: "/images/hero grid/geyeser(hero grid-1).png",
   imageAlt: "Electric Water Geyser - Best electric geysers in Nepal",
-  href: "#",
+  href: "/search?q=water%20geyser",
   buttonLabel: "Shop Now",
 };
 
@@ -31,18 +31,18 @@ const defaultSecondary: HeroCard = {
   badge: "Home Appliance",
   title: "Multi-Door Refrigerators",
   description: "Same Footprint, Bigger Capacity",
-  imageSrc: "public/images/fridge-hero grid(2).png",
+  imageSrc: "/images/hero grid/fridge-hero grid(2).png",
   imageAlt: "Multi-door Refrigerator - Ultra Space Technology",
-  href: "#",
+  href: "/search?category=refrigerator",
 };
 
 const defaultTertiary: HeroCard = {
   badge: "Entertainment",
   title: "Neo QLED 8K TVs",
   description: "Incredible Picture & Sound",
-  imageSrc: "public/images/tcl tv(hero-grid).jpeg",
+  imageSrc: "/images/hero grid/tcl tv(hero-grid).jpeg",
   imageAlt: "Samsung Neo QLED 8K TV - Incredible picture and sound",
-  href: "#",
+  href: "/search?category=televisions",
 };
 
 export function HeroGrid({

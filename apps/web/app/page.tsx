@@ -10,6 +10,9 @@ import { BestSellingProducts } from "@/components/best-selling-products";
 import { CompareProvider } from "@/components/compare/CompareProvider";
 import { CompareDrawer } from "@/components/compare/CompareDrawer";
 import { CompareModal } from "@/components/compare/CompareModal";
+import { BuyingGuides } from "@/components/home/BuyingGuides";
+import { KitchenAppliances } from "@/components/home/KitchenAppliances";
+import { Footer } from "@/components/layout/Footer";
 
 export default function WebStorePage() {
   return (
@@ -22,26 +25,26 @@ export default function WebStorePage() {
             badge: "Featured",
             title: "Electric Water Geysers",
             description: "Best-in-class electric geysers for your home.",
-            imageSrc: "/images/geyeser(hero grid-1).png",
+            imageSrc: "/images/hero grid/geyeser(hero grid-1).png",
             imageAlt: "Electric Water Geyser",
-            href: "/products?category=water-geyser",
+            href: "/search?q=water%20geyser",
             buttonLabel: "Shop Now",
           }}
           secondary={{
             badge: "Home Appliance",
             title: "Multi-Door Refrigerators",
             description: "Same Footprint, Bigger Capacity",
-            imageSrc: "/images/fridge-hero grid(2).png",
+            imageSrc: "/images/hero grid/fridge-hero grid(2).png",
             imageAlt: "Refrigerator",
-            href: "/products?category=refrigerators",
+            href: "/search?category=refrigerator",
           }}
           tertiary={{
             badge: "Entertainment",
             title: "Neo QLED 8K TVs",
             description: "Incredible Picture & Sound",
-            imageSrc: "/images/tcl tv(hero-grid).jpeg",
+            imageSrc: "/images/hero grid/tcl tv(hero-grid).jpeg",
             imageAlt: "TV",
-            href: "/products?category=televisions",
+            href: "/search?category=televisions",
           }}
         />
 
@@ -53,6 +56,9 @@ export default function WebStorePage() {
           <TrendingProducts />
           <HomeTrustSection />
           <ClearanceDeals />
+          <KitchenAppliances />
+          <BuyingGuides />
+          <Footer />
         </div>
 
         {/* Compare feature - drawer and modal */}
