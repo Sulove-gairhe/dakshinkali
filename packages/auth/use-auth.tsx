@@ -31,7 +31,17 @@ export interface AuthContextValue {
     signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
     
     /** Sign up with email and password */
-    signUp: (email: string, password: string, metadata?: any) => Promise<{ error: Error | null }>;
+    signUp: (
+        email: string,
+        password: string,
+        metadata?: Record<string, unknown>,
+        options?: { emailRedirectTo?: string },
+    ) => Promise<{ error: Error | null; session: Session | null; needsEmailConfirmation: boolean }>;
+
+    /** Sign in with Google OAuth */
+    signInWithGoogle: (
+        options?: { redirectPath?: string; emailRedirectTo?: string },
+    ) => Promise<{ error: Error | null }>;
     
     /** Sign out */
     signOut: () => Promise<void>;

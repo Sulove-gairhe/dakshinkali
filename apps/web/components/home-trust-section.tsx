@@ -152,7 +152,7 @@ export function HomeTrustSection() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-linear-to-br from-[#fff8e7] via-background to-[#fffdf7] py-14 sm:py-16 lg:min-h-[92vh] lg:py-0">
+      <section className="relative overflow-hidden bg-linear-to-br from-[#fff8e7] via-background to-[#fffdf7] py-12 sm:py-14 lg:py-16">
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent" />
         <div className="mx-auto flex min-h-full max-w-7xl flex-col justify-center px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">

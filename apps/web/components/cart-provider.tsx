@@ -17,13 +17,18 @@ export type CartProduct = {
   name: string;
   shortDescription: string;
   image: string;
-  currentPrice: string;
+  currentPrice?: string | number;
+  price?: string | number;
+  salePrice?: string | number;
+  discountPrice?: string | number;
+  amount?: string | number;
   oldPrice?: string;
   href: string;
 };
 
 export type CartItem = CartProduct & {
   quantity: number;
+  price: number;
   unitPrice: number;
 };
 
@@ -39,17 +44,67 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-function parsePrice(price: string) {
-  const numericPrice = Number(price.replace(/[^\d.]/g, ""));
+export function parseProductPrice(value: number | string | undefined | null) {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (!value) return 0;
+
+  const numericPrice = Number(value.match(/\d+(?:\.\d+)?/g)?.join("") ?? "");
   return Number.isFinite(numericPrice) ? numericPrice : 0;
 }
 
-function readStoredCart() {
+function getProductPrice(product: CartProduct) {
+  return parseProductPrice(
+    product.price ??
+      product.currentPrice ??
+      product.salePrice ??
+      product.discountPrice ??
+      product.amount,
+  );
+}
+
+function getDisplayedProductPrice(product: CartProduct) {
+  return parseProductPrice(
+    product.currentPrice ??
+      product.salePrice ??
+      product.discountPrice ??
+      product.amount,
+  );
+}
+
+function normalizeCartItem(item: CartItem): CartItem {
+  const storedPrice = parseProductPrice(item.price);
+  const productPrice = getDisplayedProductPrice(item);
+  const storedUnitPrice = parseProductPrice(item.unitPrice);
+  const unitPrice =
+    (storedPrice > 1 ? storedPrice : 0) ||
+    productPrice ||
+    (storedUnitPrice > 1 ? storedUnitPrice : 0) ||
+    storedPrice ||
+    storedUnitPrice;
+  const currentPrice =
+    typeof item.currentPrice === "number"
+      ? formatPrice(item.currentPrice)
+      : item.currentPrice;
+
+  return {
+    ...item,
+    currentPrice: currentPrice ?? formatPrice(unitPrice),
+    quantity: Math.max(1, Number(item.quantity) || 1),
+    price: unitPrice,
+    unitPrice,
+  };
+}
+
+function readStoredCart(): CartItem[] {
   if (typeof window === "undefined") return [];
 
   try {
     const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
-    return storedCart ? (JSON.parse(storedCart) as CartItem[]) : [];
+    const parsedCart = storedCart ? (JSON.parse(storedCart) as CartItem[]) : [];
+    return parsedCart.map(normalizeCartItem);
   } catch {
     return [];
   }
@@ -60,8 +115,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    setItems(readStoredCart());
-    setIsReady(true);
+    queueMicrotask(() => {
+      setItems(readStoredCart());
+      setIsReady(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -72,11 +129,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addItem = useCallback((product: CartProduct) => {
     setItems((currentItems) => {
       const existingItem = currentItems.find((item) => item.id === product.id);
+      const unitPrice = getProductPrice(product);
+      const currentPrice =
+        typeof product.currentPrice === "number"
+          ? formatPrice(product.currentPrice)
+          : product.currentPrice;
 
       if (existingItem) {
         return currentItems.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? {
+                ...item,
+                ...product,
+                currentPrice: currentPrice ?? item.currentPrice,
+                quantity: item.quantity + 1,
+                price: unitPrice || item.unitPrice,
+                unitPrice: unitPrice || item.unitPrice,
+              }
             : item,
         );
       }
@@ -85,8 +154,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         ...currentItems,
         {
           ...product,
+          currentPrice: currentPrice ?? formatPrice(unitPrice),
           quantity: 1,
-          unitPrice: parsePrice(product.currentPrice),
+          price: unitPrice,
+          unitPrice,
         },
       ];
     });

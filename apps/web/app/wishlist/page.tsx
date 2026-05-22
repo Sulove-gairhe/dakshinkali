@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
-import { formatPrice, useCart } from "@/components/cart-provider";
+import {
+  formatPrice,
+  parseProductPrice,
+  useCart,
+} from "@/components/cart-provider";
 import { SiteNavbar } from "@/components/site-navbar";
 import { useWishlist } from "@/components/wishlist-provider";
 
@@ -141,7 +145,7 @@ export default function WishlistPage() {
                   {formatPrice(
                     items.reduce(
                       (total, item) =>
-                        total + Number(item.currentPrice.replace(/[^\d.]/g, "")),
+                        total + parseProductPrice(item.currentPrice),
                       0,
                     ),
                   )}

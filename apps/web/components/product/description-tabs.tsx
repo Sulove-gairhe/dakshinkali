@@ -14,6 +14,66 @@ interface DescriptionTabsProps {
   deliveryInfo?: string[]
 }
 
+// ─── Thresholds ────────────────────────────────────────────────────────────────
+// Description: collapse if total text > 400 chars OR more than 2 sections
+const DESCRIPTION_CHAR_THRESHOLD = 400
+const DESCRIPTION_SECTION_THRESHOLD = 2
+
+// Specs: collapse if total spec rows > 10
+const SPEC_ROW_THRESHOLD = 10
+
+// ─── Collapsible wrapper ───────────────────────────────────────────────────────
+interface CollapsibleProps {
+  children: React.ReactNode
+  /** Whether the content is long enough to need collapsing */
+  needsToggle: boolean
+  /** Collapsed height in Tailwind max-h value (e.g. "max-h-48") */
+  collapsedClass?: string
+}
+
+function Collapsible({ children, needsToggle, collapsedClass = 'max-h-48' }: CollapsibleProps) {
+  const [expanded, setExpanded] = useState(false)
+
+  if (!needsToggle) return <>{children}</>
+
+  return (
+    <div>
+      <div
+        className={[
+          'overflow-hidden transition-[max-height] motion-reduce:transition-none',
+          expanded ? 'max-h-[4000px] duration-500 ease-in-out' : `${collapsedClass} duration-300 ease-in-out`,
+        ].join(' ')}
+      >
+        {children}
+      </div>
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="mt-3 cursor-pointer text-[13px] font-medium text-foreground/60 underline-offset-2 transition-colors hover:text-foreground hover:underline"
+      >
+        {expanded ? 'View less' : 'View more'}
+      </button>
+    </div>
+  )
+}
+
+/** Collapsible body text for a single description section. */
+function CollapsibleBody({ paragraphs }: { paragraphs: string[] }) {
+  const totalChars = paragraphs.join(' ').length
+  const needsToggle = totalChars > 280 || paragraphs.length > 2
+
+  return (
+    <Collapsible needsToggle={needsToggle} collapsedClass="max-h-[5.5rem]">
+      <div className="space-y-4">
+        {paragraphs.map((paragraph, i) => (
+          <p key={i} className="leading-relaxed text-muted-foreground">
+            {paragraph}
+          </p>
+        ))}
+      </div>
+    </Collapsible>
+  )
+}
+
 export function DescriptionTabs({
   sections = [],
   specifications = [],
@@ -28,6 +88,17 @@ export function DescriptionTabs({
     specificationGroups.length > 0 ||
     boxContents.length > 0 ||
     deliveryInfo.length > 0
+
+  // Compute whether description tab needs a top-level collapse
+  const totalDescriptionChars = sections.flatMap((s) => s.body ?? []).join(' ').length
+  const descriptionNeedsToggle =
+    totalDescriptionChars > DESCRIPTION_CHAR_THRESHOLD ||
+    sections.length > DESCRIPTION_SECTION_THRESHOLD
+
+  // Compute whether spec tab needs a top-level collapse
+  const totalSpecRows = specificationGroups.reduce((sum, g) => sum + g.specs.length, 0)
+    + boxContents.length + deliveryInfo.length
+  const specNeedsToggle = totalSpecRows > SPEC_ROW_THRESHOLD
 
   return (
     <div className="mt-12">
@@ -53,72 +124,66 @@ export function DescriptionTabs({
       {/* Tab Content */}
       <div className="mt-8">
         {activeTab === 'description' && (
-          <div className="space-y-8">
-            {sections.length > 0 ? (
-              sections.map((section, index) => (
-                <div key={section.id}>
-                  {section.title && (
-                    <h3 className="mb-4 text-2xl font-bold text-foreground">
-                      {section.title}
-                    </h3>
-                  )}
-                  {section.subtitle && (
-                    <h4 className="mb-3 text-lg font-semibold text-foreground">
-                      {section.subtitle}
-                    </h4>
-                  )}
-                  {section.body && (
-                    <div className="space-y-4">
-                      {section.body.map((paragraph, i) => (
-                        <p
-                          key={i}
-                          className="leading-relaxed text-muted-foreground"
-                        >
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                  {section.image && (
-                    <div className="relative my-6 aspect-video w-full overflow-hidden rounded-lg">
-                      <Image
-                        src={section.image.src}
-                        alt={section.image.alt}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-                  {section.bullets && (
-                    <ul className="space-y-2">
-                      {section.bullets.map((bullet, i) => (
-                        <li
-                          key={i}
-                          className="flex gap-3 text-muted-foreground"
-                        >
-                          <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-foreground" />
-                          <span>{bullet}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {index < sections.length - 1 && (
-                    <div className="mt-8 border-t border-border" />
-                  )}
+          <Collapsible needsToggle={descriptionNeedsToggle} collapsedClass="max-h-64">
+            <div className="space-y-8">
+              {sections.length > 0 ? (
+                sections.map((section, index) => (
+                  <div key={section.id}>
+                    {section.title && (
+                      <h3 className="mb-4 text-2xl font-bold text-foreground">
+                        {section.title}
+                      </h3>
+                    )}
+                    {section.subtitle && (
+                      <h4 className="mb-3 text-lg font-semibold text-foreground">
+                        {section.subtitle}
+                      </h4>
+                    )}
+                    {section.body && (
+                      <CollapsibleBody paragraphs={section.body} />
+                    )}
+                    {section.image && (
+                      <div className="relative my-6 aspect-video w-full overflow-hidden rounded-lg">
+                        <Image
+                          src={section.image.src}
+                          alt={section.image.alt}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    {section.bullets && (
+                      <ul className="space-y-2">
+                        {section.bullets.map((bullet, i) => (
+                          <li
+                            key={i}
+                            className="flex gap-3 text-muted-foreground"
+                          >
+                            <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-foreground" />
+                            <span>{bullet}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {index < sections.length - 1 && (
+                      <div className="mt-8 border-t border-border" />
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="py-8 text-center text-muted-foreground">
+                  <p>Product description will be updated soon.</p>
                 </div>
-              ))
-            ) : (
-              <div className="py-8 text-center text-muted-foreground">
-                <p>Product description will be updated soon.</p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </Collapsible>
         )}
 
         {activeTab === 'specification' && (
           <>
             {hasSpecificationContent ? (
-              <div className="space-y-8">
+              <Collapsible needsToggle={specNeedsToggle} collapsedClass="max-h-80">
+                <div className="space-y-8">
                 {specificationGroups.map((group) => (
                   <section key={group.title}>
                     <h3 className="mb-4 text-xl font-bold text-foreground">
@@ -178,6 +243,7 @@ export function DescriptionTabs({
                   </section>
                 )}
               </div>
+              </Collapsible>
             ) : (
               <div className="py-8 text-center text-muted-foreground">
                 <p>Specifications will be updated soon.</p>

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { Heart, Scale } from "lucide-react";
 import type { ProductImage, StoreProduct } from "@/lib/store-products";
+import { getRecommendedProducts } from "@/lib/store-products";
 import { ImageGallery } from "./image-gallery";
 import { VariantSelector } from "./variant-selector";
 import { DescriptionTabs } from "./description-tabs";
+import { SimilarProducts } from "./similar-products";
 
 interface ProductDetailProps {
   product: StoreProduct;
@@ -38,6 +40,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
     { label: product.name },
   ];
 
+  const recommendations = getRecommendedProducts(product, { limit: 8 });
+
   return (
     <main className="min-h-screen bg-background">
       {/* Breadcrumb */}
@@ -63,16 +67,16 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </div>
       </div>
 
-      {/* Product Overview */}
+      {/* Product Overview — clean 2-col: image | info */}
       <div className="border-b border-border px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 lg:grid-cols-2">
-            {/* Left Column - Image Gallery */}
+            {/* Image Gallery */}
             <div>
               <ImageGallery images={images} badge={badge} />
             </div>
 
-            {/* Right Column - Product Info */}
+            {/* Product Info */}
             <div className="flex flex-col gap-6">
               {/* Category & Title */}
               <div>
@@ -187,7 +191,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </div>
       </div>
 
-      {/* Description Tabs */}
+      {/* Description Tabs + Similar Products */}
       <div className="px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <DescriptionTabs
@@ -196,6 +200,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             boxContents={product.boxContents}
             deliveryInfo={product.deliveryInfo}
           />
+          <SimilarProducts products={recommendations} />
         </div>
       </div>
     </main>

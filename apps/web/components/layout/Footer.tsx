@@ -2,8 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Navigation } from "lucide-react";
 import { FadeUp } from "@/components/ui/FadeUp";
+
+const mapEmbedSrc =
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d439.4560241494744!2d83.98665739556925!3d28.217999357761567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399595e718456229%3A0x5a51698daf03db03!2sDakshinkali%20Electronic%20Center!5e0!3m2!1sen!2snp!4v1779349861344!5m2!1sen!2snp";
+
+const directionsUrl =
+  "https://www.google.com/maps/dir/?api=1&destination=Dakshinkali+Electronic+Center,+New+Road,+Pokhara,+Kaski,+Nepal";
 
 function InstagramIcon() {
   return (
@@ -36,19 +42,6 @@ function FacebookIcon() {
   );
 }
 
-function YoutubeIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="size-4"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
-      <path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.7 4.6 12 4.6 12 4.6s-5.7 0-7.5.5a3 3 0 0 0-2.1 2.1C2 9 2 12 2 12s0 3 .4 4.8a3 3 0 0 0 2.1 2.1c1.8.5 7.5.5 7.5.5s5.7 0 7.5-.5a3 3 0 0 0 2.1-2.1C22 15 22 12 22 12s0-3-.4-4.8ZM10 15.4V8.6l5.8 3.4L10 15.4Z" />
-    </svg>
-  );
-}
-
 const socialLinks = [
   {
     label: "Instagram",
@@ -66,9 +59,9 @@ const socialLinks = [
     icon: MessageCircle,
   },
   {
-    label: "YouTube",
-    href: "#",
-    icon: YoutubeIcon,
+    label: "Viber",
+    href: "viber://chat?number=%2B9779846069986",
+    icon: MessageCircle,
   },
 ];
 
@@ -103,7 +96,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-secondary text-secondary-foreground">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
-        <div className="grid gap-8 md:grid-cols-3 lg:grid-cols-[1.35fr_0.8fr_0.9fr]">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-[1.25fr_0.72fr_0.82fr_0.95fr]">
           <FadeUp>
             <Link
               href="/"
@@ -123,10 +116,19 @@ export function Footer() {
             <p className="mt-3 max-w-sm text-sm leading-6 text-secondary-foreground/65">
               Pokhara&apos;s trusted electronics shop since 2001.
             </p>
+            <div className="mt-4 w-full max-w-[220px] sm:max-w-[260px]">
+              <Image
+                src="/images/download.png"
+                alt="Download our store app or catalog"
+                width={260}
+                height={130}
+                className="h-auto w-full object-contain object-left"
+                sizes="(max-width: 640px) 220px, 260px"
+              />
+            </div>
             <div className="mt-5 flex flex-wrap gap-2">
               {socialLinks.map((social) => {
                 const Icon = social.icon;
-                const isPlaceholder = social.href === "#";
 
                 return (
                   <a
@@ -136,9 +138,6 @@ export function Footer() {
                     rel="noreferrer"
                     aria-label={social.label}
                     className="inline-flex size-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-secondary-foreground/75 transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary"
-                    onClick={(event) => {
-                      if (isPlaceholder) event.preventDefault();
-                    }}
                   >
                     <Icon className="size-4" aria-hidden="true" />
                   </a>
@@ -181,6 +180,39 @@ export function Footer() {
               </ul>
             </FadeUp>
           ))}
+
+          <FadeUp delay={240}>
+            <h2 className="text-sm font-bold uppercase tracking-wide text-secondary-foreground">
+              Visit Us
+            </h2>
+            <p className="mt-4 text-sm font-semibold text-secondary-foreground/85">
+              Dakshinkali Electronic Center
+            </p>
+            <p className="mt-2 text-xs leading-5 text-secondary-foreground/65 sm:text-sm sm:leading-6">
+              Pokhara (New Road), Kaski
+              <br />
+              In front of the Old Metropolitan Office
+            </p>
+            <div className="mt-4 overflow-hidden rounded-xl border border-white/15 bg-white/5 shadow-[0_12px_32px_rgba(0,0,0,0.2)]">
+              <iframe
+                src={mapEmbedSrc}
+                title="Dakshinkali Electronic Center — Pokhara (New Road), Kaski"
+                className="aspect-4/3 h-auto min-h-[160px] w-full border-0 sm:min-h-[180px]"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+            <a
+              href={directionsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary sm:text-sm"
+            >
+              <Navigation className="size-4 shrink-0" aria-hidden="true" />
+              Get directions
+            </a>
+          </FadeUp>
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-sm text-secondary-foreground/45 sm:flex-row sm:items-center sm:justify-between">
