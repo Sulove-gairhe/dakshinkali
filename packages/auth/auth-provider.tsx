@@ -79,23 +79,68 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 password,
             });
 
-            return { error };
+            return { error: error ? new Error(error.message) : null };
         },
         [supabase]
     );
 
     // Sign up with email and password
     const signUp = useCallback(
-        async (email: string, password: string, metadata?: any) => {
-            const { error } = await supabase.auth.signUp({
+        async (
+            email: string,
+            password: string,
+            metadata?: Record<string, unknown>,
+            options?: { emailRedirectTo?: string },
+        ) => {
+            const emailRedirectTo =
+                options?.emailRedirectTo ??
+                (typeof window !== 'undefined'
+                    ? `${window.location.origin}/auth/callback?next=${encodeURIComponent('/account')}`
+                    : undefined);
+
+            const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
                     data: metadata,
+                    emailRedirectTo,
                 },
             });
 
-            return { error };
+            return {
+                error: error ? new Error(error.message) : null,
+                session: data.session,
+                needsEmailConfirmation: !error && !data.session,
+            };
+        },
+        [supabase]
+    );
+
+    const signInWithGoogle = useCallback(
+        async (options?: { redirectPath?: string; emailRedirectTo?: string }) => {
+            const redirectPath = options?.redirectPath ?? '/account';
+            const redirectTo =
+                options?.emailRedirectTo ??
+                (typeof window !== 'undefined'
+                    ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectPath)}`
+                    : undefined);
+
+            if (!redirectTo) {
+                return { error: new Error('Google sign-in is only available in the browser.') };
+            }
+
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo,
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent',
+                    },
+                },
+            });
+
+            return { error: error ? new Error(error.message) : null };
         },
         [supabase]
     );
@@ -117,6 +162,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         supabase,
         signIn,
         signUp,
+        signInWithGoogle,
         signOut,
         refreshSession,
     };

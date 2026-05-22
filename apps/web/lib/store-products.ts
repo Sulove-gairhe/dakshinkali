@@ -822,7 +822,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     name: "Godrej 23L Convection Microwave Oven GME 523 CF1 RM",
     shortDescription:
       "23L convection microwave | 205 Instacook recipes | Air Fry mode | Stainless steel cavity",
-    image: "/images/logo-placeholder.jpeg",
+    image: kitchenImage("godrej 23ltr oven (kitchen-4).png"),
     currentPrice: "Rs. 17,990",
     oldPrice: "Rs. 22,400",
     warranty: "1 Year Comprehensive Warranty",
@@ -837,6 +837,58 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
       "godrej microwave",
       "air fry",
       "instacook",
+    ],
+    galleryImages: [
+      {
+        id: "godrej-oven-main",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4).png"),
+        alt: "Godrej 23L Convection Microwave Oven front view",
+      },
+      {
+        id: "godrej-oven-a",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.a).png"),
+        alt: "Godrej 23L convection microwave angled view",
+      },
+      {
+        id: "godrej-oven-b",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.b).png"),
+        alt: "Godrej 23L convection microwave door open",
+      },
+      {
+        id: "godrej-oven-c",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.c).png"),
+        alt: "Godrej 23L convection microwave control panel",
+      },
+      {
+        id: "godrej-oven-d",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.d).png"),
+        alt: "Godrej 23L convection microwave interior",
+      },
+      {
+        id: "godrej-oven-e",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.e).png"),
+        alt: "Godrej 23L convection microwave detail",
+      },
+      {
+        id: "godrej-oven-f",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.f).png"),
+        alt: "Godrej 23L convection microwave side view",
+      },
+      {
+        id: "godrej-oven-g",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.g).png"),
+        alt: "Godrej 23L convection microwave feature detail",
+      },
+      {
+        id: "godrej-oven-h",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.h).png"),
+        alt: "Godrej 23L convection microwave cooking modes",
+      },
+      {
+        id: "godrej-oven-i",
+        src: kitchenImage("godrej 23ltr oven (kitchen-4.i).png"),
+        alt: "Godrej 23L convection microwave accessory view",
+      },
     ],
     highlights: [
       "23L capacity suitable for 3 to 4 members",
@@ -894,10 +946,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
       },
     ],
     boxContents: ["Microwave oven", "User manual"],
-    deliveryInfo: [
-      "Product image will be updated when kitchen-4 assets are added.",
-      "Warranty support available through Dakshinkali Electronics.",
-    ],
+    deliveryInfo: ["Warranty support available through Dakshinkali Electronics."],
     relatedProductSlugs: [
       "samsung-23l-grill-microwave-mg23a3515ak-tl",
       "cg-2000w-induction-cooktop-cgic20a03",
@@ -1013,7 +1062,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     name: "CG 550W Mixer Grinder CGMG5505A",
     shortDescription:
       "550W mixer grinder | 3 stainless steel jars | 3-speed control | Overload protection",
-    image: "/images/logo-placeholder.jpeg",
+    image: kitchenImage("CG mixer(kitchen-7).png"),
     currentPrice: "Rs. 3,800",
     oldPrice: "Rs. 4,260",
     warranty: "2 Years Warranty on Motor",
@@ -1028,6 +1077,18 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
       "cg mixer",
       "grinder",
       "blender",
+    ],
+    galleryImages: [
+      {
+        id: "cg-mixer-main",
+        src: kitchenImage("CG mixer(kitchen-7).png"),
+        alt: "CG 550W Mixer Grinder front view",
+      },
+      {
+        id: "cg-mixer-a",
+        src: kitchenImage("CG mixer(kitchen-7.a).png"),
+        alt: "CG 550W Mixer Grinder with jars",
+      },
     ],
     highlights: [
       "550W motor for grinding, blending, and mixing",
@@ -1084,10 +1145,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
       },
     ],
     boxContents: ["Mixer grinder unit", "Liquidizing jar", "Dry/wet jar", "Chutney jar"],
-    deliveryInfo: [
-      "Product image will be updated when kitchen-6 assets are added.",
-      "Warranty support available through Dakshinkali Electronics.",
-    ],
+    deliveryInfo: ["Warranty support available through Dakshinkali Electronics."],
   },
   {
     id: "kitchen-7",
@@ -1563,4 +1621,139 @@ export function getRelatedProducts(product: StoreProduct, limit = 4) {
 
 function dedupeBySlug(products: StoreProduct[]) {
   return [...new Map(products.map((product) => [product.slug, product])).values()];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Recommendation Engine
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Safely parse a price string like "Rs 51,999" or "NPR 85,000" to a number.
+ * Returns 0 if the value is missing or unparseable.
+ */
+export function parseProductPrice(value: number | string | undefined | null): number {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (!value) return 0;
+  const digits = value.replace(/[^\d.]/g, "");
+  const parsed = Number(digits);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/** Normalize a category string for comparison (lowercase, trimmed). */
+function normalizeCategory(value: string | undefined | null): string {
+  return (value ?? "").toLowerCase().trim();
+}
+
+/** Normalize a brand string for comparison. */
+function normalizeBrand(value: string | undefined | null): string {
+  return (value ?? "").toLowerCase().trim();
+}
+
+/** Return all searchable keywords for a product. */
+function getProductKeywords(product: StoreProduct): string[] {
+  return (product.searchTerms ?? []).map((t) => t.toLowerCase().trim());
+}
+
+export type RecommendedProduct = StoreProduct & {
+  /** Human-readable reason for the recommendation (max 2). */
+  reasons: string[];
+};
+
+export interface GetRecommendedProductsOptions {
+  /** Maximum number of recommendations to return (default: 4). */
+  limit?: number;
+}
+
+/**
+ * Score-based recommendation engine.
+ *
+ * Scoring weights:
+ *   +50  same category
+ *   +30  same brand
+ *   +10  each overlapping search term (capped at 3 matches)
+ *   +30  price within 10 %
+ *   +20  price within 20 %
+ *   +10  price within 30 %
+ *   + 5  product is featured or best-seller
+ */
+export function getRecommendedProducts(
+  currentProduct: StoreProduct,
+  options: GetRecommendedProductsOptions = {},
+): RecommendedProduct[] {
+  const { limit = 4 } = options;
+
+  const currentPrice = parseProductPrice(currentProduct.currentPrice);
+  const currentCategory = normalizeCategory(currentProduct.category);
+  const currentBrand = normalizeBrand(currentProduct.brand);
+  const currentKeywords = new Set(getProductKeywords(currentProduct));
+
+  const candidates = getActiveProducts().filter(
+    (p) =>
+      p.slug !== currentProduct.slug &&
+      p.status !== "Out of Stock",
+  );
+
+  type Scored = { product: StoreProduct; score: number; reasons: string[] };
+
+  const scored: Scored[] = candidates.map((product) => {
+    let score = 0;
+    const reasons: string[] = [];
+
+    // ── Category match ──────────────────────────────────────────────────────
+    if (normalizeCategory(product.category) === currentCategory) {
+      score += 50;
+      reasons.push("Same Category");
+    }
+
+    // ── Brand match ─────────────────────────────────────────────────────────
+    if (normalizeBrand(product.brand) === currentBrand) {
+      score += 30;
+      reasons.push("Same Brand");
+    }
+
+    // ── Keyword overlap ─────────────────────────────────────────────────────
+    const productKeywords = getProductKeywords(product);
+    let keywordMatches = 0;
+    for (const kw of productKeywords) {
+      if (currentKeywords.has(kw)) {
+        keywordMatches++;
+        if (keywordMatches >= 3) break;
+      }
+    }
+    score += keywordMatches * 10;
+
+    // ── Price proximity ─────────────────────────────────────────────────────
+    if (currentPrice > 0) {
+      const candidatePrice = parseProductPrice(product.currentPrice);
+      if (candidatePrice > 0) {
+        const diff = Math.abs(candidatePrice - currentPrice) / currentPrice;
+        if (diff <= 0.1) {
+          score += 30;
+          reasons.push("Similar Price");
+        } else if (diff <= 0.2) {
+          score += 20;
+          reasons.push("Similar Price");
+        } else if (diff <= 0.3) {
+          score += 10;
+          reasons.push("Similar Price");
+        }
+      }
+    }
+
+    // ── Featured / best-seller bonus ────────────────────────────────────────
+    if (product.isFeatured || product.isBestSeller) {
+      score += 5;
+    }
+
+    return { product, score, reasons };
+  });
+
+  // Sort descending by score, then alphabetically as tiebreaker
+  scored.sort((a, b) => b.score - a.score || a.product.name.localeCompare(b.product.name));
+
+  return scored.slice(0, limit).map(({ product, reasons }) => ({
+    ...product,
+    // Keep at most 2 reason badges; prefer the most informative ones
+    reasons: [...new Set(reasons)].slice(0, 2),
+  }));
 }
