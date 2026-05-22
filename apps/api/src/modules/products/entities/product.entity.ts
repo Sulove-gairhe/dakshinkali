@@ -49,6 +49,12 @@ export interface ProductEntity {
     /** Unique product identifier (UUID v4) */
     id: string;
 
+    /** Public product slug used in frontend URLs */
+    slug?: string | null;
+
+    /** Product brand / manufacturer */
+    brand?: string | null;
+
     /** Product name (required, 1-200 chars, unique within category) */
     name: string;
 
@@ -66,6 +72,9 @@ export interface ProductEntity {
 
     /** Array of product images with metadata (stored as JSONB in DB) */
     images: ProductImage[];
+
+    /** Flexible product metadata/specifications */
+    specs?: Record<string, unknown> | null;
 
     /** Timestamp when product was created (auto-generated) */
     createdAt: Date;

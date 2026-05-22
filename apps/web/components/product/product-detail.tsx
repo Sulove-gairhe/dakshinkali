@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Heart, Share2, Scale } from "lucide-react";
+import Link from "next/link";
+import { Heart, Scale } from "lucide-react";
 import type { ProductDetailData } from "@/types/product";
 import { ImageGallery } from "./image-gallery";
 import { VariantSelector } from "./variant-selector";
@@ -67,14 +68,14 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
               {/* Wishlist & Compare */}
               <div className="flex gap-4 border-b border-border pb-6">
-                  <button className="cursor-pointer flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
+                  <button type="button" className="cursor-pointer flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
                     <Heart className="h-5 w-5" />
                     Add to wishlist
                   </button>
-                <button className="cursor-pointer flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
+                <Link href="/compare" className="cursor-pointer flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground/80">
                   <Scale className="h-5 w-5" />
                   Compare
-                </button>
+                </Link>
               </div>
 
               {/* Features */}
@@ -150,10 +151,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  <button className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90">
+                  <button type="button" className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90">
                     Add to cart
                   </button>
-                  <button className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90">
+                  <button type="button" className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90">
                     Buy Now
                   </button>
                 </div>

@@ -14,6 +14,39 @@ import { AdminProductController } from '../controllers/admin-product.controller'
 import { PublicProductController } from '../controllers/public-product.controller';
 import { authMiddleware, adminAuthMiddleware, rateLimitMiddleware } from '../../../common/middleware/express-adapters';
 
+function parseJsonObject(value: unknown): Record<string, unknown> | null | undefined {
+    if (value === undefined) {
+        return undefined;
+    }
+
+    if (value === null || value === '') {
+        return null;
+    }
+
+    if (typeof value === 'object') {
+        return Array.isArray(value) ? undefined : (value as Record<string, unknown>);
+    }
+
+    if (typeof value === 'string') {
+        try {
+            const parsed = JSON.parse(value);
+            if (parsed === null) {
+                return null;
+            }
+
+            if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+                throw new Error('Invalid JSON object');
+            }
+
+            return parsed;
+        } catch {
+            throw new Error('Product specs must be a valid JSON object');
+        }
+    }
+
+    return null;
+}
+
 // Configure multer for memory storage
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -61,6 +94,8 @@ export function registerProductRoutes(app: Express): void {
                 const productData = {
                     name: req.body.name,
                     description: req.body.description,
+                    brand: req.body.brand,
+                    specs: parseJsonObject(req.body.specs),
                     price: parseFloat(req.body.price),
                     category: req.body.category,
                     status: req.body.status,
@@ -121,6 +156,8 @@ export function registerProductRoutes(app: Express): void {
                 const updateData = {
                     name: req.body.name,
                     description: req.body.description,
+                    brand: req.body.brand,
+                    specs: parseJsonObject(req.body.specs),
                     price: req.body.price ? parseFloat(req.body.price) : undefined,
                     category: req.body.category,
                     status: req.body.status,

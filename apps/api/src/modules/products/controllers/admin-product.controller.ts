@@ -86,6 +86,8 @@ export class AdminProductController {
                 {
                     name: request.name,
                     description: request.description,
+                    brand: request.brand,
+                    specs: request.specs,
                     price: request.price,
                     category: request.category,
                     status: request.status,
@@ -256,6 +258,8 @@ export class AdminProductController {
                 {
                     name: request.name,
                     description: request.description,
+                    brand: request.brand,
+                    specs: request.specs,
                     price: request.price,
                     category: request.category,
                     status: request.status,
@@ -355,6 +359,14 @@ export class AdminProductController {
             errors.push({ field: 'description', message: 'Product description must not exceed 2000 characters' });
         }
 
+        if (request.brand !== undefined && request.brand !== null && request.brand.trim() === '') {
+            errors.push({ field: 'brand', message: 'Product brand cannot be empty' });
+        }
+
+        if (request.specs !== undefined && request.specs !== null && (typeof request.specs !== 'object' || Array.isArray(request.specs))) {
+            errors.push({ field: 'specs', message: 'Product specs must be an object' });
+        }
+
         // Validate status
         if (request.status) {
             const validStatuses = ['active', 'inactive', 'out_of_stock'];
@@ -404,6 +416,14 @@ export class AdminProductController {
         // Validate description length if provided
         if (request.description !== undefined && request.description.length > 2000) {
             errors.push({ field: 'description', message: 'Product description must not exceed 2000 characters' });
+        }
+
+        if (request.brand !== undefined && request.brand !== null && request.brand.trim() === '') {
+            errors.push({ field: 'brand', message: 'Product brand cannot be empty' });
+        }
+
+        if (request.specs !== undefined && request.specs !== null && (typeof request.specs !== 'object' || Array.isArray(request.specs))) {
+            errors.push({ field: 'specs', message: 'Product specs must be an object' });
         }
 
         // Validate status if provided

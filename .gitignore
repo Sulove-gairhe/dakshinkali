@@ -1,10 +1,13 @@
-.readme.md(for me)
-node_modules
-.next
-dist
+node_modules/
+
+# build output
+.next/
+dist/
+.turbo/
+coverage/
+*.tsbuildinfo
+*.ts.html
+
+# environment
 .env
 .env.local
-turbo
-.md
-coverage
-*.ts.html

@@ -77,10 +77,13 @@ export interface CartItemWithProductEntity extends CartItemEntity {
      */
     product: {
         id: string;
+        slug: string | null;
         name: string;
+        description: string | null;
+        category: string;
         price: number;
         status: string;
-        images: string[];
+        images: Array<string | { url?: string }>;
         deletedAt: Date | null;
     };
 }
@@ -116,6 +119,9 @@ export interface CartItemRow {
 export interface CartItemWithProductRow extends CartItemRow {
     product_id: string;
     product_name: string;
+    product_slug: string | null;
+    product_description: string | null;
+    product_category: string;
     product_price: string | number;
     product_status: string;
     product_images: any; // JSONB
@@ -185,7 +191,10 @@ export function mapRowToCartItemWithProductEntity(
         updatedAt: new Date(row.updated_at),
         product: {
             id: row.product_id,
+            slug: row.product_slug,
             name: row.product_name,
+            description: row.product_description,
+            category: row.product_category,
             price: typeof row.product_price === 'string'
                 ? parseFloat(row.product_price)
                 : row.product_price,

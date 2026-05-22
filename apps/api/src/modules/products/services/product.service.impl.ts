@@ -32,6 +32,14 @@ import {
 } from '../types/product.types';
 import { ProductValidator } from '../validators/product.validator';
 
+function slugify(value: string): string {
+    return value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
 /**
  * ProductServiceImpl
  * 
@@ -96,12 +104,15 @@ export class ProductServiceImpl implements ProductService {
         // Build ProductEntity
         const entity: ProductEntity = {
             id: productId,
+            slug: slugify(`${data.category} ${data.name}`),
             name: data.name,
             description: data.description || null,
+            brand: data.brand ?? null,
             price: data.price,
             category: data.category,
             status: data.status || 'active', // Default to "active"
             images: uploadedImages,
+            specs: data.specs ?? {},
             createdAt: new Date(),
             updatedAt: new Date(),
             deletedAt: null,
@@ -139,17 +150,19 @@ export class ProductServiceImpl implements ProductService {
         // Validate update data
         ProductValidator.validateUpdateProduct(data);
 
-        // Check name uniqueness if name is being changed
-        if (data.name && data.name !== existing.name) {
-            const category = data.category || existing.category;
+        const nextName = data.name ?? existing.name;
+        const nextCategory = data.category ?? existing.category;
+
+        // Check name uniqueness if name or category is being changed
+        if (nextName !== existing.name || nextCategory !== existing.category) {
             const exists = await this.repository.existsByNameAndCategory(
-                data.name,
-                category,
+                nextName,
+                nextCategory,
                 id
             );
             if (exists) {
                 throw new Error(
-                    `A product with name '${data.name}' already exists in category '${category}'.`
+                    `A product with name '${nextName}' already exists in category '${nextCategory}'.`
                 );
             }
         }
@@ -203,11 +216,18 @@ export class ProductServiceImpl implements ProductService {
 
         // Build update data
         const updates: Partial<ProductEntity> = {};
+        if (data.slug !== undefined) updates.slug = data.slug;
         if (data.name !== undefined) updates.name = data.name;
         if (data.description !== undefined) updates.description = data.description;
+        if (data.brand !== undefined) updates.brand = data.brand;
+        if (data.specs !== undefined) updates.specs = data.specs;
         if (data.price !== undefined) updates.price = data.price;
         if (data.category !== undefined) updates.category = data.category;
         if (data.status !== undefined) updates.status = data.status;
+
+        if (data.name !== undefined || data.category !== undefined) {
+            updates.slug = slugify(`${nextCategory} ${nextName}`);
+        }
 
         // Update images array
         updates.images = [...remainingImages, ...uploadedImages];

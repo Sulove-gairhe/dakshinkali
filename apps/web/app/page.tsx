@@ -1,9 +1,29 @@
-"use client";
-
 import { ApplianceStrip } from "@/components/appliance-strip";
 import { HeroGrid } from "@/components/hero-grid";
 import { SiteNavbar } from "@/components/site-navbar";
 import { TrendingProducts } from "@/components/trending-products";
+import type { Metadata } from "next";
+import { siteDescription, siteName } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: siteName,
+  },
+  description: siteDescription,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: siteName,
+    description: siteDescription,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteName,
+    description: siteDescription,
+  },
+};
 
 export default function WebStorePage() {
   return (

@@ -6,7 +6,7 @@
  * 
  * @remarks
  * - All required fields must be provided
- * - Optional fields: description, status, images
+ * - Optional fields: description, brand, specs, status, images
  * - Status defaults to "active" if not provided
  * - Images are handled as multipart/form-data File objects
  * - Maximum 5 images allowed, each max 5MB
@@ -23,6 +23,8 @@ import { ProductStatus } from '../entities/product.entity';
  * Validation rules:
  * - name: Required, 1-200 characters, will be checked for uniqueness within category
  * - description: Optional, max 2000 characters
+ * - brand: Optional, product manufacturer
+ * - specs: Optional, flexible metadata object
  * - price: Required, must be > 0
  * - category: Required, non-empty string
  * - status: Optional, must be valid ProductStatus enum value, defaults to "active"
@@ -34,6 +36,12 @@ export interface CreateProductRequest {
 
     /** Product description (optional, max 2000 chars) */
     description?: string;
+
+    /** Product brand / manufacturer (optional) */
+    brand?: string | null;
+
+    /** Flexible product metadata/specifications (optional) */
+    specs?: Record<string, unknown> | null;
 
     /** Product price (required, must be > 0) */
     price: number;

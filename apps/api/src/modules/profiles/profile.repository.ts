@@ -6,6 +6,7 @@ export interface ProfileEntity {
     id: string;
     email: string;
     fullName: string | null;
+    phone?: string | null;
     role: ProfileRole;
     avatarUrl: string | null;
     createdAt: Date;
@@ -40,9 +41,10 @@ export class ProfileRepository {
         };
     }
 
-    async updateProfile(id: string, data: { fullName?: string | null; avatarUrl?: string | null }): Promise<ProfileEntity> {
+async updateProfile(id: string, data: { fullName?: string | null; phone?: string | null; avatarUrl?: string | null }): Promise<ProfileEntity> {
         const row: any = {};
         if (data.fullName !== undefined) row.full_name = data.fullName;
+        if (data.phone !== undefined) row.phone = data.phone;
         if (data.avatarUrl !== undefined) row.avatar_url = data.avatarUrl;
 
         const { data: updated, error } = await this.supabase.from('profiles').update(row).eq('id', id).select().single();
@@ -71,6 +73,7 @@ export class ProfileRepository {
             id: row.id,
             email: row.email,
             fullName: row.full_name,
+            phone: row.phone,
             role: row.role,
             avatarUrl: row.avatar_url,
             createdAt: new Date(row.created_at),

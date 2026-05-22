@@ -391,17 +391,28 @@ export class CartServiceImpl implements CartService {
      * @returns CartDTO with computed fields
      */
     private mapToCartDTO(cartWithItems: CartWithItemsEntity): CartDTO {
+        const slugify = (value: string) =>
+            value
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+
         // Map cart items to DTOs
         const items: CartItemDTO[] = cartWithItems.items.map(item => {
             const subtotal = item.quantity * item.priceAtAddition;
             const isAvailable = item.product.deletedAt === null && item.product.status === 'active';
             const priceChanged = item.product.price !== item.priceAtAddition;
-            const productImage = item.product.images.length > 0 ? item.product.images[0] : null;
+            const firstImage = item.product.images.length > 0 ? item.product.images[0] : null;
+            const productImage = typeof firstImage === 'string' ? firstImage : firstImage?.url ?? null;
 
             return {
                 id: item.id,
                 productId: item.productId,
                 productName: item.product.name,
+                productSlug: item.product.slug || slugify(`${item.product.category} ${item.product.name}`),
+                productDescription: item.product.description,
+                productCategory: item.product.category,
                 productImage,
                 productStatus: item.product.status,
                 quantity: item.quantity,

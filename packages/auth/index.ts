@@ -23,6 +23,8 @@ export {
 // Auth helpers
 export {
     getAccessToken,
+    getUserRole,
+    hasRole,
     refreshSession,
     signOut,
     type AuthTokens,

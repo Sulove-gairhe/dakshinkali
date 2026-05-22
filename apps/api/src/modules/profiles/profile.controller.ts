@@ -9,6 +9,7 @@ function mapProfile(profile: ProfileEntity) {
         id: profile.id,
         email: profile.email,
         fullName: profile.fullName,
+        phone: profile.phone ?? null,
         role: profile.role,
         avatarUrl: profile.avatarUrl,
         createdAt: profile.createdAt.toISOString(),
@@ -28,8 +29,9 @@ export class ProfileController {
 
     async updateMe(user: AuthUser | undefined, body: any) {
         const currentUser = this.requireUser(user);
-        const profile = await this.repository.updateProfile(currentUser.id, {
+const profile = await this.repository.updateProfile(currentUser.id, {
             fullName: this.optionalString(body?.fullName, 'fullName'),
+            phone: this.optionalString(body?.phone, 'phone'),
             avatarUrl: this.optionalString(body?.avatarUrl, 'avatarUrl'),
         });
         return { status: 200, data: mapProfile(profile) };

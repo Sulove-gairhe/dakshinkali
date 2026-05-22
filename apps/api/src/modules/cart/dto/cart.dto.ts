@@ -29,6 +29,15 @@ export interface CartItemDTO {
     /** Product name (for display) */
     productName: string;
 
+    /** Public product slug used by storefront routes */
+    productSlug: string | null;
+
+    /** Product description (for display) */
+    productDescription: string | null;
+
+    /** Product category */
+    productCategory: string;
+
     /** Primary product image URL (null if no images) */
     productImage: string | null;
 

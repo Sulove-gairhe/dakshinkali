@@ -14,7 +14,7 @@ type ApplianceStripProps = {
 const defaultAppliances: ApplianceItem[] = [
   {
     label: "Televisions",
-    href: "#",
+    href: "/products?category=televisions",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 transition-colors duration-300">
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z" />
@@ -23,7 +23,7 @@ const defaultAppliances: ApplianceItem[] = [
   },
   {
     label: "Washing Machines",
-    href: "#",
+    href: "/products",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 transition-colors duration-300">
         <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 3.75h13.5a1.5 1.5 0 011.5 1.5v13.5a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5z" />
@@ -35,7 +35,7 @@ const defaultAppliances: ApplianceItem[] = [
   },
   {
     label: "Refrigerators",
-    href: "#",
+    href: "/products?category=refrigerators",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 transition-colors duration-300">
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z" />
@@ -47,7 +47,7 @@ const defaultAppliances: ApplianceItem[] = [
   },
   {
     label: "Air Conditioner",
-    href: "#",
+    href: "/products?category=air-conditioners",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 transition-colors duration-300">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z" />
@@ -61,7 +61,7 @@ const defaultAppliances: ApplianceItem[] = [
   },
   {
     label: "Water Geyser",
-    href: "#",
+    href: "/products?category=water-geyser",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 transition-colors duration-300">
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 4h8a2 2 0 012 2v12a2 2 0 01-2 2H8a2 2 0 01-2-2V6a2 2 0 012-2z" />
@@ -73,7 +73,7 @@ const defaultAppliances: ApplianceItem[] = [
   },
   {
     label: "Water Dispenser",
-    href: "#",
+    href: "/products",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 transition-colors duration-300">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 4h6a1 1 0 011 1v2H8V5a1 1 0 011-1z" />
@@ -85,7 +85,7 @@ const defaultAppliances: ApplianceItem[] = [
   },
   {
     label: "Oven",
-    href: "#",
+    href: "/products",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 transition-colors duration-300">
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" />
@@ -112,7 +112,7 @@ export function ApplianceStrip({
           {appliances.map((appliance) => (
             <a
               key={appliance.label}
-              href={appliance.href || "#"}
+              href={appliance.href || "/products"}
               className="group flex min-w-[80px] flex-col items-center gap-3"
             >
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-foreground transition-all duration-300 group-hover:bg-primary/10 group-hover:text-primary">

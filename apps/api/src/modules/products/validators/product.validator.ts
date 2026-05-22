@@ -162,6 +162,20 @@ export class ProductValidator {
             });
         }
 
+        if (data.brand !== undefined && data.brand !== null && data.brand.trim().length === 0) {
+            errors.push({
+                field: 'brand',
+                message: 'Product brand cannot be empty.'
+            });
+        }
+
+        if (data.specs !== undefined && data.specs !== null && (typeof data.specs !== 'object' || Array.isArray(data.specs))) {
+            errors.push({
+                field: 'specs',
+                message: 'Product specs must be an object.'
+            });
+        }
+
         // Validate status if provided
         if (data.status !== undefined) {
             const validStatuses = ['active', 'inactive', 'out_of_stock'];
@@ -219,6 +233,20 @@ export class ProductValidator {
             errors.push({
                 field: 'description',
                 message: 'Product description cannot exceed 2000 characters.'
+            });
+        }
+
+        if (data.brand !== undefined && data.brand !== null && data.brand.trim().length === 0) {
+            errors.push({
+                field: 'brand',
+                message: 'Product brand cannot be empty.'
+            });
+        }
+
+        if (data.specs !== undefined && data.specs !== null && (typeof data.specs !== 'object' || Array.isArray(data.specs))) {
+            errors.push({
+                field: 'specs',
+                message: 'Product specs must be an object.'
             });
         }
 

@@ -47,6 +47,12 @@ export interface ProductDTO {
     /** Unique product identifier (UUID v4) */
     id: string;
 
+    /** Public product slug used in frontend URLs */
+    slug: string;
+
+    /** Product brand / manufacturer */
+    brand: string | null;
+
     /** Product name */
     name: string;
 
@@ -64,6 +70,9 @@ export interface ProductDTO {
 
     /** Array of product images with public URLs */
     images: ProductImageDTO[];
+
+    /** Flexible product metadata/specifications */
+    specs: Record<string, unknown>;
 
     /** ISO 8601 timestamp when product was created */
     createdAt: string;
@@ -112,6 +121,14 @@ export interface ProductDTO {
  * ```
  */
 export function mapEntityToDTO(entity: ProductEntity): ProductDTO {
+    function slugify(value: string): string {
+        return value
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
     // Validate required fields
     if (!entity.name || entity.name.trim() === '') {
         throw new Error('Invalid ProductEntity: name is required and cannot be empty');
@@ -157,15 +174,26 @@ export function mapEntityToDTO(entity: ProductEntity): ProductDTO {
         order: img.order
     }));
 
+    const slugSource = entity.slug && entity.slug.trim() !== ''
+        ? entity.slug
+        : `${entity.category} ${entity.name}`;
+
+    const specs = entity.specs && typeof entity.specs === 'object' && !Array.isArray(entity.specs)
+        ? entity.specs
+        : {};
+
     // Build ProductDTO (exclude deletedAt)
     return {
         id: entity.id,
+        slug: slugify(slugSource),
+        brand: entity.brand ?? null,
         name: entity.name,
         description: entity.description, // Handles null correctly
         price: entity.price,
         category: entity.category,
         status: entity.status,
         images,
+        specs,
         createdAt: entity.createdAt.toISOString(),
         updatedAt: entity.updatedAt.toISOString()
     };

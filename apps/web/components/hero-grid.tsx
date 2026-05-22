@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 
 type HeroCard = {
   badge: string
@@ -52,8 +53,8 @@ export function HeroGrid({
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
-        <a
-          href={primary.href || "#"}
+        <Link
+          href={primary.href || "/products"}
           className="group relative overflow-hidden rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(59,130,246,0.15)] lg:col-span-7 lg:row-span-2 min-h-[400px] lg:min-h-[500px] block"
         >
           <Image
@@ -68,23 +69,20 @@ export function HeroGrid({
             <span className="inline-block rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground mb-3">
               {primary.badge}
             </span>
-            <h2 className="mb-2 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
+            <h1 className="mb-2 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
               {primary.title}
-            </h2>
+            </h1>
             <p className="mb-4 max-w-md text-sm text-gray-200 sm:text-base">
               {primary.description}
             </p>
-            <button
-              type="button"
-              className="cursor-pointer rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors duration-300 hover:bg-primary/90"
-            >
+            <span className="inline-flex cursor-pointer rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors duration-300 hover:bg-primary/90">
               {primary.buttonLabel || "Shop Now"}
-            </button>
+            </span>
           </div>
-        </a>
+        </Link>
 
-        <a
-          href={secondary.href || "#"}
+        <Link
+          href={secondary.href || "/products"}
           className="group relative overflow-hidden rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(251,191,36,0.15)] lg:col-span-5 min-h-[240px] block"
         >
           <Image
@@ -105,10 +103,10 @@ export function HeroGrid({
               {secondary.description}
             </p>
           </div>
-        </a>
+        </Link>
 
-        <a
-          href={tertiary.href || "#"}
+        <Link
+          href={tertiary.href || "/products"}
           className="group relative overflow-hidden rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(139,92,246,0.15)] lg:col-span-5 min-h-[240px] block"
         >
           <Image
@@ -129,7 +127,7 @@ export function HeroGrid({
               {tertiary.description}
             </p>
           </div>
-        </a>
+        </Link>
       </div>
     </section>
   )

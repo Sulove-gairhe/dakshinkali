@@ -46,10 +46,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
-    const [supabase] = useState(() => createBrowserClient());
+    const [supabase] = useState(() => {
+        const hasUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const hasKey = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+        if (!hasUrl || !hasKey) {
+            return null;
+        }
+
+        return createBrowserClient();
+    });
 
     // Initialize auth state
     useEffect(() => {
+        if (!supabase) {
+            setLoading(false);
+            return;
+        }
+
         // Get initial session
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
@@ -74,6 +88,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Sign in with email and password
     const signIn = useCallback(
         async (email: string, password: string) => {
+            if (!supabase) {
+                return { error: new Error('Supabase environment variables are not configured.') };
+            }
+
             const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
@@ -87,6 +105,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Sign up with email and password
     const signUp = useCallback(
         async (email: string, password: string, metadata?: any) => {
+            if (!supabase) {
+                return { error: new Error('Supabase environment variables are not configured.') };
+            }
+
             const { error } = await supabase.auth.signUp({
                 email,
                 password,
@@ -102,11 +124,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Sign out
     const signOut = useCallback(async () => {
+        if (!supabase) {
+            return;
+        }
+
         await supabase.auth.signOut();
     }, [supabase]);
 
     // Refresh session
     const refreshSession = useCallback(async () => {
+        if (!supabase) {
+            return;
+        }
+
         await supabase.auth.refreshSession();
     }, [supabase]);
 

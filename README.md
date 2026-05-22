@@ -5,9 +5,7 @@ Monorepo for ecommerce storefront + admin dashboard + business management system
 ## 📚 Documentation
 
 - **[Installation Guide](./INSTALLATION.md)** - Setup instructions
-- **[Agent Documentation](./agent/docs/)** - AI-generated docs and status reports
 - **[API Documentation](./apps/api/docs/)** - API reference and guides
-- **[Current Status](./agent/docs/REALITY_CHECK.md)** - What's implemented vs what's missing
 
 ## 🚀 Quick Start
 
@@ -71,5 +69,4 @@ agent/
 ## 📖 Learn More
 
 - [Project Status & Context](./.kiro/steering/project_status.md)
-- [Reality Check](./agent/docs/REALITY_CHECK.md)
 - [API Quick Reference](./apps/api/docs/API_QUICK_REFERENCE.md)

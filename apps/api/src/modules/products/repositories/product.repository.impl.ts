@@ -55,15 +55,37 @@ import { Pagination, PaginatedResult, RepositoryFilters, CursorPagination, Curso
  */
 interface ProductRow {
     id: string;
+    slug?: string | null;
+    brand?: string | null;
     name: string;
     description: string | null;
     price: string | number;  // Numeric type comes as string or number from Supabase
     category: string;
     status: string;
     images: any;  // JSONB field
+    specs?: any;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
+}
+
+function slugify(value: string): string {
+    return value
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+function getMissingColumn(errorMessage: string): 'slug' | 'brand' | 'specs' | null {
+    const normalized = errorMessage.toLowerCase();
+    for (const column of ['slug', 'brand', 'specs'] as const) {
+        if (normalized.includes(`'${column}'`) || normalized.includes(`.${column}`) || normalized.includes(` ${column} `)) {
+            return column;
+        }
+    }
+
+    return null;
 }
 
 /**
@@ -73,6 +95,7 @@ interface ProductRow {
  */
 export class ProductRepositoryImpl implements ProductRepository {
     constructor(private readonly supabase: SupabaseClient) { }
+    private readonly unsupportedColumns = new Set<'slug' | 'brand' | 'specs'>();
 
     /**
      * Insert a new product into the database
@@ -92,21 +115,46 @@ export class ProductRepositoryImpl implements ProductRepository {
      */
     async insert(product: ProductEntity): Promise<ProductEntity> {
         // Convert ProductEntity to database row format (snake_case)
-        const row = {
+        const row: Record<string, unknown> = {
+            slug: product.slug ?? slugify(`${product.category} ${product.name}`),
+            brand: product.brand,
             name: product.name,
             description: product.description,
             price: product.price,
             category: product.category,
             status: product.status,
             images: JSON.stringify(product.images), // Convert array to JSONB
+            specs: JSON.stringify(product.specs ?? {}),
         };
 
+        this.unsupportedColumns.forEach((column) => delete row[column]);
+
         // Execute INSERT query
-        const { data, error } = await this.supabase
-            .from('products')
-            .insert(row)
-            .select()
-            .single();
+        let data: unknown = null;
+        let error: { code?: string; message: string } | null = null;
+
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+            const result = await this.supabase
+                .from('products')
+                .insert(row)
+                .select()
+                .single();
+
+            data = result.data;
+            error = result.error;
+
+            if (!error) {
+                break;
+            }
+
+            const missingColumn = getMissingColumn(error.message);
+            if (!missingColumn || !(missingColumn in row)) {
+                break;
+            }
+
+            this.unsupportedColumns.add(missingColumn);
+            delete row[missingColumn];
+        }
 
         if (error) {
             // Translate database errors to domain exceptions
@@ -124,7 +172,7 @@ export class ProductRepositoryImpl implements ProductRepository {
         }
 
         // Map database row to ProductEntity
-        return this.mapRowToEntity(data);
+        return this.mapRowToEntity(data as ProductRow);
     }
 
     /**
@@ -142,19 +190,44 @@ export class ProductRepositoryImpl implements ProductRepository {
 
         if (updates.name !== undefined) row.name = updates.name;
         if (updates.description !== undefined) row.description = updates.description;
+        if (updates.brand !== undefined) row.brand = updates.brand;
+        if (updates.slug !== undefined) row.slug = updates.slug;
         if (updates.price !== undefined) row.price = updates.price;
         if (updates.category !== undefined) row.category = updates.category;
         if (updates.status !== undefined) row.status = updates.status;
         if (updates.images !== undefined) row.images = JSON.stringify(updates.images);
+        if (updates.specs !== undefined) row.specs = JSON.stringify(updates.specs ?? {});
+
+        this.unsupportedColumns.forEach((column) => delete row[column]);
 
         // Execute UPDATE query with soft delete filter
-        const { data, error } = await this.supabase
-            .from('products')
-            .update(row)
-            .eq('id', id)
-            .is('deleted_at', null)
-            .select()
-            .single();
+        let data: unknown = null;
+        let error: { code?: string; message: string } | null = null;
+
+        for (let attempt = 0; attempt < 4; attempt += 1) {
+            const result = await this.supabase
+                .from('products')
+                .update(row)
+                .eq('id', id)
+                .is('deleted_at', null)
+                .select()
+                .single();
+
+            data = result.data;
+            error = result.error;
+
+            if (!error) {
+                break;
+            }
+
+            const missingColumn = getMissingColumn(error.message);
+            if (!missingColumn || !(missingColumn in row)) {
+                break;
+            }
+
+            this.unsupportedColumns.add(missingColumn);
+            delete row[missingColumn];
+        }
 
         if (error) {
             if (error.code === 'PGRST116') {
@@ -172,7 +245,7 @@ export class ProductRepositoryImpl implements ProductRepository {
             throw new Error(`Product with ID '${id}' not found.`);
         }
 
-        return this.mapRowToEntity(data);
+        return this.mapRowToEntity(data as ProductRow);
     }
 
     /**
@@ -549,15 +622,36 @@ export class ProductRepositoryImpl implements ProductRepository {
 
         return {
             id: row.id,
+            slug: row.slug ?? slugify(`${row.category} ${row.name}`),
+            brand: row.brand ?? null,
             name: row.name,
             description: row.description,
             price,
             category: row.category,
             status: row.status as any, // Type assertion for ProductStatus
             images,
+            specs: this.parseSpecs(row.specs),
             createdAt,
             updatedAt,
             deletedAt,
         };
+    }
+
+    private parseSpecs(specs: any): Record<string, unknown> {
+        if (!specs) {
+            return {};
+        }
+
+        if (typeof specs === 'string') {
+            try {
+                const parsed = JSON.parse(specs);
+                return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+            } catch (error) {
+                console.error('Failed to parse specs JSONB:', error);
+                return {};
+            }
+        }
+
+        return typeof specs === 'object' && !Array.isArray(specs) ? specs : {};
     }
 }

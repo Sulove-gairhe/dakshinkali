@@ -22,6 +22,8 @@ import { ProductStatus } from '../entities/product.entity';
  * Validation rules:
  * - name: Optional, 1-200 characters if provided, checked for uniqueness within category
  * - description: Optional, max 2000 characters if provided
+ * - brand: Optional, manufacturer name
+ * - specs: Optional, flexible metadata object
  * - price: Optional, must be > 0 if provided
  * - category: Optional, non-empty string if provided
  * - status: Optional, must be valid ProductStatus enum value if provided
@@ -34,6 +36,12 @@ export interface UpdateProductRequest {
 
     /** Product description (optional, max 2000 chars) */
     description?: string;
+
+    /** Product brand / manufacturer (optional) */
+    brand?: string | null;
+
+    /** Flexible product metadata/specifications (optional) */
+    specs?: Record<string, unknown> | null;
 
     /** Product price (optional, must be > 0) */
     price?: number;

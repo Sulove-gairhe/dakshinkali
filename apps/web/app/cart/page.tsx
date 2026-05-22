@@ -7,7 +7,7 @@ import { formatPrice, useCart } from "@/components/cart-provider";
 import { SiteNavbar } from "@/components/site-navbar";
 
 export default function CartPage() {
-  const { items, itemCount, subtotal, removeItem, updateQuantity } = useCart();
+  const { items, itemCount, subtotal, removeItem, updateQuantity, loading, syncing, error } = useCart();
   const grandTotal = subtotal;
 
   return (
@@ -20,7 +20,7 @@ export default function CartPage() {
             <h1 className="text-2xl font-bold sm:text-3xl">Shopping Cart</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {itemCount} {itemCount === 1 ? "item" : "items"} enlisted for
-              checkout
+              checkout {syncing ? "· syncing" : ""}
             </p>
           </div>
           <Link
@@ -31,7 +31,17 @@ export default function CartPage() {
           </Link>
         </div>
 
-        {items.length === 0 ? (
+        {error ? (
+          <div className="mb-5 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </div>
+        ) : null}
+
+        {loading && items.length === 0 ? (
+          <div className="rounded-lg border border-border bg-card p-8 text-sm font-semibold text-muted-foreground shadow-sm">
+            Loading your cart...
+          </div>
+        ) : items.length === 0 ? (
           <div className="flex min-h-[360px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card px-6 py-12 text-center">
             <ShoppingBag className="h-12 w-12 text-muted-foreground" />
             <h2 className="mt-4 text-xl font-bold">Your cart is empty</h2>
@@ -61,6 +71,7 @@ export default function CartPage() {
                       src={item.image}
                       alt={item.name}
                       fill
+                      sizes="128px"
                       className="object-cover"
                     />
                   </Link>
@@ -145,6 +156,12 @@ export default function CartPage() {
                   <span className="font-semibold">{formatPrice(subtotal)}</span>
                 </div>
 
+                {items.some((item) => item.priceChanged || item.isAvailable === false) ? (
+                  <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
+                    Some cart items changed price or availability. The backend cart is the checkout source of truth.
+                  </div>
+                ) : null}
+
                 <div>
                   <label
                     htmlFor="coupon-code"
@@ -177,12 +194,12 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  className="w-full rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
+                <Link
+                  href="/checkout"
+                  className="inline-flex w-full items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   Proceed to Checkout
-                </button>
+                </Link>
               </div>
             </aside>
           </div>

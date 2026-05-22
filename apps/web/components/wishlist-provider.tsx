@@ -36,17 +36,24 @@ function readStoredWishlist() {
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartProduct[]>([]);
-  const [isReady, setIsReady] = useState(false);
+  const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
-    setItems(readStoredWishlist());
-    setIsReady(true);
+    const timer = window.setTimeout(() => {
+      const storedItems = readStoredWishlist();
+      if (storedItems.length > 0) {
+        setItems(storedItems);
+      }
+      setStorageReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!storageReady) return;
     window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items));
-  }, [isReady, items]);
+  }, [items, storageReady]);
 
   const addItem = useCallback((product: CartProduct) => {
     setItems((currentItems) => {

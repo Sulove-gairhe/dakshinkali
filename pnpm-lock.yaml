@@ -164,6 +164,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@dakshinkali/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@hugeicons/core-free-icons':
         specifier: ^4.1.1
         version: 4.1.1

@@ -151,6 +151,8 @@ export class CartRepositoryImpl implements CartRepository {
         products:product_id (
           id,
           name,
+          description,
+          category,
           price,
           status,
           images,
@@ -175,6 +177,9 @@ export class CartRepositoryImpl implements CartRepository {
                 created_at: row.created_at,
                 updated_at: row.updated_at,
                 product_name: product?.name || '',
+                product_slug: null,
+                product_description: product?.description || null,
+                product_category: product?.category || '',
                 product_price: product?.price || '0',
                 product_status: product?.status || 'inactive',
                 product_images: product?.images || [],

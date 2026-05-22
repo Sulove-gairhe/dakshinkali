@@ -125,7 +125,6 @@ curl http://localhost:3002/api/v1/admin/products \
 |-------|-------------|
 | **QUICK_START.md** | Fast setup with copy-paste commands |
 | **TOKEN_USAGE_GUIDE.md** | Complete guide to using access tokens |
-| **../agent/docs/AUTH_NEXT_STEPS.md** | Full authentication setup guide |
 
 ---
 
@@ -301,7 +300,6 @@ pnpm auth:token admin@example.com password
 
 - **Supabase Auth Docs**: https://supabase.com/docs/guides/auth
 - **JWT.io**: https://jwt.io (decode tokens to see contents)
-- **Project Auth Guide**: `../agent/docs/AUTH_NEXT_STEPS.md`
 
 ---
 
@@ -309,7 +307,7 @@ pnpm auth:token admin@example.com password
 
 1. Check **TOKEN_USAGE_GUIDE.md** for detailed examples
 2. Check **QUICK_START.md** for fast setup
-3. Check **../agent/docs/** for architecture docs
+3. Check project README files for architecture docs
 4. Run `pnpm auth:test` to verify your setup
 
 ---

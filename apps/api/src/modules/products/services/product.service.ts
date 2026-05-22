@@ -32,6 +32,12 @@ export interface CreateProductData {
     /** Product description (optional, max 2000 chars) */
     description?: string;
 
+    /** Product brand / manufacturer (optional) */
+    brand?: string | null;
+
+    /** Flexible product metadata/specifications (optional) */
+    specs?: Record<string, unknown> | null;
+
     /** Product price (required, must be > 0) */
     price: number;
 
@@ -51,8 +57,17 @@ export interface UpdateProductData {
     /** Product name (optional, 1-200 chars, unique within category) */
     name?: string;
 
+    /** Public slug derived from category and name */
+    slug?: string;
+
     /** Product description (optional, max 2000 chars) */
     description?: string;
+
+    /** Product brand / manufacturer (optional) */
+    brand?: string | null;
+
+    /** Flexible product metadata/specifications (optional) */
+    specs?: Record<string, unknown> | null;
 
     /** Product price (optional, must be > 0) */
     price?: number;

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "lib": [
       "dom",
       "dom.iterable",
@@ -16,6 +17,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "paths": {
+      "@dakshinkali/auth": ["../../packages/auth/index.ts"],
+      "@dakshinkali/auth/*": ["../../packages/auth/*"]
+    },
     "plugins": [
       {
         "name": "next"
@@ -29,6 +34,7 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tailwind.config.ts"
   ]
 }
