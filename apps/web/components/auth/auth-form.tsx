@@ -49,7 +49,15 @@ type AuthFormProps = {
 
 export function AuthForm({ mode, initialError }: AuthFormProps) {
   const router = useRouter();
-  const { signIn, signUp, signInWithGoogle, loading, user, supabase } = useAuth();
+  const {
+    signIn,
+    signUp,
+    signInWithGoogle,
+    loading,
+    user,
+    supabase,
+    configError,
+  } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,6 +89,40 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
 
   if (user) {
     return null;
+  }
+
+  if (configError || !supabase) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10 text-foreground">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-lg sm:p-10">
+          <AuthBrandTitle />
+          <p className="mt-6 text-sm leading-6 text-muted-foreground">
+            {configError ??
+              "Authentication is unavailable right now. Please try again shortly."}
+          </p>
+          <p className="mt-3 text-xs leading-5 text-muted-foreground/80">
+            Production requires{" "}
+            <code className="rounded bg-muted px-1 py-0.5">
+              NEXT_PUBLIC_SUPABASE_URL
+            </code>{" "}
+            and{" "}
+            <code className="rounded bg-muted px-1 py-0.5">
+              NEXT_PUBLIC_SUPABASE_ANON_KEY
+            </code>{" "}
+            in your hosting environment.
+          </p>
+          <Link
+            href="/"
+            className={cn(
+              "mt-6 inline-block text-sm font-semibold text-primary transition-colors hover:text-primary/80",
+              pointer,
+            )}
+          >
+            Back to store
+          </Link>
+        </div>
+      </main>
+    );
   }
 
   function setSuccessMessage(text: string) {
@@ -177,6 +219,11 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
 
     setSubmitting(true);
     setMessage(null);
+
+    if (!supabase) {
+      setErrorMessage("Authentication is not configured.");
+      return;
+    }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: getAuthCallbackUrl("/login"),
