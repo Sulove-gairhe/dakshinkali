@@ -24,8 +24,11 @@ export interface AuthContextValue {
     /** Loading state */
     loading: boolean;
     
-    /** Supabase client */
-    supabase: SupabaseClient;
+    /** Supabase client (null until client-side init completes) */
+    supabase: SupabaseClient | null;
+
+    /** Set when Supabase env vars are missing or client init fails */
+    configError: string | null;
     
     /** Sign in with email and password */
     signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
