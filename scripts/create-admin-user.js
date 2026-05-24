@@ -41,6 +41,9 @@ async function createAdminUser(email, password) {
             user_metadata: {
                 role: 'admin',
             },
+            app_metadata: {
+                role: 'admin',
+            },
         });
 
         if (authError) {

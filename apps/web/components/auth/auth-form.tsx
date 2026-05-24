@@ -1,14 +1,18 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useAuth } from "@dakshinkali/auth";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { getAuthCallbackUrl, getEmailRedirectUrl } from "@/lib/auth-urls";
+import {
+  getAuthCallbackUrl,
+  getEmailRedirectUrl,
+  sanitizeNextPath,
+} from "@/lib/auth-urls";
 import {
   eyeClickMotion,
   loginCardMotion,
@@ -49,6 +53,11 @@ type AuthFormProps = {
 
 export function AuthForm({ mode, initialError }: AuthFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = useMemo(
+    () => sanitizeNextPath(searchParams.get("redirectTo")),
+    [searchParams],
+  );
   const {
     signIn,
     signUp,
@@ -75,9 +84,9 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
 
   useEffect(() => {
     if (!loading && user) {
-      router.replace("/account");
+      router.replace(redirectTo);
     }
-  }, [loading, user, router]);
+  }, [loading, user, router, redirectTo]);
 
   if (loading) {
     return (
@@ -159,7 +168,7 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
         email,
         password,
         fullName.trim() ? { full_name: fullName.trim() } : undefined,
-        { emailRedirectTo: getEmailRedirectUrl("/account") },
+        { emailRedirectTo: getEmailRedirectUrl(redirectTo) },
       );
 
       if (error) {
@@ -169,7 +178,7 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
       }
 
       if (session) {
-        router.replace("/account");
+        router.replace(redirectTo);
         return;
       }
 
@@ -194,7 +203,7 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
       return;
     }
 
-    router.replace("/account");
+    router.replace(redirectTo);
   }
 
   async function handleGoogleSignIn() {
@@ -202,7 +211,8 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
     setMessage(null);
 
     const { error } = await signInWithGoogle({
-      emailRedirectTo: getAuthCallbackUrl("/account"),
+      redirectPath: redirectTo,
+      emailRedirectTo: getAuthCallbackUrl(redirectTo),
     });
 
     if (error) {
@@ -489,7 +499,11 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
             <>
               Don&apos;t have an account?{" "}
               <Link
-                href="/signup"
+                href={
+                  redirectTo === "/account"
+                    ? "/signup"
+                    : `/signup?redirectTo=${encodeURIComponent(redirectTo)}`
+                }
                 className={cn(
                   "font-semibold text-primary transition-colors hover:text-primary/80",
                   pointer,
@@ -502,7 +516,11 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
             <>
               Already have an account?{" "}
               <Link
-                href="/login"
+                href={
+                  redirectTo === "/account"
+                    ? "/login"
+                    : `/login?redirectTo=${encodeURIComponent(redirectTo)}`
+                }
                 className={cn(
                   "font-semibold text-primary transition-colors hover:text-primary/80",
                   pointer,

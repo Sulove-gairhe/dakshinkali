@@ -7,6 +7,7 @@
 
 import { createBrowserClient as createClient, createServerClient as createServer } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { resolveSupabaseAnonKey } from './supabase-env';
 
 /**
  * Auth client configuration
@@ -21,18 +22,19 @@ export interface AuthClientConfig {
  */
 function getConfig(): AuthClientConfig {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey =
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    const resolved = resolveSupabaseAnonKey(supabaseUrl);
 
-    if (!supabaseUrl || !supabaseAnonKey) {
+    if ('error' in resolved) {
+        throw new Error(resolved.error);
+    }
+
+    if (!supabaseUrl) {
         throw new Error(
-            'Missing Supabase environment variables. ' +
-            'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY'
+            'Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL.',
         );
     }
 
-    return { supabaseUrl, supabaseAnonKey };
+    return { supabaseUrl, supabaseAnonKey: resolved.key };
 }
 
 /**

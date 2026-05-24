@@ -13,7 +13,6 @@ export function SiteNavbar() {
       cartCount={cartCount}
       wishlistCount={wishlistCount}
       cartPreviewItems={cartItems}
-      accountHref="/account"
       cartHref="/cart"
       wishlistHref="/wishlist"
     />

@@ -10,6 +10,7 @@
 import { createContext, useContext } from 'react';
 import type { User, Session } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { UserProfile, UserRole } from './types';
 
 /**
  * Auth context value
@@ -20,9 +21,24 @@ export interface AuthContextValue {
     
     /** Current session */
     session: Session | null;
+
+    /** Profile from public.profiles */
+    profile: UserProfile | null;
+
+    /** Resolved role (metadata or profiles table) */
+    role: UserRole | null;
     
     /** Loading state */
     loading: boolean;
+
+    /** Alias for loading */
+    isLoading: boolean;
+
+    /** True when a session exists */
+    isAuthenticated: boolean;
+
+    /** True when role is admin */
+    isAdmin: boolean;
     
     /** Supabase client (null until client-side init completes) */
     supabase: SupabaseClient | null;
@@ -51,6 +67,9 @@ export interface AuthContextValue {
     
     /** Refresh session */
     refreshSession: () => Promise<void>;
+
+    /** Reload profile and role from Supabase */
+    refreshProfile: () => Promise<void>;
 }
 
 /**

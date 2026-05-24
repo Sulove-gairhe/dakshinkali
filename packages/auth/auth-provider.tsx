@@ -12,6 +12,8 @@ import type { User, Session } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { AuthContext, type AuthContextValue } from './use-auth';
 import { createBrowserClient } from './supabase-client';
+import { getUserRole } from './auth-helpers';
+import type { UserProfile, UserRole } from './types';
 
 /**
  * Auth provider props
@@ -28,12 +30,78 @@ function getConfigErrorMessage(error: unknown) {
     return 'Authentication is not configured.';
 }
 
+function resolveRoleFromUser(user: User | null): UserRole | null {
+    if (!user) {
+        return null;
+    }
+
+    const metadataRole =
+        user.app_metadata?.role || user.user_metadata?.role;
+
+    if (metadataRole === 'admin' || metadataRole === 'customer') {
+        return metadataRole;
+    }
+
+    return null;
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
     const [session, setSession] = useState<Session | null>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [role, setRole] = useState<UserRole | null>(null);
     const [loading, setLoading] = useState(true);
     const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
     const [configError, setConfigError] = useState<string | null>(null);
+
+    const loadProfile = useCallback(async (client: SupabaseClient, currentUser: User) => {
+        const { data, error } = await client
+            .from('profiles')
+            .select('id, email, full_name, role, avatar_url, created_at, updated_at')
+            .eq('id', currentUser.id)
+            .maybeSingle();
+
+        if (error) {
+            console.warn('Failed to load profile:', error.message);
+        }
+
+        if (data) {
+            const nextProfile = data as UserProfile;
+            setProfile(nextProfile);
+            setRole(nextProfile.role);
+            return;
+        }
+
+        const metadataRole = resolveRoleFromUser(currentUser);
+        const fallbackRole = metadataRole ?? 'customer';
+        setProfile({
+            id: currentUser.id,
+            email: currentUser.email ?? '',
+            full_name:
+                (currentUser.user_metadata?.full_name as string | undefined) ?? null,
+            role: fallbackRole,
+            avatar_url: null,
+        });
+        setRole(fallbackRole);
+    }, []);
+
+    const clearProfile = useCallback(() => {
+        setProfile(null);
+        setRole(null);
+    }, []);
+
+    const refreshProfile = useCallback(async () => {
+        if (!supabase || !user) {
+            clearProfile();
+            return;
+        }
+
+        await loadProfile(supabase, user);
+        const resolvedRole = await getUserRole(supabase);
+        if (resolvedRole === 'admin' || resolvedRole === 'customer') {
+            setRole(resolvedRole);
+        }
+    }, [supabase, user, loadProfile, clearProfile]);
 
     useEffect(() => {
         let subscription: { unsubscribe: () => void } | undefined;
@@ -44,15 +112,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
             client.auth.getSession().then(({ data: { session: nextSession } }) => {
                 setSession(nextSession);
-                setUser(nextSession?.user ?? null);
-                setLoading(false);
+                const nextUser = nextSession?.user ?? null;
+                setUser(nextUser);
+                setRole(resolveRoleFromUser(nextUser));
+
+                if (nextUser) {
+                    void loadProfile(client, nextUser).finally(() => setLoading(false));
+                } else {
+                    clearProfile();
+                    setLoading(false);
+                }
             });
 
             const {
                 data: { subscription: authSubscription },
             } = client.auth.onAuthStateChange((_event, nextSession) => {
                 setSession(nextSession);
-                setUser(nextSession?.user ?? null);
+                const nextUser = nextSession?.user ?? null;
+                setUser(nextUser);
+                setRole(resolveRoleFromUser(nextUser));
+
+                if (nextUser) {
+                    void loadProfile(client, nextUser);
+                } else {
+                    clearProfile();
+                }
+
                 setLoading(false);
             });
 
@@ -65,7 +150,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return () => {
             subscription?.unsubscribe();
         };
-    }, []);
+    }, [loadProfile, clearProfile]);
 
     const requireClient = useCallback(() => {
         if (configError) {
@@ -126,7 +211,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 email,
                 password,
                 options: {
-                    data: metadata,
+                    data: {
+                        role: 'customer',
+                        ...metadata,
+                    },
                     emailRedirectTo,
                 },
             });
@@ -175,7 +263,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         await client.auth.signOut();
-    }, [requireClient]);
+        clearProfile();
+    }, [requireClient, clearProfile]);
 
     const refreshSession = useCallback(async () => {
         const { client, error: clientError } = requireClient();
@@ -186,10 +275,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await client.auth.refreshSession();
     }, [requireClient]);
 
+    const isAuthenticated = !!user && !!session;
+    const isAdmin = role === 'admin';
+
     const value: AuthContextValue = {
         user,
         session,
+        profile,
+        role,
         loading,
+        isLoading: loading,
+        isAuthenticated,
+        isAdmin,
         supabase,
         configError,
         signIn,
@@ -197,6 +294,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         signInWithGoogle,
         signOut,
         refreshSession,
+        refreshProfile,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

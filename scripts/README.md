@@ -30,7 +30,21 @@ pnpm auth:token testadmin@example.com TestAdmin123!
 
 ---
 
-### 2. Create Admin User
+### 2. Seed dev/staging test users (customers + admins)
+```bash
+pnpm auth:seed
+```
+
+**What it does:**
+- Creates or updates fixed dev accounts (`customer1@dakshinkali.shop` … `admin2@dakshinkali.shop`)
+- Confirms emails, sets `app_metadata.role` and `profiles.role`
+- **DEV/STAGING ONLY** — requires `SUPABASE_SERVICE_ROLE_KEY` in root `.env`
+
+Re-login after seeding so JWTs include the latest `app_metadata`.
+
+---
+
+### 3. Create Admin User
 ```bash
 pnpm auth:create-admin <email> <password>
 ```

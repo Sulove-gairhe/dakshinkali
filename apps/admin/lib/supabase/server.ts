@@ -1,14 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { getSupabaseEnv } from "@/lib/supabase/env";
 
 export async function createClient() {
   const cookieStore = await cookies();
 
-  const { url: supabaseUrl, key: supabaseAnonKey, error } = getSupabaseEnv();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(error ?? "Missing Supabase environment variables.");
+    throw new Error(
+      "Missing Supabase env: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    );
   }
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -22,7 +26,7 @@ export async function createClient() {
             cookieStore.set(name, value, options);
           });
         } catch {
-          // setAll can fail in Server Components; safe to ignore when read-only.
+          // Safe to ignore in read-only Server Components.
         }
       },
     },

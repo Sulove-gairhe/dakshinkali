@@ -1,15 +1,25 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  buildLoginRedirectUrl,
+  isAuthEntryPath,
+  isProtectedCustomerPath,
+} from "@/lib/auth-routes";
+import { getSupabaseEnv } from "@/lib/supabase/env";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  const { pathname } = request.nextUrl;
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const { url: supabaseUrl, key: supabaseAnonKey } = getSupabaseEnv();
 
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (isProtectedCustomerPath(pathname)) {
+      return NextResponse.redirect(
+        buildLoginRedirectUrl(request.nextUrl, pathname),
+      );
+    }
+
     return supabaseResponse;
   }
 
@@ -30,7 +40,24 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user && isProtectedCustomerPath(pathname)) {
+    return NextResponse.redirect(
+      buildLoginRedirectUrl(request.nextUrl, pathname),
+    );
+  }
+
+  if (user && isAuthEntryPath(pathname) && pathname !== "/auth/callback") {
+    const redirectTo = request.nextUrl.searchParams.get("redirectTo");
+    const destination =
+      redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+        ? redirectTo
+        : "/account";
+    return NextResponse.redirect(new URL(destination, request.url));
+  }
 
   return supabaseResponse;
 }

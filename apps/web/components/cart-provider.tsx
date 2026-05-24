@@ -6,10 +6,23 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
-const CART_STORAGE_KEY = "dakshinkali_cart";
+/* ------------------------------------------------------------------ */
+/*  Storage key scoped per user                                       */
+/* ------------------------------------------------------------------ */
+
+function getCartStorageKey(userId: string | null) {
+  return userId
+    ? `dakshinkali_cart:${userId}`
+    : "dakshinkali_cart:anon";
+}
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 
 export type CartProduct = {
   id: string;
@@ -40,9 +53,14 @@ type CartContextValue = {
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   getQuantity: (productId: string) => number;
+  clearCart: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
+
+/* ------------------------------------------------------------------ */
+/*  Price helpers                                                      */
+/* ------------------------------------------------------------------ */
 
 export function parseProductPrice(value: number | string | undefined | null) {
   if (typeof value === "number") {
@@ -98,11 +116,11 @@ function normalizeCartItem(item: CartItem): CartItem {
   };
 }
 
-function readStoredCart(): CartItem[] {
+function readStoredCart(key: string): CartItem[] {
   if (typeof window === "undefined") return [];
 
   try {
-    const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
+    const storedCart = window.localStorage.getItem(key);
     const parsedCart = storedCart ? (JSON.parse(storedCart) as CartItem[]) : [];
     return parsedCart.map(normalizeCartItem);
   } catch {
@@ -110,20 +128,35 @@ function readStoredCart(): CartItem[] {
   }
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+/* ------------------------------------------------------------------ */
+/*  Provider                                                           */
+/* ------------------------------------------------------------------ */
+
+export interface CartProviderProps {
+  children: React.ReactNode;
+  /** Current authenticated user ID, or null for anonymous. */
+  userId?: string | null;
+}
+
+export function CartProvider({ children, userId = null }: CartProviderProps) {
+  const storageKey = getCartStorageKey(userId);
+  const storageKeyRef = useRef(storageKey);
+
   const [items, setItems] = useState<CartItem[]>([]);
   const [isReady, setIsReady] = useState(false);
 
+  // Load cart from the correct user-scoped key whenever userId changes.
   useEffect(() => {
-    queueMicrotask(() => {
-      setItems(readStoredCart());
-      setIsReady(true);
-    });
-  }, []);
+    storageKeyRef.current = storageKey;
+    const loaded = readStoredCart(storageKey);
+    setItems(loaded);
+    setIsReady(true);
+  }, [storageKey]);
 
+  // Persist items to the current user-scoped key.
   useEffect(() => {
     if (!isReady) return;
-    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    window.localStorage.setItem(storageKeyRef.current, JSON.stringify(items));
   }, [isReady, items]);
 
   const addItem = useCallback((product: CartProduct) => {
@@ -187,6 +220,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     [items],
   );
 
+  const clearCart = useCallback(() => {
+    setItems([]);
+  }, []);
+
   const value = useMemo(
     () => ({
       items,
@@ -199,8 +236,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem,
       updateQuantity,
       getQuantity,
+      clearCart,
     }),
-    [addItem, getQuantity, items, removeItem, updateQuantity],
+    [addItem, clearCart, getQuantity, items, removeItem, updateQuantity],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
