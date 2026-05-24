@@ -1,4 +1,4 @@
-import { AuthProvider } from "@dakshinkali/auth";
+import { Suspense } from "react";
 import { SignupCard } from "@/components/auth/signup-card";
 import { decodeAuthMessage } from "@/lib/auth-urls";
 
@@ -16,8 +16,14 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
   const initialError = decodeAuthMessage(params.error);
 
   return (
-    <AuthProvider>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
+          Loading...
+        </div>
+      }
+    >
       <SignupCard initialError={initialError} />
-    </AuthProvider>
+    </Suspense>
   );
 }

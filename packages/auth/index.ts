@@ -12,6 +12,8 @@ export {
     type AuthClientConfig,
 } from './supabase-client';
 
+export { resolveSupabaseAnonKey } from './supabase-env';
+
 // Auth hooks for React/Next.js
 export {
     useAuth,
@@ -23,10 +25,18 @@ export {
 // Auth helpers
 export {
     getAccessToken,
+    getAuthTokens,
+    getCurrentUser,
+    getUserRole,
+    hasRole,
+    isAuthenticated,
     refreshSession,
     signOut,
     type AuthTokens,
 } from './auth-helpers';
+
+// Types
+export type { UserProfile, UserRole } from './types';
 
 // Auth provider
 export { AuthProvider } from './auth-provider';

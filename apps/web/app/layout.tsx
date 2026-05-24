@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Figtree, Nunito, Poppins } from "next/font/google";
-import { CartProvider } from "@/components/cart-provider";
-import { WishlistProvider } from "@/components/wishlist-provider";
+import { AppProviders } from "@/components/providers";
 import { cn } from "@/lib/utils";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -33,9 +32,7 @@ export default function RootLayout({
       className={cn(figtree.variable, poppins.variable, nunito.variable)}
     >
       <body>
-        <CartProvider>
-          <WishlistProvider>{children}</WishlistProvider>
-        </CartProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

@@ -1,6 +1,9 @@
+import { AdminProviders } from "@/components/admin-providers";
+import "./globals.css";
+
 export const metadata = {
-  title: 'Shop Platform - Admin',
-  description: 'E-commerce admin panel',
+  title: "Dakshinkali Admin",
+  description: "E-commerce admin panel",
 };
 
 export default function RootLayout({
@@ -10,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AdminProviders>{children}</AdminProviders>
+      </body>
     </html>
   );
 }

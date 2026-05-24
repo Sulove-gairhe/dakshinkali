@@ -10,10 +10,10 @@ import { normalizeBrandSlug } from "@/lib/search-products";
 import {
   Heart,
   ShoppingCart,
-  User,
   ChevronDown,
   Wrench,
 } from "lucide-react";
+import { AccountMenu } from "@/components/account-menu";
 
 type BrandItem = {
   label: string;
@@ -38,7 +38,6 @@ type NavbarProps = {
   menuItems?: MenuItem[];
   wishlistHref?: string;
   cartHref?: string;
-  accountHref?: string;
 };
 
 const defaultBrands: BrandItem[] = [
@@ -69,7 +68,6 @@ export function Navbar({
   menuItems = defaultMenuItems,
   wishlistHref = "#",
   cartHref = "#",
-  accountHref = "/account",
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBrandsOpen, setIsBrandsOpen] = useState(false);
@@ -129,7 +127,7 @@ export function Navbar({
               badge={cartCount}
               items={cartPreviewItems}
             />
-            <IconButton icon={User} label="Account" href={accountHref} />
+            <AccountMenu />
           </nav>
 
           <div className="flex items-center gap-1 md:hidden">
@@ -145,6 +143,7 @@ export function Navbar({
               href={cartHref}
               badge={cartCount}
             />
+            <AccountMenu variant="mobile" />
           </div>
         </div>
       </div>

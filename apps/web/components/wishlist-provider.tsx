@@ -6,11 +6,24 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type { CartProduct } from "@/components/cart-provider";
 
-const WISHLIST_STORAGE_KEY = "dakshinkali_wishlist";
+/* ------------------------------------------------------------------ */
+/*  Storage key scoped per user                                       */
+/* ------------------------------------------------------------------ */
+
+function getWishlistStorageKey(userId: string | null) {
+  return userId
+    ? `dakshinkali_wishlist:${userId}`
+    : "dakshinkali_wishlist:anon";
+}
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
 
 type WishlistContextValue = {
   items: CartProduct[];
@@ -19,33 +32,58 @@ type WishlistContextValue = {
   removeItem: (productId: string) => void;
   toggleItem: (product: CartProduct) => void;
   hasItem: (productId: string) => boolean;
+  clearWishlist: () => void;
 };
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
-function readStoredWishlist() {
+/* ------------------------------------------------------------------ */
+/*  localStorage helpers                                               */
+/* ------------------------------------------------------------------ */
+
+function readStoredWishlist(key: string): CartProduct[] {
   if (typeof window === "undefined") return [];
 
   try {
-    const storedWishlist = window.localStorage.getItem(WISHLIST_STORAGE_KEY);
+    const storedWishlist = window.localStorage.getItem(key);
     return storedWishlist ? (JSON.parse(storedWishlist) as CartProduct[]) : [];
   } catch {
     return [];
   }
 }
 
-export function WishlistProvider({ children }: { children: React.ReactNode }) {
+/* ------------------------------------------------------------------ */
+/*  Provider                                                           */
+/* ------------------------------------------------------------------ */
+
+export interface WishlistProviderProps {
+  children: React.ReactNode;
+  /** Current authenticated user ID, or null for anonymous. */
+  userId?: string | null;
+}
+
+export function WishlistProvider({
+  children,
+  userId = null,
+}: WishlistProviderProps) {
+  const storageKey = getWishlistStorageKey(userId);
+  const storageKeyRef = useRef(storageKey);
+
   const [items, setItems] = useState<CartProduct[]>([]);
   const [isReady, setIsReady] = useState(false);
 
+  // Load wishlist from the correct user-scoped key whenever userId changes.
   useEffect(() => {
-    setItems(readStoredWishlist());
+    storageKeyRef.current = storageKey;
+    const loaded = readStoredWishlist(storageKey);
+    setItems(loaded);
     setIsReady(true);
-  }, []);
+  }, [storageKey]);
 
+  // Persist items to the current user-scoped key.
   useEffect(() => {
     if (!isReady) return;
-    window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items));
+    window.localStorage.setItem(storageKeyRef.current, JSON.stringify(items));
   }, [isReady, items]);
 
   const addItem = useCallback((product: CartProduct) => {
@@ -79,6 +117,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     [items],
   );
 
+  const clearWishlist = useCallback(() => {
+    setItems([]);
+  }, []);
+
   const value = useMemo(
     () => ({
       items,
@@ -87,8 +129,9 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       removeItem,
       toggleItem,
       hasItem,
+      clearWishlist,
     }),
-    [addItem, hasItem, items, removeItem, toggleItem],
+    [addItem, clearWishlist, hasItem, items, removeItem, toggleItem],
   );
 
   return (
