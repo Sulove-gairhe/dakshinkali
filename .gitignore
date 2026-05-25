@@ -3,6 +3,24 @@ node_modules
 dist
 .md
 coverage
+build
 .env
 .env.local
 .env.example
+.ts.html
+.tsx.html
+.jsx.html
+.js.html
+
+# dependencies
+node_modules/
+
+# turbo
+.turbo/
+turbo/cache/
+
+# Turbo cache
+.turbo/
+
+# Turbo cache anywhere
+**/.turbo/
