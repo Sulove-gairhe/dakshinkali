@@ -57,7 +57,7 @@ export async function updateSession(request: NextRequest) {
     if (user && pathname === "/login") {
       const role = getUserRoleFromMetadata(user);
       if (role === "admin") {
-        return NextResponse.redirect(new URL("/", request.url));
+        return NextResponse.redirect(new URL("/admin", request.url));
       }
     }
 
@@ -70,7 +70,13 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const role = getUserRoleFromMetadata(user);
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const role = profile?.role ?? getUserRoleFromMetadata(user);
   if (role !== "admin") {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set(

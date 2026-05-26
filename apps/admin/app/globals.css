@@ -11,11 +11,11 @@
 
   /* ---- LIGHT MODE ---- */
   :root {
-    /* Brand Colors */
-    --color-primary: #3A5A40;
-    --color-secondary: #FAF3E0;
-    --color-accent: #E76F51;
-    --color-highlight: #F4A261;
+    /* Admin panel — mirrors apps/web yellow brand tokens */
+    --color-primary: #111111;
+    --color-secondary: #fafafa;
+    --color-accent: #fbbf24;
+    --color-highlight: #ffe566;
     --color-text: #2B2B2B;
     --color-text-muted: #6B7280;
     --color-border: #E5D9C3;
