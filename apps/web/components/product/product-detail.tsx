@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Heart, Scale } from "lucide-react";
 import type { ProductImage, StoreProduct } from "@/lib/store-products";
-import { getRecommendedProducts } from "@/lib/store-products";
+import {
+  getRecommendedProducts,
+  parseProductPrice,
+} from "@/lib/store-products";
+import { useCart } from "@/components/cart-provider";
 import { ImageGallery } from "./image-gallery";
 import { VariantSelector } from "./variant-selector";
 import { DescriptionTabs } from "./description-tabs";
@@ -14,6 +19,8 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {
+  const router = useRouter();
+  const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const badge = product.badge ?? product.badges?.[0];
   const images = getProductImages(product);
@@ -41,6 +48,28 @@ export function ProductDetail({ product }: ProductDetailProps) {
   ];
 
   const recommendations = getRecommendedProducts(product, { limit: 8 });
+
+  const handleAddToCart = () => {
+    for (let i = 0; i < quantity; i++) {
+      addItem({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        shortDescription: product.shortDescription,
+        image: product.image,
+        currentPrice: product.currentPrice,
+        oldPrice: product.oldPrice,
+        href: `/products/${product.slug}`,
+        price: parseProductPrice(product.currentPrice),
+      });
+    }
+    setQuantity(1);
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    router.push("/checkout");
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -178,10 +207,16 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  <button className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90">
+                  <button
+                    onClick={handleAddToCart}
+                    className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90"
+                  >
                     Add to cart
                   </button>
-                  <button className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90">
+                  <button
+                    onClick={handleBuyNow}
+                    className="cursor-pointer flex-1 rounded-full bg-black py-3 font-semibold text-white transition-colors hover:bg-black/90"
+                  >
                     Buy Now
                   </button>
                 </div>
