@@ -35,7 +35,7 @@
     "@vitest/coverage-v8": "^1.0.0",
     "fast-check": "^4.7.0",
     "node-fetch": "^3.3.2",
-    "supabase": "^2.96.0",
+    "supabase": "^2.101.0",
     "turbo": "latest",
     "vitest": "^1.0.0"
   },
