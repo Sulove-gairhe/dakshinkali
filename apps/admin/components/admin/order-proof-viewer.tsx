@@ -8,6 +8,7 @@ import {
   isPdfProofType,
 } from "@/lib/admin/order-utils";
 import { uploadOrderProof } from "@/lib/admin/actions/orders";
+import { actionErrorMessage } from "@/lib/admin/order-types";
 
 export function OrderProofViewer({
   orderId,
@@ -32,7 +33,7 @@ export function OrderProofViewer({
     const result = await uploadOrderProof(formData);
     setUploading(false);
     if (!result.success) {
-      toast.error(result.error);
+      toast.error(actionErrorMessage(result) ?? "Upload failed");
       return;
     }
     toast.success("Proof uploaded");

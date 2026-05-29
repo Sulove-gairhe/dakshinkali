@@ -29,7 +29,7 @@ const saveProductSchema = z.object({
   images: z.array(
     z.object({
       id: z.string(),
-      url: z.string().url(),
+      url: z.string().min(1),
       filename: z.string(),
       order: z.number().int().min(0),
       storagePath: z.string().optional(),
@@ -90,10 +90,12 @@ export async function createDraftProduct(categoryId?: string) {
     throw new Error("Category not found");
   }
 
+  const draftName = `Untitled product ${Date.now()}`;
+
   const { data, error } = await supabase
     .from("products")
     .insert({
-      name: "Untitled product",
+      name: draftName,
       description: null,
       price: 1,
       category: category.name,
@@ -102,14 +104,13 @@ export async function createDraftProduct(categoryId?: string) {
       publishing_status: "draft",
       images: [],
       storefront_data: {
-        slug: `draft-${globalThis.crypto?.randomUUID?.() ?? Date.now()}`,
+        slug: `draft-${Date.now()}`,
       },
     })
     .select()
     .single();
 
   if (error) throw new Error(error.message);
-  revalidatePath("/admin/products");
   return mapRow(data as Record<string, unknown>);
 }
 
@@ -255,6 +256,21 @@ export async function saveProduct(
     throw new Error("Selected category not found");
   }
 
+  let mergedStorefrontData = storefrontData;
+  if (parsed.id) {
+    const { data: existing, error: existingError } = await supabase
+      .from("products")
+      .select("storefront_data")
+      .eq("id", parsed.id)
+      .maybeSingle();
+
+    if (existingError) throw new Error(existingError.message);
+    mergedStorefrontData = {
+      ...((existing?.storefront_data as StorefrontData | null) ?? {}),
+      ...storefrontData,
+    };
+  }
+
   const row = {
     name: parsed.name,
     description: parsed.description,
@@ -264,7 +280,7 @@ export async function saveProduct(
     status: parsed.status,
     publishing_status: parsed.publishingStatus,
     images: parsed.images,
-    storefront_data: storefrontData,
+    storefront_data: mergedStorefrontData,
   };
 
   if (parsed.id) {
@@ -338,6 +354,6 @@ export async function productToFormState(product: AdminProductRecord): Promise<P
     publishingStatus: product.publishing_status,
     images: product.images ?? [],
     storefrontData: product.storefront_data ?? {},
-    variants: [],
+    variants: product.storefront_data?.variants ?? [],
   };
 }

@@ -29,6 +29,7 @@
     "auth:token": "node scripts/get-auth-token.js",
     "auth:tokens": "node scripts/get-auth-tokens.js",
     "auth:list-users": "node scripts/list-users.js",
+    "admin:sync-store-products": "node scripts/sync-store-products-to-db.js",
     "db:check": "node check-database.js"
   },
   "devDependencies": {
@@ -36,7 +37,7 @@
     "fast-check": "^4.7.0",
     "node-fetch": "^3.3.2",
     "supabase": "^2.101.0",
-    "turbo": "latest",
+    "turbo": "2.9.15",
     "vitest": "^1.0.0"
   },
   "dependencies": {

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { Search } from "lucide-react";
 import { toast } from "sonner";
 import {
   createCategory,
@@ -16,22 +17,35 @@ export function CategoriesManager({
   initialCategories: CategoryRecord[];
 }) {
   const [categories, setCategories] = useState(initialCategories);
+  const [search, setSearch] = useState("");
   const [panelOpen, setPanelOpen] = useState(false);
   const [editing, setEditing] = useState<CategoryRecord | null>(null);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
-  const [sortOrder, setSortOrder] = useState(0);
   const [slugManual, setSlugManual] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Sort alphabetically by name, then filter by search query
+  const filtered = useMemo(() => {
+    const sorted = [...categories].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+    const q = search.trim().toLowerCase();
+    if (!q) return sorted;
+    return sorted.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.slug.toLowerCase().includes(q),
+    );
+  }, [categories, search]);
 
   function openCreate() {
     setEditing(null);
     setName("");
     setSlug("");
     setDescription("");
-    setSortOrder(categories.length + 1);
     setSlugManual(false);
     setError(null);
     setPanelOpen(true);
@@ -42,7 +56,6 @@ export function CategoriesManager({
     setName(cat.name);
     setSlug(cat.slug);
     setDescription(cat.description ?? "");
-    setSortOrder(cat.sort_order);
     setSlugManual(true);
     setError(null);
     setPanelOpen(true);
@@ -56,7 +69,6 @@ export function CategoriesManager({
         name: name.trim(),
         slug: slug.trim() || slugifyName(name),
         description: description.trim() || null,
-        sort_order: sortOrder,
       };
       if (editing) {
         const updated = await updateCategory(editing.id, payload);
@@ -85,7 +97,9 @@ export function CategoriesManager({
       setCategories((prev) =>
         prev.map((c) => (c.id === updated.id ? updated : c)),
       );
-      toast.success(updated.is_active ? "Category activated" : "Category deactivated");
+      toast.success(
+        updated.is_active ? "Category activated" : "Category deactivated",
+      );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Update failed");
     }
@@ -93,7 +107,18 @@ export function CategoriesManager({
 
   return (
     <>
-      <div className="mb-4 flex justify-end">
+      {/* Toolbar */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search categories…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+          />
+        </div>
         <button
           type="button"
           onClick={openCreate}
@@ -105,7 +130,9 @@ export function CategoriesManager({
 
       {categories.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-gray-600">No categories yet — create your first category</p>
+          <p className="text-gray-600">
+            No categories yet — create your first category
+          </p>
           <button
             type="button"
             onClick={openCreate}
@@ -114,53 +141,56 @@ export function CategoriesManager({
             Create category
           </button>
         </div>
+      ) : filtered.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-500">
+          No categories match &ldquo;{search}&rdquo;
+        </div>
       ) : (
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table className="min-w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
-            <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Slug</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Sort</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((cat) => (
-              <tr key={cat.id} className="border-t border-gray-100">
-                <td className="px-4 py-3 font-medium">{cat.name}</td>
-                <td className="px-4 py-3 text-gray-600">{cat.slug}</td>
-                <td className="px-4 py-3">
-                  <button
-                    type="button"
-                    onClick={() => void handleToggle(cat)}
-                    className={
-                      cat.is_active
-                        ? "rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800"
-                        : "rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
-                    }
-                  >
-                    {cat.is_active ? "Active" : "Inactive"}
-                  </button>
-                </td>
-                <td className="px-4 py-3">{cat.sort_order}</td>
-                <td className="px-4 py-3">
-                  <button
-                    type="button"
-                    onClick={() => openEdit(cat)}
-                    className="text-amber-700 hover:underline"
-                  >
-                    Edit
-                  </button>
-                </td>
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
+              <tr>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Slug</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map((cat) => (
+                <tr key={cat.id} className="border-t border-gray-100">
+                  <td className="px-4 py-3 font-medium">{cat.name}</td>
+                  <td className="px-4 py-3 text-gray-600">{cat.slug}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => void handleToggle(cat)}
+                      className={
+                        cat.is_active
+                          ? "rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800"
+                          : "rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                      }
+                    >
+                      {cat.is_active ? "Active" : "Inactive"}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(cat)}
+                      className="text-amber-700 hover:underline"
+                    >
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
+      {/* Create / Edit panel */}
       {panelOpen ? (
         <div className="fixed inset-0 z-50 flex justify-end">
           <button
@@ -206,16 +236,9 @@ export function CategoriesManager({
                   className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium">Sort order</label>
-                <input
-                  type="number"
-                  value={sortOrder}
-                  onChange={(e) => setSortOrder(Number(e.target.value))}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-                />
-              </div>
-              {error ? <p className="text-sm text-red-600">{error}</p> : null}
+              {error ? (
+                <p className="text-sm text-red-600">{error}</p>
+              ) : null}
               <div className="flex gap-2">
                 <button
                   type="button"

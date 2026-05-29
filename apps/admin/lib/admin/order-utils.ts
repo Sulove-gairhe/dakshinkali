@@ -105,6 +105,11 @@ export function formatRelativeTime(iso: string): string {
   return date.toLocaleDateString();
 }
 
+export function formatNprPrice(amount: number): string {
+  if (!Number.isFinite(amount) || amount < 0) return "Rs. —";
+  return `Rs. ${Math.round(amount).toLocaleString("en-NP")}`;
+}
+
 export function paymentMethodLabel(method: PaymentMethod): string {
   switch (method) {
     case "cash_on_delivery":

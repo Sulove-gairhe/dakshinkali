@@ -92,8 +92,8 @@ export type ActionResult<T> =
 export function actionErrorMessage<T>(
   result: ActionResult<T>,
 ): string | undefined {
-  if (result.success) return undefined;
-  return result.error;
+  if (!result.success) return (result as { success: false; error: string }).error;
+  return undefined;
 }
 
 export interface OrderListFilters {

@@ -1634,9 +1634,8 @@ function dedupeBySlug(products: StoreProduct[]) {
 export function parseProductPrice(value: number | string | undefined | null): number {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
   if (!value) return 0;
-  const digits = value.replace(/[^\d.]/g, "");
-  const parsed = Number(digits);
-  return Number.isFinite(parsed) ? parsed : 0;
+  const numericPrice = Number(String(value).match(/\d+(?:\.\d+)?/g)?.join("") ?? "");
+  return Number.isFinite(numericPrice) ? numericPrice : 0;
 }
 
 /** Normalize a category string for comparison (lowercase, trimmed). */

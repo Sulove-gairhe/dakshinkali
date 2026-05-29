@@ -1,4 +1,5 @@
 import { AdminNavProvider } from "@/components/admin/admin-nav-provider";
+import { AdminQueryProvider } from "@/components/admin/query-provider";
 import { getOrderNavCounts } from "@/lib/admin/actions/orders";
 import { getAdminNotificationCounts } from "@/lib/admin/actions/notifications";
 
@@ -27,7 +28,9 @@ export default async function AdminSectionLayout({
 
   return (
     <AdminNavProvider counts={counts} notifications={notifications}>
-      {children}
+      <AdminQueryProvider>
+        {children}
+      </AdminQueryProvider>
     </AdminNavProvider>
   );
 }

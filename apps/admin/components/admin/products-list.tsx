@@ -1,22 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ImageIcon, Pencil, Trash2 } from "lucide-react";
+import { LayoutGrid, PackageSearch } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmModal } from "./confirm-modal";
-import { ListTableSkeleton } from "./list-table-skeleton";
+import { ProductCard } from "./products/product-card";
+import { ProductCardGridSkeleton } from "./products/product-card-skeleton";
 import {
   deactivateProduct,
   listAdminProducts,
   softDeleteProduct,
 } from "@/lib/admin/actions/products";
-import {
-  formatNprPrice,
-  publishingBadgeClass,
-  statusBadgeClass,
-} from "@/lib/admin/utils";
 import type { AdminProductRecord, CategoryRecord } from "@/lib/admin/types";
 
 export function ProductsList({
@@ -25,26 +21,27 @@ export function ProductsList({
   categories: CategoryRecord[];
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<AdminProductRecord[]>([]);
   const [total, setTotal] = useState(0);
-  const [search, setSearch] = useState(searchParams.get("q") ?? "");
-  const [categoryId, setCategoryId] = useState(searchParams.get("category") ?? "");
-  const [status, setStatus] = useState(searchParams.get("status") ?? "");
-  const [publishingStatus, setPublishingStatus] = useState(
-    searchParams.get("publishing") ?? "",
-  );
+  const [search, setSearch] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [status, setStatus] = useState("");
+  const [publishingStatus, setPublishingStatus] = useState("");
   const [confirm, setConfirm] = useState<{
     type: "deactivate" | "delete";
     product: AdminProductRecord;
   } | null>(null);
+
+  // Suppress unused router warning — kept for potential future navigation
+  void router;
 
   useEffect(() => {
     const timer = setTimeout(() => {
       void load();
     }, 300);
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, categoryId, status, publishingStatus]);
 
   async function load() {
@@ -54,8 +51,7 @@ export function ProductsList({
         search: search || undefined,
         categoryId: categoryId || undefined,
         status: (status as AdminProductRecord["status"]) || undefined,
-        publishingStatus:
-          (publishingStatus as "draft" | "live") || undefined,
+        publishingStatus: (publishingStatus as "draft" | "live") || undefined,
       });
       setProducts(result.products);
       setTotal(result.total);
@@ -83,21 +79,24 @@ export function ProductsList({
     }
   }
 
+  const hasActiveFilters = !!(search || categoryId || status || publishingStatus);
+
   return (
     <>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      {/* ── Filter / search bar ── */}
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-1 flex-wrap gap-2">
           <input
             type="search"
             placeholder="Search products…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="min-w-[200px] flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm md:max-w-xs"
+            className="min-w-[180px] flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200 md:max-w-xs"
           />
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
           >
             <option value="">All categories</option>
             {categories.map((c) => (
@@ -109,7 +108,7 @@ export function ProductsList({
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
           >
             <option value="">All statuses</option>
             <option value="active">Active</option>
@@ -120,7 +119,7 @@ export function ProductsList({
           <select
             value={publishingStatus}
             onChange={(e) => setPublishingStatus(e.target.value)}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
           >
             <option value="">All publishing</option>
             <option value="draft">Draft</option>
@@ -129,157 +128,81 @@ export function ProductsList({
         </div>
         <Link
           href="/admin/products/new"
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-amber-400"
+          className="shrink-0 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
         >
           Create Product
         </Link>
       </div>
 
-      {loading ? (
-        <ListTableSkeleton rows={5} />
-      ) : products.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-gray-600">
-            No products yet — click &apos;Create Product&apos; to get started
-          </p>
-          <Link
-            href="/admin/products/new"
-            className="mt-4 inline-block rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
-          >
-            Create Product
-          </Link>
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
-              <tr>
-                <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3">Price</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Publishing</th>
-                <th className="px-4 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => {
-                const thumb = [...product.images]
-                  .sort((a, b) => a.order - b.order)[0];
-                const sf = product.storefront_data;
-                return (
-                  <tr key={product.id} className="border-t border-gray-100">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
-                          {thumb?.url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={thumb.url}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <ImageIcon className="h-4 w-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">
-                            {product.name}
-                          </p>
-                          <p className="line-clamp-1 text-xs text-gray-500">
-                            {sf?.shortDescription || product.description}
-                          </p>
-                          {sf?.brand ? (
-                            <p className="text-xs text-gray-400">{sf.brand}</p>
-                          ) : null}
-                          <div className="mt-1 flex flex-wrap gap-1">
-                            {sf?.isFeatured ? (
-                              <span className="rounded bg-amber-50 px-1 text-[10px] text-amber-800">
-                                Featured
-                              </span>
-                            ) : null}
-                            {sf?.isBestSeller ? (
-                              <span className="rounded bg-blue-50 px-1 text-[10px] text-blue-800">
-                                Best seller
-                              </span>
-                            ) : null}
-                            {sf?.isNewArrival ? (
-                              <span className="rounded bg-green-50 px-1 text-[10px] text-green-800">
-                                New
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">{product.category}</td>
-                    <td className="px-4 py-3">
-                      {formatNprPrice(product.price)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs ${statusBadgeClass(product.status)}`}
-                      >
-                        {product.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs ${publishingBadgeClass(product.publishing_status)}`}
-                      >
-                        {product.publishing_status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            router.push(`/admin/products/${product.id}/edit`)
-                          }
-                          className="text-amber-700 hover:text-amber-900"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setConfirm({ type: "deactivate", product })
-                          }
-                          className="text-gray-500 hover:text-gray-800"
-                          title="Deactivate"
-                        >
-                          Off
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setConfirm({ type: "delete", product })
-                          }
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <p className="border-t border-gray-100 px-4 py-2 text-xs text-gray-500">
+      {/* ── Product count ── */}
+      {!loading && products.length > 0 && (
+        <div className="mb-3 flex items-center gap-1.5 text-xs text-gray-500">
+          <LayoutGrid className="h-3.5 w-3.5" />
+          <span>
             {total} product{total === 1 ? "" : "s"}
-          </p>
+            {hasActiveFilters ? " matching filters" : ""}
+          </span>
         </div>
       )}
 
+      {/* ── Loading skeleton ── */}
+      {loading && <ProductCardGridSkeleton count={8} />}
+
+      {/* ── Empty state ── */}
+      {!loading && products.length === 0 && (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
+          <PackageSearch className="mb-3 h-10 w-10 text-gray-300" />
+          <p className="text-sm font-semibold text-gray-700">
+            {hasActiveFilters ? "No products match your current filters" : "No products yet"}
+          </p>
+          <p className="mt-1 text-xs text-gray-400">
+            {hasActiveFilters
+              ? "Try adjusting your search or filter criteria."
+              : "Click 'Create Product' to add your first product."}
+          </p>
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setCategoryId("");
+                setStatus("");
+                setPublishingStatus("");
+              }}
+              className="mt-4 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+            >
+              Reset filters
+            </button>
+          ) : (
+            <Link
+              href="/admin/products/new"
+              className="mt-4 inline-block rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-amber-400"
+            >
+              Create Product
+            </Link>
+          )}
+        </div>
+      )}
+
+      {/* ── Product card grid ── */}
+      {!loading && products.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onDeactivate={(p) => setConfirm({ type: "deactivate", product: p })}
+              onDelete={(p) => setConfirm({ type: "delete", product: p })}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ── Confirm modal (deactivate / delete) ── */}
       <ConfirmModal
         open={!!confirm}
         title={
-          confirm?.type === "delete"
-            ? "Delete product?"
-            : "Deactivate product?"
+          confirm?.type === "delete" ? "Delete product?" : "Deactivate product?"
         }
         description={
           confirm?.type === "delete"

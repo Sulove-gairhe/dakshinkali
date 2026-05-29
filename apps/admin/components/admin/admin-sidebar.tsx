@@ -28,7 +28,7 @@ const mainNav = [
 ];
 
 const orderLinks = [
-  { href: "/admin/orders", label: "All Orders", badgeKey: null as const },
+  { href: "/admin/orders", label: "All Orders", badgeKey: null },
   {
     href: "/admin/orders?paymentStatus=pending_verification",
     label: "Awaiting Review",
@@ -39,8 +39,8 @@ const orderLinks = [
     label: "Awaiting Approval",
     badgeKey: "pendingApproval" as const,
   },
-  { href: "/admin/orders/board", label: "Fulfillment Board", badgeKey: null as const },
-];
+  { href: "/admin/orders/board", label: "Fulfillment Board", badgeKey: null },
+] as const;
 
 export function AdminSidebar({
   open,

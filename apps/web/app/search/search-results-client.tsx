@@ -25,6 +25,7 @@ import {
   type SearchSort,
 } from "@/lib/search-products";
 import type { StoreProduct } from "@/lib/store-products";
+import { useSearchData } from "@/components/search-data-provider";
 
 const sortOptions: { label: string; value: SearchSort }[] = [
   { label: "Best match", value: "best-match" },
@@ -46,6 +47,9 @@ export function SearchResultsClient() {
   const { addItem, getQuantity } = useCart();
   const { hasItem, toggleItem } = useWishlist();
 
+  // Read DB data from context (fetched once in root layout)
+  const { dbProducts, dbCategories } = useSearchData();
+
   const result = useMemo(
     () =>
       searchProducts({
@@ -53,8 +57,10 @@ export function SearchResultsClient() {
         brand: searchParams.get("brand"),
         category: searchParams.get("category"),
         sort: searchParams.get("sort"),
+        extraProducts: dbProducts,
+        extraCategories: dbCategories,
       }),
-    [searchParams],
+    [searchParams, dbProducts, dbCategories],
   );
 
   function handleSortChange(event: React.ChangeEvent<HTMLSelectElement>) {
