@@ -1,6 +1,8 @@
 import "./globals.css";
 import { Figtree, Nunito, Poppins } from "next/font/google";
 import { AppProviders } from "@/components/providers";
+import { SearchDataProvider } from "@/components/search-data-provider";
+import { fetchDbProducts, fetchDbCategories } from "@/lib/db-products";
 import { cn } from "@/lib/utils";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -21,18 +23,28 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Fetch once at the layout level — available to every page including the navbar
+  const [dbProducts, dbCategories] = await Promise.all([
+    fetchDbProducts(),
+    fetchDbCategories(),
+  ]);
+
   return (
     <html
       lang="en"
       className={cn(figtree.variable, poppins.variable, nunito.variable)}
     >
       <body>
-        <AppProviders>{children}</AppProviders>
+        <AppProviders>
+          <SearchDataProvider dbProducts={dbProducts} dbCategories={dbCategories}>
+            {children}
+          </SearchDataProvider>
+        </AppProviders>
       </body>
     </html>
   );

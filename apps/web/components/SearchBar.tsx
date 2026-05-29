@@ -9,14 +9,20 @@ import {
   type SearchOption,
   type SearchResults,
 } from "@/components/SearchDropdown";
+import { useSearchData } from "@/components/search-data-provider";
 import type { StoreProduct } from "@/lib/store-products";
+import type { DbCategory } from "@/lib/db-products";
 import {
   getAvailableBrands,
   getAvailableCategories,
   getCategoryDisplayName,
   getSearchTerms,
   indexedProducts,
+  normalizeBrandSlug,
+  normalizeCategorySlug,
+  normalizeText,
   scoreValues,
+  slugify,
 } from "@/lib/search-products";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +58,9 @@ export function SearchBar({
   const meaningfulQuery = query.trim().length >= MIN_QUERY_LENGTH;
   const shouldShowDropdown = isFocused && meaningfulQuery;
 
+  // DB data from context (populated by root layout)
+  const { dbProducts, dbCategories } = useSearchData();
+
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
       if (!rootRef.current?.contains(event.target as Node)) {
@@ -72,13 +81,13 @@ export function SearchBar({
     }
 
     const timeout = window.setTimeout(() => {
-      setResults(searchCatalog(trimmedQuery));
+      setResults(searchCatalog(trimmedQuery, dbProducts, dbCategories));
       setResolvedQuery(trimmedQuery);
       setHighlightedKey(null);
     }, SIMULATED_FETCH_MS);
 
     return () => window.clearTimeout(timeout);
-  }, [debouncedQuery]);
+  }, [debouncedQuery, dbProducts, dbCategories]);
 
   const selectableItems = useMemo(
     () =>
@@ -244,8 +253,14 @@ function useDebouncedValue(value: string, delay: number) {
   return debouncedValue;
 }
 
-function searchCatalog(query: string): SearchResults {
+function searchCatalog(
+  query: string,
+  dbProducts: StoreProduct[],
+  dbCategories: DbCategory[],
+): SearchResults {
   const terms = getSearchTerms(query);
+
+  // ── Brands ────────────────────────────────────────────────────────────────
   const brandResults = getAvailableBrands()
     .map((brand) => ({
       item: toBrandOption(brand),
@@ -256,27 +271,64 @@ function searchCatalog(query: string): SearchResults {
     .slice(0, 5)
     .map((result) => result.item);
 
-  const categoryResults = getAvailableCategories()
+  // ── Categories: static + DB (deduped by slug) ─────────────────────────────
+  const staticCategories = getAvailableCategories();
+  const staticCategorySlugs = new Set(staticCategories.map((c) => c.slug));
+  const extraCategories = dbCategories
+    .filter((c) => !staticCategorySlugs.has(c.slug))
+    .map((c) => ({ name: c.name, slug: c.slug, synonyms: [] as string[] }));
+  const allCategories = [...staticCategories, ...extraCategories];
+
+  const categoryResults = allCategories
     .map((category) => ({
       item: toCategoryOption(category),
-      score: scoreValues(terms, [category.name, category.slug, ...category.synonyms]),
+      score: scoreValues(terms, [category.name, category.slug, ...(category.synonyms ?? [])]),
     }))
     .filter((result) => result.score > 0)
     .sort(sortByScore)
     .slice(0, 6)
     .map((result) => result.item);
 
-  const productResults = indexedProducts
-    .map((indexedProduct) => ({
-      item: toProductOption(indexedProduct.product),
+  // ── Products: static + DB (deduped by slug) ───────────────────────────────
+  const staticProductSlugs = new Set(indexedProducts.map((p) => p.slug));
+  const extraIndexed = dbProducts
+    .filter((p) => !staticProductSlugs.has(p.slug))
+    .map((product) => ({
+      title: product.name,
+      description: product.shortDescription ?? "",
+      slug: product.slug,
+      brand: product.brand ?? "",
+      category: product.category ?? "",
+      normalizedCategory: slugify(normalizeText(product.category ?? "")),
+      tags: product.searchTerms ?? [],
+      product,
+    }));
+
+  const allProductSources = [
+    ...indexedProducts.map((p) => ({
+      title: p.title,
+      description: p.description ?? "",
+      slug: p.slug,
+      brand: p.brand ?? "",
+      category: p.category ?? "",
+      normalizedCategory: p.normalizedCategory ?? "",
+      tags: p.tags ?? [],
+      product: p.product,
+    })),
+    ...extraIndexed,
+  ];
+
+  const productResults = allProductSources
+    .map((p) => ({
+      item: toProductOption(p.product),
       score: scoreValues(terms, [
-        indexedProduct.title,
-        indexedProduct.description ?? "",
-        indexedProduct.slug,
-        indexedProduct.brand ?? "",
-        indexedProduct.category ?? "",
-        indexedProduct.normalizedCategory ?? "",
-        ...(indexedProduct.tags || []),
+        p.title,
+        p.description,
+        p.slug,
+        p.brand,
+        p.category,
+        p.normalizedCategory,
+        ...p.tags,
       ]),
     }))
     .filter((result) => result.score > 0)
@@ -312,12 +364,12 @@ function toBrandOption(brand: {
 function toCategoryOption(category: {
   name: string;
   slug: string;
-  synonyms: string[];
+  synonyms?: string[];
 }): SearchOption {
   return {
     type: "category",
     id: category.slug,
-    label: getCategoryDisplayName(category.slug),
+    label: category.name,
     slug: category.slug,
     href: `/search?category=${category.slug}`,
   };

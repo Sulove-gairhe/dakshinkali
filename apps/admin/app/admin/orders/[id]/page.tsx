@@ -6,9 +6,10 @@ import { getAdminOrder } from "@/lib/admin/actions/orders";
 export default async function AdminOrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const order = await getAdminOrder(params.id);
+  const { id } = await params;
+  const order = await getAdminOrder(id);
   if (!order) notFound();
 
   return (

@@ -10,11 +10,12 @@ import {
 export default async function EditProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   try {
     const [product, categories] = await Promise.all([
-      getAdminProduct(params.id),
+      getAdminProduct(id),
       listCategories(false),
     ]);
 

@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { listBoardOrders, updateOrderStatus } from "@/lib/admin/actions/orders";
 import type { AdminOrderRecord, OrderStatus } from "@/lib/admin/order-types";
+import { actionErrorMessage } from "@/lib/admin/order-types";
 import {
   formatNprPrice,
   isValidOrderTransition,
@@ -76,7 +77,7 @@ export function OrdersBoard() {
 
     const resultAction = await updateOrderStatus(orderId, newStatus);
     if (!resultAction.success) {
-      toast.error(resultAction.error);
+      toast.error(actionErrorMessage(resultAction) ?? "Status update failed");
       return;
     }
 

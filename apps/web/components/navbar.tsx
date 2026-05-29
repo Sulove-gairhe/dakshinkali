@@ -7,13 +7,7 @@ import type { CartItem } from "@/components/cart-provider";
 import { SearchBar } from "@/components/SearchBar";
 import { storeProducts } from "@/lib/store-products";
 import { normalizeBrandSlug } from "@/lib/search-products";
-import {
-  Heart,
-  ShoppingCart,
-  ChevronDown,
-  Wrench,
-} from "lucide-react";
-import { AccountMenu } from "@/components/account-menu";
+import { Heart, ShoppingCart, User, ChevronDown, Wrench } from "lucide-react";
 
 type BrandItem = {
   label: string;
@@ -38,6 +32,7 @@ type NavbarProps = {
   menuItems?: MenuItem[];
   wishlistHref?: string;
   cartHref?: string;
+  accountHref?: string;
 };
 
 const defaultBrands: BrandItem[] = [
@@ -68,6 +63,7 @@ export function Navbar({
   menuItems = defaultMenuItems,
   wishlistHref = "#",
   cartHref = "#",
+  accountHref = "/account",
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBrandsOpen, setIsBrandsOpen] = useState(false);
@@ -127,7 +123,7 @@ export function Navbar({
               badge={cartCount}
               items={cartPreviewItems}
             />
-            <AccountMenu />
+            <IconButton icon={User} label="Account" href={accountHref} />
           </nav>
 
           <div className="flex items-center gap-1 md:hidden">
@@ -143,7 +139,6 @@ export function Navbar({
               href={cartHref}
               badge={cartCount}
             />
-            <AccountMenu variant="mobile" />
           </div>
         </div>
       </div>
@@ -257,7 +252,10 @@ function CartPreviewButton({
 
   return (
     <div className="group/cart relative">
-      <a href={href} className="group flex flex-col items-center gap-1 text-foreground">
+      <a
+        href={href}
+        className="group flex flex-col items-center gap-1 text-foreground"
+      >
         <div className="relative">
           <ShoppingCart className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
           {typeof badge === "number" && badge > 0 && (
@@ -322,7 +320,9 @@ function CartPreviewButton({
                       <p className="mt-1 text-xs text-muted-foreground">
                         Quantity: {item.quantity}
                       </p>
-                      <p className="mt-1 text-sm font-bold">{item.currentPrice}</p>
+                      <p className="mt-1 text-sm font-bold">
+                        {item.currentPrice}
+                      </p>
                     </div>
                   </div>
                 ))}

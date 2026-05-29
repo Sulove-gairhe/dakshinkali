@@ -22,17 +22,17 @@ export function AdminLayoutShell({
   useCommandPaletteShortcut(openCommand);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Suspense fallback={<div className="hidden w-64 lg:block" />}>
         <AdminSidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
       </Suspense>
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <AdminTopbar
           title={title}
           onMenuClick={() => setMobileOpen(true)}
           onSearchClick={openCommand}
         />
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex flex-1 min-h-0 flex-col overflow-auto p-4 md:p-6">{children}</main>
       </div>
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
     </div>

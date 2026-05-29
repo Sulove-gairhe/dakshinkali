@@ -115,7 +115,12 @@ CREATE POLICY "Admins manage products"
   USING (public.is_admin())
   WITH CHECK (public.is_admin());
 
--- ── Step 6: Storage policies for product-images ──────────────────────────────
+-- ── Step 6: Storage — create product-images bucket (public) ─────────────────
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('product-images', 'product-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- ── Step 7: Storage policies for product-images ──────────────────────────────
 DROP POLICY IF EXISTS "Admins upload product images" ON storage.objects;
 CREATE POLICY "Admins upload product images"
   ON storage.objects FOR INSERT

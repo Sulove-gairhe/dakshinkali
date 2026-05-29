@@ -59,9 +59,14 @@ export interface StorefrontData {
   boxContents?: string[];
   deliveryInfo?: string[];
   relatedProductSlugs?: string[];
+  variants?: ProductVariantGroup[];
+  ratingText?: string;
   searchTerms?: string[];
   seoTitle?: string;
   seoDescription?: string;
+  source?: string;
+  syncedAt?: string;
+  publishingStatus?: PublishingStatus;
 }
 
 export interface CategoryRecord {

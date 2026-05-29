@@ -29,6 +29,10 @@ export type SearchProductsInput = {
   brand?: string | null;
   category?: string | null;
   sort?: string | null;
+  /** Additional products (e.g. from the DB) to include in search results. */
+  extraProducts?: StoreProduct[];
+  /** DB categories to include in intent parsing and category filter options. */
+  extraCategories?: { name: string; slug: string }[];
 };
 
 export type SearchProductsResult = {
@@ -177,7 +181,20 @@ export function searchProducts(input: SearchProductsInput): SearchProductsResult
   const brandSlug = input.brand ? normalizeBrandSlug(input.brand) : "";
   const categorySlug = input.category ? normalizeCategorySlug(input.category) : "";
   const sort = normalizeSort(input.sort);
-  const intent = parseQueryIntent(query);
+
+  // Build merged category list: static + DB categories (deduped by slug)
+  const staticCategories = getAvailableCategories();
+  const staticCategorySlugs = new Set(staticCategories.map((c) => c.slug));
+  const extraCategoryEntries = (input.extraCategories ?? [])
+    .map((c) => ({
+      name: c.name,
+      slug: c.slug, // use the raw DB slug as-is — no normalization
+      synonyms: [] as string[],
+    }))
+    .filter((c) => !staticCategorySlugs.has(c.slug));
+  const allCategories = [...staticCategories, ...extraCategoryEntries];
+
+  const intent = parseQueryIntentWithCategories(query, allCategories);
   const effectiveBrandSlug = brandSlug || intent.brandSlug || "";
   const effectiveCategorySlug = categorySlug || intent.categorySlug || "";
   const queryForScoring = getQueryForScoring(query, intent, {
@@ -190,13 +207,52 @@ export function searchProducts(input: SearchProductsInput): SearchProductsResult
     ? getBrandDisplayName(effectiveBrandSlug)
     : undefined;
   const activeCategory = categorySlug
-    ? getCategoryDisplayName(categorySlug)
+    ? getCategoryDisplayNameFromList(categorySlug, allCategories)
     : undefined;
   const headingCategory = effectiveCategorySlug
-    ? getCategoryDisplayName(effectiveCategorySlug)
+    ? getCategoryDisplayNameFromList(effectiveCategorySlug, allCategories)
     : undefined;
 
-  let scoredProducts = indexedProducts.map((product) => ({
+  // Merge extra (DB) products, deduplicating by slug (DB takes precedence)
+  const staticSlugs = new Set(indexedProducts.map((p) => p.slug));
+  const extraIndexed: IndexedProduct[] = (input.extraProducts ?? [])
+    .filter((p) => !staticSlugs.has(p.slug))
+    .map((product, i) => {
+      const salePrice = parsePrice(product.currentPrice);
+      const originalPrice = parsePrice(product.oldPrice);
+      // Use the raw category string from the DB product as the normalizedCategory
+      // so it matches the DB category slug exactly (e.g. "stand-fans")
+      const rawCategory = product.category ?? "";
+      const normalizedCategory = slugify(normalizeText(rawCategory));
+      const normalizedCollection = product.collection
+        ? slugify(normalizeText(product.collection))
+        : undefined;
+      const normalizedBrand = normalizeBrandSlug(product.brand);
+      return {
+        id: product.id,
+        title: product.name,
+        slug: product.slug,
+        brand: product.brand,
+        category: rawCategory,
+        collection: product.collection,
+        normalizedBrand,
+        normalizedCategory,
+        normalizedCollection,
+        price: salePrice ?? originalPrice,
+        originalPrice,
+        salePrice,
+        image: product.image,
+        availability: product.status,
+        description: product.shortDescription,
+        tags: product.searchTerms,
+        product,
+        index: indexedProducts.length + i,
+      };
+    });
+
+  const allIndexed = [...indexedProducts, ...extraIndexed];
+
+  let scoredProducts = allIndexed.map((product) => ({
     product,
     score: queryTerms.length > 0 ? scoreProduct(product, queryTerms, queryForScoring) : 0,
   }));
@@ -220,15 +276,27 @@ export function searchProducts(input: SearchProductsInput): SearchProductsResult
   }
 
   const sortedProducts = sortScoredProducts(scoredProducts, sort, queryTerms.length > 0);
+
+  // Build category options: product-derived counts + any DB categories not yet present
+  const productCategoryOptions = getCategoryFilterOptions({
+    query,
+    selectedBrandSlug: brandSlug,
+    selectedCategorySlug: categorySlug,
+    source: allIndexed,
+  });
+  const productCategorySlugs = new Set(productCategoryOptions.map((o) => o.slug));
+  const dbOnlyCategories = allCategories
+    .filter((c) => !productCategorySlugs.has(c.slug))
+    .map((c) => ({ name: c.name, slug: c.slug, count: 0 }));
+  const categoryOptions = [...productCategoryOptions, ...dbOnlyCategories].sort(
+    (a, b) => a.name.localeCompare(b.name),
+  );
+
   const brandOptions = getBrandFilterOptions({
     query,
     selectedBrandSlug: brandSlug,
     selectedCategorySlug: categorySlug,
-  });
-  const categoryOptions = getCategoryFilterOptions({
-    query,
-    selectedBrandSlug: brandSlug,
-    selectedCategorySlug: categorySlug,
+    source: allIndexed,
   });
 
   return {
@@ -237,9 +305,8 @@ export function searchProducts(input: SearchProductsInput): SearchProductsResult
     sort,
     heading: getHeading({ query, brand: headingBrand, category: headingCategory }),
     eyebrow: getEyebrow({ query, brand: headingBrand, category: headingCategory }),
-    resultLabel: `${sortedProducts.length} ${
-      sortedProducts.length === 1 ? "product" : "products"
-    } found`,
+    resultLabel: `${sortedProducts.length} ${sortedProducts.length === 1 ? "product" : "products"
+      } found`,
     activeBrand: actualBrand,
     activeCategory,
     activeBrandSlug: brandSlug || undefined,
@@ -287,15 +354,18 @@ export function getBrandFilterOptions({
   query,
   selectedBrandSlug,
   selectedCategorySlug,
+  source,
 }: {
   query?: string;
   selectedBrandSlug?: string;
   selectedCategorySlug?: string;
+  source?: IndexedProduct[];
 } = {}) {
   return getFilterOptions("brand", {
     query,
     selectedBrandSlug,
     selectedCategorySlug,
+    source,
   });
 }
 
@@ -303,15 +373,18 @@ export function getCategoryFilterOptions({
   query,
   selectedBrandSlug,
   selectedCategorySlug,
+  source,
 }: {
   query?: string;
   selectedBrandSlug?: string;
   selectedCategorySlug?: string;
+  source?: IndexedProduct[];
 } = {}) {
   return getFilterOptions("category", {
     query,
     selectedBrandSlug,
     selectedCategorySlug,
+    source,
   });
 }
 
@@ -434,6 +507,13 @@ export function slugify(value: string) {
 }
 
 export function parseQueryIntent(query: string): QueryIntent {
+  return parseQueryIntentWithCategories(query, getAvailableCategories());
+}
+
+function parseQueryIntentWithCategories(
+  query: string,
+  categories: { name: string; slug: string; synonyms: string[] }[],
+): QueryIntent {
   const normalizedQuery = normalizeText(query);
 
   if (!normalizedQuery) {
@@ -450,9 +530,9 @@ export function parseQueryIntent(query: string): QueryIntent {
     .filter(({ term }) => term && hasPhrase(normalizedQuery, term))
     .sort((left, right) => right.term.length - left.term.length)[0];
 
-  const categoryMatch = getAvailableCategories()
+  const categoryMatch = categories
     .flatMap((category) =>
-      [category.name, category.slug, ...category.synonyms].map((value) => ({
+      [category.name, category.slug, ...(category.synonyms ?? [])].map((value) => ({
         slug: category.slug,
         term: normalizeText(value),
       })),
@@ -473,6 +553,15 @@ export function parseQueryIntent(query: string): QueryIntent {
     remainingQuery,
     hasIntent: Boolean(brandMatch || categoryMatch),
   };
+}
+
+function getCategoryDisplayNameFromList(
+  slug: string,
+  categories: { name: string; slug: string }[],
+): string {
+  const match = categories.find((c) => c.slug === slug);
+  if (match) return match.name;
+  return getCategoryDisplayName(slug);
 }
 
 function scoreProduct(product: IndexedProduct, terms: string[], rawQuery: string) {
@@ -518,10 +607,12 @@ function getFilterOptions(
     query,
     selectedBrandSlug,
     selectedCategorySlug,
+    source: sourceOverride,
   }: {
     query?: string;
     selectedBrandSlug?: string;
     selectedCategorySlug?: string;
+    source?: IndexedProduct[];
   },
 ): FilterOption[] {
   const normalizedBrand = selectedBrandSlug
@@ -534,7 +625,9 @@ function getFilterOptions(
   const queryConstraintBrand = !normalizedBrand ? intent.brandSlug : "";
   const queryConstraintCategory = !normalizedCategory ? intent.categorySlug : "";
 
-  const source = indexedProducts.filter((product) => {
+  const allProducts = sourceOverride ?? indexedProducts;
+
+  const source = allProducts.filter((product) => {
     if (type === "brand" && normalizedCategory) {
       return productMatchesCategory(product, normalizedCategory);
     }
@@ -561,12 +654,12 @@ function getFilterOptions(
       type === "brand"
         ? product.normalizedBrand && product.brand
           ? [
-              {
-                name: product.brand,
-                slug: product.normalizedBrand,
-                synonyms: getBrandSynonyms(product.brand),
-              },
-            ]
+            {
+              name: product.brand,
+              slug: product.normalizedBrand,
+              synonyms: getBrandSynonyms(product.brand),
+            },
+          ]
           : []
         : getProductCategoryEntries(product);
 
@@ -595,17 +688,17 @@ function getProductCategoryEntries(product: IndexedProduct): FilterEntry[] {
   const entries = [
     product.normalizedCategory
       ? {
-          name: getCategoryDisplayName(product.normalizedCategory),
-          slug: product.normalizedCategory,
-          synonyms: getCategorySynonyms(product.normalizedCategory),
-        }
+        name: getCategoryDisplayName(product.normalizedCategory),
+        slug: product.normalizedCategory,
+        synonyms: getCategorySynonyms(product.normalizedCategory),
+      }
       : undefined,
     product.normalizedCollection
       ? {
-          name: getCategoryDisplayName(product.normalizedCollection),
-          slug: product.normalizedCollection,
-          synonyms: getCategorySynonyms(product.normalizedCollection),
-        }
+        name: getCategoryDisplayName(product.normalizedCollection),
+        slug: product.normalizedCollection,
+        synonyms: getCategorySynonyms(product.normalizedCollection),
+      }
       : undefined,
   ].filter((entry): entry is FilterEntry => Boolean(entry));
 

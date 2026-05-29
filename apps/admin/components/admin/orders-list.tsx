@@ -19,6 +19,7 @@ import {
   quickConfirmCod,
 } from "@/lib/admin/actions/orders";
 import type { AdminOrderRecord, OrderStatus, PaymentMethod, PaymentStatus } from "@/lib/admin/order-types";
+import { actionErrorMessage } from "@/lib/admin/order-types";
 
 export function OrdersList() {
   const searchParams = useSearchParams();
@@ -73,7 +74,7 @@ export function OrdersList() {
   async function handleQuickCod(orderId: string) {
     const result = await quickConfirmCod(orderId);
     if (!result.success) {
-      toast.error(result.error);
+      toast.error(actionErrorMessage(result) ?? "Confirm failed");
       return;
     }
     toast.success("COD order confirmed");

@@ -1,0 +1,36 @@
+
+> @dakshinkali/admin@0.1.0 build C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\admin
+> next build
+
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\sulov\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\sulov\OneDrive\Desktop\dakshinkali\pnpm-workspace.yaml
+
+▲ Next.js 16.2.4 (Turbopack)
+- Environments: .env.local
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 8.3s
+  Running TypeScript ...
+Failed to type check.
+
+./app/admin/page.tsx:28:10
+Type error: 'Link' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps<any>> & LinkProps<any> & { children?: ReactNode; } & RefAttributes<...>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps<any>> & LinkProps<any> & { children?: ReactNode; } & RefAttributes<...>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'React.ReactNode' is not assignable to type 'import("C:/Users/sulov/OneDrive/Desktop/dakshinkali/node_modules/.pnpm/@types+react@18.3.28/node_modules/@types/react/index").ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+
+  [90m26 |[0m
+  [90m27 |[0m       <div className=[32m"mt-8 grid gap-4 md:grid-cols-3"[0m>
+[31m[1m>[0m [90m28 |[0m         <[33mLink[0m
+  [90m   |[0m          [31m[1m^[0m
+  [90m29 |[0m           href=[32m"/admin/products"[0m
+  [90m30 |[0m           className=[32m"card-cozy flex items-center gap-3 p-5 hover:border-amber-300"[0m
+  [90m31 |[0m         >
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.
