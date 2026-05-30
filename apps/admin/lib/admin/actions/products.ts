@@ -7,6 +7,7 @@ import {
   normalizeStorefrontData,
   slugifyProductName,
   validateStorefrontLiveData,
+  updateStorefrontSection,
 } from "@/lib/admin/utils";
 import type {
   AdminProductRecord,
@@ -257,6 +258,8 @@ export async function saveProduct(
   }
 
   let mergedStorefrontData = storefrontData;
+  // Keep previous storefront data for membership comparisons when updating
+  let prevStorefrontData: StorefrontData | null = null;
   if (parsed.id) {
     const { data: existing, error: existingError } = await supabase
       .from("products")
@@ -265,10 +268,8 @@ export async function saveProduct(
       .maybeSingle();
 
     if (existingError) throw new Error(existingError.message);
-    mergedStorefrontData = {
-      ...((existing?.storefront_data as StorefrontData | null) ?? {}),
-      ...storefrontData,
-    };
+    prevStorefrontData = (existing?.storefront_data as StorefrontData | null) ?? {};
+    mergedStorefrontData = { ...prevStorefrontData, ...storefrontData };
   }
 
   const row = {
@@ -297,9 +298,54 @@ export async function saveProduct(
       }
       throw new Error(error.message);
     }
+    // Update storefront sections based on final storefront_data
+    try {
+      const finalSf = mergedStorefrontData ?? {};
+      const slug = finalSf.slug ?? slugifyProductName(parsed.name);
+      const isActive = finalSf.isActive !== false && parsed.publishingStatus === "live";
+
+      // If admin explicitly requested removal of featured state, ensure it's cleared
+      if (finalSf.removeFeatured) {
+        finalSf.isFeatured = false;
+      }
+
+      // Kitchen Appliances: explicit flag
+      await updateStorefrontSection(
+        supabase,
+        "kitchen_appliances",
+        slug,
+        Boolean(isActive && finalSf.showInKitchen),
+        12,
+      );
+
+      // Best selling: explicit flag
+      await updateStorefrontSection(
+        supabase,
+        "best_selling",
+        slug,
+        Boolean(isActive && finalSf.showInBestSelling),
+        8,
+      );
+
+      // Trending: explicit flag
+      await updateStorefrontSection(
+        supabase,
+        "trending",
+        slug,
+        Boolean(isActive && finalSf.showInTrending),
+        8,
+      );
+
+      // Clearance deals: explicit flag
+      await updateStorefrontSection(supabase, "clearance_deals", slug, Boolean(isActive && finalSf.showInClearance), 8);
+    } catch (err) {
+      // Do not block product save on storefront section update failures; log server-side
+      console.error("Failed to update storefront sections:", err);
+    }
 
     revalidatePath("/admin/products");
     revalidatePath(`/admin/products/${parsed.id}/edit`);
+    revalidatePath("/");
     return { ok: true as const, product: mapRow(data as Record<string, unknown>) };
   }
 
@@ -316,7 +362,33 @@ export async function saveProduct(
     throw new Error(error.message);
   }
 
+  // Insert flow: update storefront sections similarly
+  try {
+    const finalSf = mergedStorefrontData ?? {};
+    const slug = finalSf.slug ?? slugifyProductName(parsed.name);
+    const isActive = finalSf.isActive !== false && parsed.publishingStatus === "live";
+
+    if (finalSf.removeFeatured) {
+      finalSf.isFeatured = false;
+    }
+
+    await updateStorefrontSection(
+      supabase,
+      "kitchen_appliances",
+      slug,
+      Boolean(isActive && finalSf.showInKitchen),
+      12,
+    );
+
+    await updateStorefrontSection(supabase, "best_selling", slug, Boolean(isActive && finalSf.showInBestSelling), 8);
+    await updateStorefrontSection(supabase, "trending", slug, Boolean(isActive && finalSf.showInTrending), 8);
+    await updateStorefrontSection(supabase, "clearance_deals", slug, Boolean(isActive && finalSf.showInClearance), 8);
+  } catch (err) {
+    console.error("Failed to update storefront sections:", err);
+  }
+
   revalidatePath("/admin/products");
+  revalidatePath("/");
   return { ok: true as const, product: mapRow(data as Record<string, unknown>) };
 }
 
