@@ -10,6 +10,10 @@ import { CompareToggle } from "@/components/compare/CompareToggle";
 import { type StoreProduct } from "@/lib/store-products";
 import { cn } from "@/lib/utils";
 
+type TrendingProductsProps = {
+  products: StoreProduct[];
+};
+
 function getItemsPerSlide(width: number) {
   if (width >= 1024) return 4;
   if (width >= 640) return 2;
@@ -26,7 +30,7 @@ function chunkProducts(products: StoreProduct[], chunkSize: number) {
   return chunks;
 }
 
-export function TrendingProducts() {
+export function TrendingProducts({ products }: TrendingProductsProps) {
   const { addItem, getQuantity } = useCart();
   const { hasItem, toggleItem } = useWishlist();
 
@@ -34,29 +38,9 @@ export function TrendingProducts() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [dragStart, setDragStart] = useState<number | null>(null);
 
-  const [products, setProducts] = useState<StoreProduct[]>([]);
-
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/storefront-products?key=trending&max=8");
-        if (!res.ok) return;
-        const json = await res.json();
-        if (!mounted) return;
-        const prods = Array.isArray(json.products) ? json.products : [];
-        if (prods.length) setProducts(prods);
-      } catch (err) {
-        console.error("Failed to fetch trending section", err);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const updateItemsPerSlide = () => setItemsPerSlide(getItemsPerSlide(window.innerWidth));
+    const updateItemsPerSlide = () =>
+      setItemsPerSlide(getItemsPerSlide(window.innerWidth));
 
     updateItemsPerSlide();
     window.addEventListener("resize", updateItemsPerSlide);
@@ -64,7 +48,10 @@ export function TrendingProducts() {
     return () => window.removeEventListener("resize", updateItemsPerSlide);
   }, []);
 
-  const slides = useMemo(() => chunkProducts(products, itemsPerSlide), [itemsPerSlide, products]);
+  const slides = useMemo(
+    () => chunkProducts(products, itemsPerSlide),
+    [itemsPerSlide, products],
+  );
   const lastSlide = Math.max(slides.length - 1, 0);
   const isAtStart = activeSlide === 0;
   const isAtEnd = activeSlide === lastSlide;
@@ -73,7 +60,8 @@ export function TrendingProducts() {
     setActiveSlide((current) => Math.min(current, lastSlide));
   }, [lastSlide]);
 
-  const goToSlide = (slideIndex: number) => setActiveSlide(Math.min(Math.max(slideIndex, 0), lastSlide));
+  const goToSlide = (slideIndex: number) =>
+    setActiveSlide(Math.min(Math.max(slideIndex, 0), lastSlide));
 
   const handlePointerEnd = (clientX: number) => {
     if (dragStart === null) return;
@@ -98,10 +86,13 @@ export function TrendingProducts() {
           <div className="flex items-center gap-2">
             <Link
               href="/products"
-              className="inline-flex items-center h-10 gap-0 px-3 hover:px-6 rounded-full bg-primary text-sm font-bold text-primary-foreground transition-all duration-200 ease-in-out hover:gap-2 hover:scale-[1.03] hover:shadow-md hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
+              className="view-all-btn inline-flex items-center h-10 gap-0 px-3 hover:px-6 rounded-full border border-foreground text-sm font-bold text-foreground hover:gap-2 hover:text-black group-hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
             >
               View all
-              <span className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100" aria-hidden>
+              <span
+                className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100 group-hover:delay-100"
+                aria-hidden
+              >
                 →
               </span>
             </Link>
@@ -113,7 +104,8 @@ export function TrendingProducts() {
               onClick={() => goToSlide(activeSlide - 1)}
               className={cn(
                 "inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground shadow-sm transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                isAtStart && "cursor-not-allowed opacity-40 hover:border-border hover:bg-card",
+                isAtStart &&
+                  "cursor-not-allowed opacity-40 hover:border-border hover:bg-card",
               )}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -130,7 +122,8 @@ export function TrendingProducts() {
               onClick={() => goToSlide(activeSlide + 1)}
               className={cn(
                 "inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-card text-foreground shadow-sm transition-colors hover:border-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                isAtEnd && "cursor-not-allowed opacity-40 hover:border-border hover:bg-card",
+                isAtEnd &&
+                  "cursor-not-allowed opacity-40 hover:border-border hover:bg-card",
               )}
             >
               <ChevronRight className="h-4 w-4" />

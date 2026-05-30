@@ -45,10 +45,13 @@ export function BuyingGuides() {
 
           <Link
             href="/blogs"
-            className="inline-flex items-center gap-0 px-3 hover:px-6 h-10 rounded-full bg-primary text-sm font-bold text-primary-foreground transition-all duration-200 ease-in-out hover:gap-2 hover:scale-[1.03] hover:shadow-md hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
+            className="view-all-btn inline-flex items-center gap-0 px-3 hover:px-6 h-10 rounded-full border border-foreground text-sm font-bold text-foreground hover:gap-2 hover:text-black group-hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
           >
             View all blogs
-            <span className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100" aria-hidden>
+            <span
+              className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100 group-hover:delay-100"
+              aria-hidden
+            >
               →
             </span>
           </Link>

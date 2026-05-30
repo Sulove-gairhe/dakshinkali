@@ -4,6 +4,7 @@ import { fetchDbProductBySlug } from "@/lib/db-products";
 
 export async function GET(req: Request) {
   try {
+    console.log("[debug] SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
     const url = new URL(req.url);
     const key = url.searchParams.get("key") || "";
     const max = Number(url.searchParams.get("max") ?? "0") || 0;

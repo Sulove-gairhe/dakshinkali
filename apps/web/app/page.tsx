@@ -1,5 +1,3 @@
-"use client";
-
 import { HeroGrid } from "@/components/hero-grid";
 import { ApplianceStrip } from "@/components/appliance-strip";
 import { ClearanceDeals } from "@/components/clearance-deals";
@@ -13,8 +11,16 @@ import { CompareModal } from "@/components/compare/CompareModal";
 import { BuyingGuides } from "@/components/home/BuyingGuides";
 import { KitchenAppliances } from "@/components/home/KitchenAppliances";
 import { Footer } from "@/components/layout/Footer";
+import { fetchStorefrontProductsByKey } from "@/lib/db-products";
 
-export default function WebStorePage() {
+export default async function WebStorePage() {
+  const [trending, bestSelling, clearance, kitchen] = await Promise.all([
+    fetchStorefrontProductsByKey("trending", 8),
+    fetchStorefrontProductsByKey("best_selling", 8),
+    fetchStorefrontProductsByKey("clearance_deals", 8),
+    fetchStorefrontProductsByKey("kitchen_appliances", 12),
+  ]);
+
   return (
     <CompareProvider>
       <main className="min-h-screen bg-background text-foreground">
@@ -52,11 +58,11 @@ export default function WebStorePage() {
 
         {/* Render all main components for verification */}
         <div className="mt-12">
-          <BestSellingProducts />
-          <TrendingProducts />
+          <BestSellingProducts products={bestSelling} />
+          <TrendingProducts products={trending} />
           <HomeTrustSection />
-          <ClearanceDeals />
-          <KitchenAppliances />
+          <ClearanceDeals products={clearance} />
+          <KitchenAppliances products={kitchen} />
           <BuyingGuides />
           <Footer />
         </div>

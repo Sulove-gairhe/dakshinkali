@@ -7,22 +7,12 @@ import { ProductCard } from "@/components/product-card";
 import { CompareToggle } from "@/components/compare/CompareToggle";
 import { useCart } from "@/components/cart-provider";
 import { useWishlist } from "@/components/wishlist-provider";
-import {
-  kitchenApplianceProducts,
-  type StoreProduct,
-} from "@/lib/store-products";
+import { type StoreProduct } from "@/lib/store-products";
 import { cn } from "@/lib/utils";
 
-const homepageKitchenSlugs = [
-  "samsung-23l-grill-microwave-mg23a3515ak-tl",
-  "samsung-universal-tv-remote",
-  "samsung-vcc4540s36-sml-bagless-vacuum-cleaner",
-  "cg-2000w-induction-cooktop-cgic20a03",
-  "himstar-8l-electric-pressure-cooker-hk-8k1epj-za",
-  "cg-5l-bottom-loading-water-dispenser-cgwdb-lec",
-  "cg-550w-mixer-grinder-cgmg5505a",
-  "godrej-23l-convection-microwave-gme-523-cf1-rm",
-];
+type KitchenAppliancesProps = {
+  products: StoreProduct[];
+};
 
 function getItemsPerSlide(width: number) {
   if (width >= 1024) return 6;
@@ -40,35 +30,12 @@ function chunkProducts<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
-export function KitchenAppliances() {
+export function KitchenAppliances({ products }: KitchenAppliancesProps) {
   const { addItem, getQuantity } = useCart();
   const { hasItem, toggleItem } = useWishlist();
   const [itemsPerSlide, setItemsPerSlide] = useState(6);
   const [activeSlide, setActiveSlide] = useState(0);
   const [dragStart, setDragStart] = useState<number | null>(null);
-  const [homepageProducts, setHomepageProducts] = useState<StoreProduct[]>(() =>
-    kitchenApplianceProducts.slice(0, 12),
-  );
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/storefront-products?key=kitchen_appliances&max=12");
-        if (!res.ok) return;
-        const json = await res.json();
-        if (!mounted) return;
-        const products = Array.isArray(json.products) ? json.products : [];
-        if (products.length) setHomepageProducts(products);
-      } catch (err) {
-        // ignore and keep fallback
-        console.error("Failed to fetch kitchen appliances section", err);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     const updateItemsPerSlide = () => {
@@ -82,8 +49,8 @@ export function KitchenAppliances() {
   }, []);
 
   const slides = useMemo(
-    () => chunkProducts(homepageProducts, itemsPerSlide),
-    [homepageProducts, itemsPerSlide],
+    () => chunkProducts(products, itemsPerSlide),
+    [products, itemsPerSlide],
   );
   const lastSlide = Math.max(slides.length - 1, 0);
   const currentSlide = Math.min(activeSlide, lastSlide);
@@ -140,10 +107,13 @@ export function KitchenAppliances() {
           <div className="flex items-center gap-3">
             <Link
               href="/search?category=kitchen-appliances"
-              className="inline-flex items-center h-10 gap-0 px-3 hover:px-6 rounded-full bg-primary text-sm font-bold text-primary-foreground transition-all duration-200 ease-in-out hover:gap-2 hover:scale-[1.03] hover:shadow-md hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
+              className="view-all-btn inline-flex items-center h-10 gap-0 px-3 hover:px-6 rounded-full border border-foreground text-sm font-bold text-foreground hover:gap-2 hover:text-black group-hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
             >
               View all
-              <span className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100" aria-hidden>
+              <span
+                className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100 group-hover:delay-100"
+                aria-hidden
+              >
                 →
               </span>
             </Link>
@@ -184,7 +154,7 @@ export function KitchenAppliances() {
           </div>
         </div>
 
-        {homepageProducts.length > 0 ? (
+        {products.length > 0 ? (
           <div>
             <div
               className="overflow-hidden"
