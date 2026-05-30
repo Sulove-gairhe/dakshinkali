@@ -147,6 +147,46 @@ function mapRowToStoreProduct(row: DbProductRow): StoreProduct | null {
     };
 }
 
+/**
+ * Fetch storefront products for a given section key (e.g. "trending", "best_selling").
+ * Replicates the logic of the API route at app/api/storefront-products/route.ts
+ * but can be called directly from server components (no HTTP round-trip).
+ */
+export async function fetchStorefrontProductsByKey(
+  key: string,
+  max: number,
+): Promise<StoreProduct[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("storefront_sections")
+      .select("slugs")
+      .eq("key", key)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("[storefront-products] supabase error", error.message);
+      return [];
+    }
+
+    const slugs: string[] =
+      data?.slugs && Array.isArray(data.slugs) ? data.slugs : [];
+    const limited = max > 0 ? slugs.slice(-max) : slugs;
+
+    const products: StoreProduct[] = [];
+    for (const slug of limited) {
+      const product = await fetchDbProductBySlug(slug);
+      if (product) products.push(product);
+    }
+
+    return products;
+  } catch (err) {
+    console.error("[storefront-products] unexpected error", err);
+    return [];
+  }
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
