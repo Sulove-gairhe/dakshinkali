@@ -73,6 +73,71 @@ export function normalizeStorefrontData(
   return next;
 }
 
+/**
+ * Update a storefront section (ordered slug list) with rotation.
+ * - If shouldInclude is true: ensure slug is present and moved to the end.
+ * - If shouldInclude is false: ensure slug is removed.
+ * - Keeps at most `max` items by removing from the start (oldest) when needed.
+ *
+ * The caller provides a Supabase client instance (service/admin context).
+ */
+export async function updateStorefrontSection(
+  supabase: any,
+  key: string,
+  slug: string,
+  shouldInclude: boolean,
+  max = 12,
+): Promise<string[] | null> {
+  if (!key || !slug) return null;
+
+  // Read existing row
+  const { data: existingData, error: fetchError } = await supabase
+    .from("storefront_sections")
+    .select("slugs")
+    .eq("key", key)
+    .limit(1)
+    .maybeSingle();
+
+  if (fetchError) {
+    throw new Error(fetchError.message || "Failed to fetch storefront section");
+  }
+
+  let slugs: string[] = [];
+  if (existingData && existingData.slugs) {
+    try {
+      slugs = Array.isArray(existingData.slugs) ? existingData.slugs : JSON.parse(existingData.slugs as string);
+    } catch {
+      slugs = [];
+    }
+  }
+
+  // Remove any existing occurrence
+  slugs = slugs.filter((s) => s !== slug);
+
+  if (shouldInclude) {
+    // Append to end
+    slugs.push(slug);
+    // Trim from start while length > max
+    while (slugs.length > max) {
+      slugs.shift();
+    }
+  }
+
+  // Upsert the row
+  const payload = { key, slugs };
+  const { data: upserted, error: upsertError } = await supabase
+    .from("storefront_sections")
+    .upsert(payload, { onConflict: ["key"] })
+    .select()
+    .maybeSingle();
+
+  if (upsertError) {
+    throw new Error(upsertError.message || "Failed to upsert storefront section");
+  }
+
+  return slugs;
+}
+
 export function buildStoreProductPreview(
   product: ProductFormState,
   storefrontData: StorefrontData,

@@ -46,15 +46,28 @@ export function KitchenAppliances() {
   const [itemsPerSlide, setItemsPerSlide] = useState(6);
   const [activeSlide, setActiveSlide] = useState(0);
   const [dragStart, setDragStart] = useState<number | null>(null);
-  const homepageProducts = useMemo(() => {
-    const productsBySlug = new Map(
-      kitchenApplianceProducts.map((product) => [product.slug, product]),
-    );
+  const [homepageProducts, setHomepageProducts] = useState<StoreProduct[]>(() =>
+    kitchenApplianceProducts.slice(0, 12),
+  );
 
-    return homepageKitchenSlugs
-      .map((slug) => productsBySlug.get(slug))
-      .filter((product): product is StoreProduct => Boolean(product))
-      .slice(0, 12);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/storefront-products?key=kitchen_appliances&max=12");
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!mounted) return;
+        const products = Array.isArray(json.products) ? json.products : [];
+        if (products.length) setHomepageProducts(products);
+      } catch (err) {
+        // ignore and keep fallback
+        console.error("Failed to fetch kitchen appliances section", err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -127,9 +140,12 @@ export function KitchenAppliances() {
           <div className="flex items-center gap-3">
             <Link
               href="/search?category=kitchen-appliances"
-              className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground transition-colors hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="inline-flex items-center h-10 gap-0 px-3 hover:px-6 rounded-full bg-primary text-sm font-bold text-primary-foreground transition-all duration-200 ease-in-out hover:gap-2 hover:scale-[1.03] hover:shadow-md hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
             >
               View all
+              <span className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100" aria-hidden>
+                →
+              </span>
             </Link>
 
             {hasMultipleSlides && (
@@ -147,6 +163,9 @@ export function KitchenAppliances() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
+                <span className="min-w-12 text-center text-xs font-semibold text-muted-foreground">
+                  {currentSlide + 1}/{slides.length}
+                </span>
                 <button
                   type="button"
                   aria-label="Show next kitchen appliances"

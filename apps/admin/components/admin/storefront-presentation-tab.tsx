@@ -37,7 +37,9 @@ export function StorefrontPresentationTab({
   onStorefrontChange: (data: StorefrontData) => void;
 }) {
   const sf = form.storefrontData;
-  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "ok" | "taken">("idle");
+  const [slugStatus, setSlugStatus] = useState<
+    "idle" | "checking" | "ok" | "taken"
+  >("idle");
 
   useEffect(() => {
     const slug = sf.slug?.trim();
@@ -151,9 +153,9 @@ export function StorefrontPresentationTab({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <Toggle
-          label="Featured"
-          checked={!!sf.isFeatured}
-          onChange={(v) => patch({ isFeatured: v })}
+          label="Active on storefront"
+          checked={sf.isActive !== false}
+          onChange={(v) => patch({ isActive: v })}
         />
         <Toggle
           label="Best seller"
@@ -165,10 +167,21 @@ export function StorefrontPresentationTab({
           checked={!!sf.isNewArrival}
           onChange={(v) => patch({ isNewArrival: v })}
         />
+
         <Toggle
-          label="Active on storefront"
-          checked={sf.isActive !== false}
-          onChange={(v) => patch({ isActive: v })}
+          label="Kitchen Appliances"
+          checked={!!sf.showInKitchen}
+          onChange={(v) => patch({ showInKitchen: v })}
+        />
+        <Toggle
+          label="Trending Products"
+          checked={!!sf.showInTrending}
+          onChange={(v) => patch({ showInTrending: v })}
+        />
+        <Toggle
+          label="Clearance Deals"
+          checked={!!sf.showInClearance}
+          onChange={(v) => patch({ showInClearance: v })}
         />
       </div>
 
@@ -180,21 +193,27 @@ export function StorefrontPresentationTab({
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-gray-700">Box contents</label>
+        <label className="text-sm font-medium text-gray-700">
+          Box contents
+        </label>
         <StringArrayEditor
           value={sf.boxContents ?? []}
           onChange={(boxContents) => patch({ boxContents })}
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-gray-700">Delivery info</label>
+        <label className="text-sm font-medium text-gray-700">
+          Delivery info
+        </label>
         <StringArrayEditor
           value={sf.deliveryInfo ?? []}
           onChange={(deliveryInfo) => patch({ deliveryInfo })}
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-gray-700">Related products</label>
+        <label className="text-sm font-medium text-gray-700">
+          Related products
+        </label>
         <RelatedProductSelector
           value={sf.relatedProductSlugs ?? []}
           onChange={(relatedProductSlugs) => patch({ relatedProductSlugs })}

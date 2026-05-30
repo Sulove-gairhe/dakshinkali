@@ -49,6 +49,13 @@ export interface StorefrontData {
   badge?: string;
   badges?: string[];
   collection?: string;
+  // Explicit storefront section membership flags (admin-controlled)
+  showInKitchen?: boolean;
+  showInBestSelling?: boolean;
+  showInTrending?: boolean;
+  showInClearance?: boolean;
+  // Admin can explicitly request that featured flag be removed for storefront
+  removeFeatured?: boolean;
   isFeatured?: boolean;
   isBestSeller?: boolean;
   isNewArrival?: boolean;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/components/cart-provider";
 import { useWishlist } from "@/components/wishlist-provider";
@@ -43,10 +44,30 @@ export function BestSellingProducts() {
     return () => window.removeEventListener("resize", updateItemsPerSlide);
   }, []);
 
-  const slides = useMemo(
-    () => chunkProducts(bestSellingProducts, itemsPerSlide),
-    [itemsPerSlide],
+  const [products, setProducts] = useState<StoreProduct[]>(() =>
+    bestSellingProducts.slice(0, 8),
   );
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/storefront-products?key=best_selling&max=8");
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!mounted) return;
+        const prods = Array.isArray(json.products) ? json.products : [];
+        if (prods.length) setProducts(prods);
+      } catch (err) {
+        console.error("Failed to fetch best selling section", err);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const slides = useMemo(() => chunkProducts(products, itemsPerSlide), [itemsPerSlide, products]);
   const lastSlide = Math.max(slides.length - 1, 0);
   const isAtStart = activeSlide === 0;
   const isAtEnd = activeSlide === lastSlide;
@@ -86,6 +107,15 @@ export function BestSellingProducts() {
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              href="/products"
+              className="inline-flex items-center h-10 gap-0 px-3 hover:px-6 rounded-full bg-primary text-sm font-bold text-primary-foreground transition-all duration-200 ease-in-out hover:gap-2 hover:scale-[1.03] hover:shadow-md hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 group"
+            >
+              View all
+              <span className="transform -translate-x-1 opacity-0 transition-all duration-200 ease-in-out group-hover:translate-x-0 group-hover:opacity-100" aria-hidden>
+                →
+              </span>
+            </Link>
             <button
               type="button"
               aria-label="Show previous best selling products"
