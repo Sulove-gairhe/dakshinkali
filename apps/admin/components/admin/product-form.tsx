@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CategorySelect } from "./category-select";
@@ -20,6 +20,12 @@ import {
 } from "@/lib/admin/utils";
 import { saveProduct } from "@/lib/admin/actions/products";
 import type { CategoryRecord, ProductFormState } from "@/lib/admin/types";
+import {
+  generateProductSeo,
+  MAX_VARIATIONS,
+  validateSeoSuggestion,
+  type ProductSeoSuggestion,
+} from "@/lib/seo/generateProductSeo";
 
 const TABS = [
   "Core Details",
@@ -62,6 +68,17 @@ export function ProductForm({
   const [saving, setSaving] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [publishErrors, setPublishErrors] = useState<string[] | null>(null);
+  const [seoSuggestion, setSeoSuggestion] = useState<ProductSeoSuggestion | null>(null);
+  const [seoPreviewTitle, setSeoPreviewTitle] = useState("");
+  const [seoPreviewDescription, setSeoPreviewDescription] = useState("");
+  const [seoPreviewSearchTerms, setSeoPreviewSearchTerms] = useState<string[]>([]);
+  const [seoWarnings, setSeoWarnings] = useState<string[]>([]);
+  const [isGeneratorUnlocked, setIsGeneratorUnlocked] = useState(false);
+  const previousSeoStateRef = useRef<{
+    title: string | undefined;
+    description: string | undefined;
+    searchTerms: string[];
+  } | null>(null);
   const productId = form.id ?? crypto.randomUUID();
 
   const updateForm = useCallback((updater: (prev: ProductFormState) => ProductFormState) => {
@@ -357,7 +374,248 @@ export function ProductForm({
           )}
 
           {tab === "SEO & Search" && (
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <h3 className="text-sm font-semibold text-amber-900">
+                  Smart SEO Generator
+                </h3>
+                <p className="mt-1 text-xs text-amber-700">
+                  Generate SEO title, description, and search terms from your
+                  product data.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = {
+                        name: form.name,
+                        description: form.description,
+                        brand: form.storefrontData.brand ?? "",
+                        category: form.categoryName,
+                        shortDescription:
+                          form.storefrontData.shortDescription ?? "",
+                        highlights: form.storefrontData.highlights ?? [],
+                        specifications:
+                          form.storefrontData.specifications ?? [],
+                        existingSearchTerms:
+                          form.storefrontData.searchTerms ?? [],
+                        variants: form.storefrontData.variants ?? [],
+                      };
+                      const nextVi = seoSuggestion
+                        ? (seoSuggestion.variationIndex + 1) % MAX_VARIATIONS
+                        : 0;
+                      const suggestion = generateProductSeo(input, nextVi);
+                      setSeoSuggestion(suggestion);
+                      setSeoPreviewTitle(suggestion.title);
+                      setSeoPreviewDescription(suggestion.description);
+                      setSeoPreviewSearchTerms(suggestion.searchTerms);
+                      const validation = validateSeoSuggestion(
+                        suggestion,
+                        input,
+                      );
+                      setSeoWarnings(
+                        validation.warnings.map((w) => w.message),
+                      );
+                      setIsGeneratorUnlocked(true);
+                      toast.success("SEO suggestions generated");
+                    }}
+                    className="rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-amber-400"
+                  >
+                    {seoSuggestion ? "Regenerate" : "Generate SEO"}
+                  </button>
+                  {seoSuggestion && (
+                    <span className="self-center text-xs text-amber-700">
+                      Variation {seoSuggestion.variationIndex + 1} of{" "}
+                      {MAX_VARIATIONS}
+                    </span>
+                  )}
+                  {seoSuggestion && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const prev = {
+                          title: form.storefrontData.seoTitle,
+                          description: form.storefrontData.seoDescription,
+                          searchTerms: form.storefrontData.searchTerms ?? [],
+                        };
+                        previousSeoStateRef.current = prev;
+                        updateForm((f) => ({
+                          ...f,
+                          storefrontData: {
+                            ...f.storefrontData,
+                            seoTitle: seoPreviewTitle || undefined,
+                            seoDescription:
+                              seoPreviewDescription || undefined,
+                            searchTerms: seoPreviewSearchTerms,
+                          },
+                        }));
+                        toast("SEO suggestions applied", {
+                          action: {
+                            label: "Undo",
+                            onClick: () => {
+                              const p = previousSeoStateRef.current;
+                              if (!p) return;
+                              updateForm((f) => ({
+                                ...f,
+                                storefrontData: {
+                                  ...f.storefrontData,
+                                  seoTitle: p.title,
+                                  seoDescription: p.description,
+                                  searchTerms: p.searchTerms,
+                                },
+                              }));
+                              previousSeoStateRef.current = null;
+                              toast.success("SEO undo successful");
+                            },
+                          },
+                          duration: 4000,
+                        });
+                      }}
+                      className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm hover:bg-amber-100"
+                    >
+                      Apply Suggestions
+                    </button>
+                  )}
+                </div>
+                {seoSuggestion && seoSuggestion.sourceFields.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    <span className="text-xs text-amber-700">
+                      Generated from:
+                    </span>
+                    {seoSuggestion.sourceFields.map((field) => (
+                      <span
+                        key={field}
+                        className="rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800"
+                      >
+                        {field}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {seoWarnings.length > 0 && (
+                <div className="space-y-1">
+                  {seoWarnings.map((w, i) => (
+                    <p
+                      key={i}
+                      className="rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800"
+                    >
+                      {w}
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {seoSuggestion && (
+                <div className="space-y-4 rounded-lg border border-gray-200 bg-white p-4">
+                  <h4 className="text-sm font-semibold text-gray-700">
+                    Preview
+                  </h4>
+                  <div>
+                    <label className="text-sm font-medium">SEO title</label>
+                    <div className="relative mt-1">
+                      <input
+                        type="text"
+                        value={seoPreviewTitle}
+                        readOnly={!isGeneratorUnlocked}
+                        onChange={(e) =>
+                          setSeoPreviewTitle(e.target.value)
+                        }
+                        className={`w-full rounded-lg border px-3 py-2 pr-14 text-sm ${
+                          isGeneratorUnlocked
+                            ? "border-gray-200"
+                            : "border-gray-100 bg-gray-50 text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 text-xs ${
+                          seoPreviewTitle.length > 60
+                            ? "text-red-500"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {seoPreviewTitle.length}/60
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">
+                      SEO description
+                    </label>
+                    <div className="relative mt-1">
+                      <textarea
+                        rows={3}
+                        value={seoPreviewDescription}
+                        readOnly={!isGeneratorUnlocked}
+                        onChange={(e) =>
+                          setSeoPreviewDescription(e.target.value)
+                        }
+                        className={`w-full rounded-lg border px-3 py-2 pr-14 text-sm ${
+                          isGeneratorUnlocked
+                            ? "border-gray-200"
+                            : "border-gray-100 bg-gray-50 text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`absolute right-2 top-2 text-xs ${
+                          seoPreviewDescription.length > 160
+                            ? "text-red-500"
+                            : seoPreviewDescription.length < 120
+                              ? "text-amber-500"
+                              : "text-gray-400"
+                        }`}
+                      >
+                        {seoPreviewDescription.length}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">
+                      Search terms ({seoPreviewSearchTerms.length})
+                    </label>
+                    <div className="mt-1 flex flex-wrap gap-1.5">
+                      {seoPreviewSearchTerms.map((term, i) => (
+                        <span
+                          key={i}
+                          className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700"
+                        >
+                          {term}
+                        </span>
+                      ))}
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Type a term and press Enter to add..."
+                      readOnly={!isGeneratorUnlocked}
+                      className={`mt-2 w-full rounded-lg border px-3 py-2 text-sm ${
+                        isGeneratorUnlocked
+                          ? "border-gray-200"
+                          : "border-gray-100 bg-gray-50 text-gray-500"
+                      }`}
+                      onKeyDown={(e) => {
+                        if (!isGeneratorUnlocked) return;
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const value = (
+                            e.target as HTMLInputElement
+                          ).value.trim();
+                          if (value && !seoPreviewSearchTerms.includes(value)) {
+                            setSeoPreviewSearchTerms((prev) => [
+                              ...prev,
+                              value,
+                            ]);
+                          }
+                          (e.target as HTMLInputElement).value = "";
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <hr className="border-gray-200" />
+
               <div>
                 <label className="text-sm font-medium">Search terms</label>
                 <StringArrayEditor
