@@ -20,24 +20,23 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
     () => sanitizeNextPath(searchParams.get("redirectTo")),
     [searchParams],
   );
-  const { signIn, loading, user, isAdmin, configError } = useAuth();
+  const { signIn, loading, user, role, configError } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(initialError ?? null);
 
   useEffect(() => {
-    if (!loading && user && isAdmin) {
-      router.replace(redirectTo);
-      return;
-    }
-
-    if (!loading && user && !isAdmin) {
+    if (!loading && user) {
+      if (role === "admin" || role === "staff") {
+        router.replace("/admin");
+        return;
+      }
       setMessage(
-        "This account does not have admin access. Use an admin seed account or contact your administrator.",
+        "This account does not have admin access. Use an admin or staff seed account.",
       );
     }
-  }, [loading, user, isAdmin, router, redirectTo]);
+  }, [loading, user, role, router, redirectTo]);
 
   if (loading) {
     return <p style={{ padding: 24 }}>Loading...</p>;
@@ -68,7 +67,7 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
       return;
     }
 
-    router.replace(redirectTo);
+    // Role-based redirect is handled by the useEffect above
   }
 
   return (

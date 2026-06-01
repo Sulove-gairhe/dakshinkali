@@ -25,7 +25,7 @@ export function getUserRoleFromMetadata(user: {
   const role =
     user.app_metadata?.role || user.user_metadata?.role;
 
-  if (role === "admin" || role === "customer") {
+  if (role === "admin" || role === "staff" || role === "customer") {
     return role;
   }
 
