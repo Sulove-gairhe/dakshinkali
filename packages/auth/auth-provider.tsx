@@ -14,6 +14,7 @@ import { AuthContext, type AuthContextValue } from './use-auth';
 import { createBrowserClient } from './supabase-client';
 import { getUserRole } from './auth-helpers';
 import type { UserProfile, UserRole } from './types';
+import { isAdminRole } from './types';
 
 /**
  * Auth provider props
@@ -38,7 +39,7 @@ function resolveRoleFromUser(user: User | null): UserRole | null {
     const metadataRole =
         user.app_metadata?.role || user.user_metadata?.role;
 
-    if (metadataRole === 'admin' || metadataRole === 'customer') {
+    if (metadataRole === 'admin' || metadataRole === 'staff' || metadataRole === 'customer') {
         return metadataRole;
     }
 
@@ -98,7 +99,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         await loadProfile(supabase, user);
         const resolvedRole = await getUserRole(supabase);
-        if (resolvedRole === 'admin' || resolvedRole === 'customer') {
+        if (resolvedRole === 'admin' || resolvedRole === 'staff' || resolvedRole === 'customer') {
             setRole(resolvedRole);
         }
     }, [supabase, user, loadProfile, clearProfile]);

@@ -15,7 +15,7 @@
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-/** @type {{ email: string; password: string; role: 'customer' | 'admin'; full_name: string }[]} */
+/** @type {{ email: string; password: string; role: 'customer' | 'staff' | 'admin'; full_name: string }[]} */
 const SEED_USERS = [
     {
         email: 'customer1@dakshinkali.shop',
@@ -46,6 +46,12 @@ const SEED_USERS = [
         password: 'TestAdmin@123',
         role: 'admin',
         full_name: 'Test Admin Two',
+    },
+    {
+        email: 'staff1@dakshinkali.shop',
+        password: 'TestStaff@123',
+        role: 'staff',
+        full_name: 'Test Staff One',
     },
 ];
 
@@ -155,6 +161,7 @@ async function main() {
     console.log('Done. These accounts are for local/dev/staging only.');
     console.log('Customers: customer1@dakshinkali.shop … customer3@dakshinkali.shop');
     console.log('Admins: admin1@dakshinkali.shop, admin2@dakshinkali.shop');
+    console.log('Staff: staff1@dakshinkali.shop');
     console.log('Re-login after seeding so JWT app_metadata includes the latest role.');
 }
 

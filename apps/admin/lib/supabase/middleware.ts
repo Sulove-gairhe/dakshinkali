@@ -54,12 +54,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (isPublicPath(pathname)) {
-    if (user && pathname === "/login") {
-      const role = getUserRoleFromMetadata(user);
-      if (role === "admin") {
-        return NextResponse.redirect(new URL("/admin", request.url));
+      if (user && pathname === "/login") {
+        const role = getUserRoleFromMetadata(user);
+        if (role === "admin" || role === "staff") {
+          return NextResponse.redirect(new URL("/admin", request.url));
+        }
       }
-    }
 
     return supabaseResponse;
   }
@@ -77,11 +77,11 @@ export async function updateSession(request: NextRequest) {
     .maybeSingle();
 
   const role = profile?.role ?? getUserRoleFromMetadata(user);
-  if (role !== "admin") {
+  if (role !== "admin" && role !== "staff") {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set(
       "error",
-      "Admin access required. Sign in with an admin account.",
+      "Admin access required. Sign in with an admin or staff account.",
     );
     return NextResponse.redirect(loginUrl);
   }

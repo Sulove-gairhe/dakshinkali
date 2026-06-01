@@ -64,6 +64,7 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
     signInWithGoogle,
     loading,
     user,
+    role,
     supabase,
     configError,
   } = useAuth();
@@ -84,9 +85,15 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
 
   useEffect(() => {
     if (!loading && user) {
+      if (role === "admin" || role === "staff") {
+        const adminUrl =
+          process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001";
+        window.location.href = `${adminUrl}/admin`;
+        return;
+      }
       router.replace(redirectTo);
     }
-  }, [loading, user, router, redirectTo]);
+  }, [loading, user, role, router, redirectTo]);
 
   if (loading) {
     return (
@@ -203,7 +210,7 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
       return;
     }
 
-    router.replace(redirectTo);
+    // Role-based redirect is handled by the useEffect above
   }
 
   async function handleGoogleSignIn() {
