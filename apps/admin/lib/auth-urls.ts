@@ -31,3 +31,32 @@ export function getUserRoleFromMetadata(user: {
 
   return null;
 }
+
+export type UserRole = "customer" | "staff" | "admin";
+
+export function isAdminRole(role: string | null | undefined) {
+  return role === "admin" || role === "staff";
+}
+
+export function isSuperAdmin(role: string | null | undefined) {
+  return role === "admin";
+}
+
+export function getAdminUrl() {
+  return (
+    process.env.NEXT_PUBLIC_ADMIN_URL ||
+    (process.env.NODE_ENV === "development"
+      ? "http://localhost:3001"
+      : "https://dakshinkali-admin.vercel.app")
+  );
+}
+
+export function getWebUrl() {
+  return (
+    process.env.NEXT_PUBLIC_WEB_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://dakshinkali.shop")
+  );
+}

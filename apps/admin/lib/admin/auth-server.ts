@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { isAdminRole, isSuperAdmin } from "@/lib/auth-urls";
 
 export async function requireAdminUser() {
   const supabase = await createClient();
@@ -21,9 +22,19 @@ export async function requireAdminUser() {
     throw new Error(profileError.message);
   }
 
-  if (profile?.role !== "admin") {
+  if (!isAdminRole(profile?.role)) {
     throw new Error("Admin access required");
   }
 
   return { supabase, user, profile };
+}
+
+export async function requireSuperAdmin() {
+  const session = await requireAdminUser();
+
+  if (!isSuperAdmin(session.profile?.role)) {
+    throw new Error("Super admin access required");
+  }
+
+  return session;
 }

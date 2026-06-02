@@ -10,6 +10,7 @@ export type OrderNavCounts = {
 
 export type AdminNavContextValue = OrderNavCounts & {
   notifications: AdminNotificationCounts;
+  role: "admin" | "staff" | "customer" | null;
 };
 
 const defaultNotifications: AdminNotificationCounts = {
@@ -24,19 +25,22 @@ const AdminNavContext = createContext<AdminNavContextValue>({
   pendingVerification: 0,
   pendingApproval: 0,
   notifications: defaultNotifications,
+  role: null,
 });
 
 export function AdminNavProvider({
   counts,
   notifications,
+  role,
   children,
 }: {
   counts: OrderNavCounts;
   notifications: AdminNotificationCounts;
+  role: AdminNavContextValue["role"];
   children: React.ReactNode;
 }) {
   return (
-    <AdminNavContext.Provider value={{ ...counts, notifications }}>
+    <AdminNavContext.Provider value={{ ...counts, notifications, role }}>
       {children}
     </AdminNavContext.Provider>
   );

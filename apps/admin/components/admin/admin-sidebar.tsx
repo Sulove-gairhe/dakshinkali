@@ -8,6 +8,7 @@ import {
   FileText,
   LayoutDashboard,
   Layers,
+  ShieldPlus,
   Package,
   Tag,
   X,
@@ -52,6 +53,7 @@ export function AdminSidebar({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const counts = useAdminNavCounts();
+  const isSuperAdmin = counts.role === "admin";
 
   const content = (
     <aside className="flex h-full w-64 flex-col border-r border-gray-200 bg-white">
@@ -159,6 +161,28 @@ export function AdminSidebar({
             );
           })}
         </div>
+
+        {isSuperAdmin ? (
+          <div className="pt-4">
+            <p className="mb-2 flex items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <ShieldPlus className="h-3.5 w-3.5" />
+              Manage
+            </p>
+            <Link
+              href="/admin/manage/staff"
+              onClick={onClose}
+              className={cn(
+                "flex items-center gap-2 rounded-lg py-2 pl-8 pr-3 text-sm transition-colors",
+                pathname.startsWith("/admin/manage/staff")
+                  ? "bg-amber-50 font-medium text-amber-900"
+                  : "text-gray-700 hover:bg-gray-50",
+              )}
+            >
+              <ShieldPlus className="h-3.5 w-3.5" />
+              Add Staff
+            </Link>
+          </div>
+        ) : null}
       </nav>
     </aside>
   );

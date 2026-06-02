@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getUserRoleFromMetadata } from "@/lib/auth-urls";
+import {
+  getUserRoleFromMetadata,
+  getWebUrl,
+  isAdminRole,
+} from "@/lib/auth-urls";
 
 const PUBLIC_PATHS = ["/login", "/auth/callback"];
 
@@ -54,12 +58,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (isPublicPath(pathname)) {
-      if (user && pathname === "/login") {
-        const role = getUserRoleFromMetadata(user);
-        if (role === "admin" || role === "staff") {
-          return NextResponse.redirect(new URL("/admin", request.url));
-        }
+    if (user && pathname === "/login") {
+      const role = getUserRoleFromMetadata(user);
+      if (isAdminRole(role)) {
+        return NextResponse.redirect(new URL("/admin", request.url));
       }
+    }
 
     return supabaseResponse;
   }
@@ -77,13 +81,8 @@ export async function updateSession(request: NextRequest) {
     .maybeSingle();
 
   const role = profile?.role ?? getUserRoleFromMetadata(user);
-  if (role !== "admin" && role !== "staff") {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set(
-      "error",
-      "Admin access required. Sign in with an admin or staff account.",
-    );
-    return NextResponse.redirect(loginUrl);
+  if (!isAdminRole(role)) {
+    return NextResponse.redirect(new URL("/login", getWebUrl()));
   }
 
   return supabaseResponse;
