@@ -27,9 +27,22 @@ export function getProjectRefFromJwtKey(key: string): string | null {
             return null;
         }
 
-        const decoded = JSON.parse(
-            Buffer.from(payload, 'base64url').toString('utf8'),
-        ) as { ref?: string };
+        const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = normalized.padEnd(
+            normalized.length + ((4 - (normalized.length % 4)) % 4),
+            '=',
+        );
+        const decodedPayload =
+            typeof atob === 'function'
+                ? decodeURIComponent(
+                      Array.from(atob(padded))
+                          .map((char) =>
+                              `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`,
+                          )
+                          .join(''),
+                  )
+                : Buffer.from(padded, 'base64').toString('utf8');
+        const decoded = JSON.parse(decodedPayload) as { ref?: string };
 
         return decoded.ref ?? null;
     } catch {
@@ -48,8 +61,8 @@ function keyMatchesUrl(supabaseUrl: string, key: string): boolean {
         return jwtRef === urlRef;
     }
 
-    // Publishable keys (sb_publishable_...) cannot be decoded; assume valid.
-    return key.startsWith('sb_publishable_');
+    // Publishable keys and other non-JWT keys cannot expose a project ref here.
+    return !key.startsWith('eyJ');
 }
 
 /**
@@ -86,7 +99,7 @@ export function resolveSupabaseAnonKey(
 
     const urlRef = getProjectRefFromUrl(supabaseUrl);
     const mismatched = candidates
-        .map((key) => getProjectRefFromJwtKey(key) || key.slice(0, 12))
+        .map((key) => getProjectRefFromJwtKey(key) || '[undecodable key]')
         .join(', ');
 
     return {
