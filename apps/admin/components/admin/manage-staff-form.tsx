@@ -1,18 +1,31 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Loader2, ShieldPlus } from "lucide-react";
+import {
+  BadgeCheck,
+  Crown,
+  Loader2,
+  MailPlus,
+  ShieldPlus,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
-import { grantAdminAccess } from "@/lib/admin/login-security";
+import {
+  addManagedStaffEmail,
+  updateAdminMemberRole,
+  type AdminMember,
+} from "@/lib/admin/login-security";
+import { cn } from "@/lib/cn";
 
-export function ManageStaffForm() {
+export function ManageStaffForm({ members }: { members: AdminMember[] }) {
   const [submitting, setSubmitting] = useState(false);
+  const [updatingMemberId, setUpdatingMemberId] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
 
-    const result = await grantAdminAccess(new FormData(event.currentTarget));
+    const result = await addManagedStaffEmail(new FormData(event.currentTarget));
     setSubmitting(false);
 
     toast[result.status === "success" ? "success" : "error"](result.message);
@@ -21,72 +34,176 @@ export function ManageStaffForm() {
     }
   }
 
+  async function handleRoleChange(memberId: string, role: string) {
+    const formData = new FormData();
+    formData.set("userId", memberId);
+    formData.set("role", role);
+    setUpdatingMemberId(memberId);
+    const result = await updateAdminMemberRole(formData);
+    setUpdatingMemberId(null);
+    toast[result.status === "success" ? "success" : "error"](result.message);
+  }
+
   return (
-    <form
-      onSubmit={(event) => void handleSubmit(event)}
-      className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-    >
-      <div className="mb-6 flex items-start gap-3">
-        <div className="grid h-11 w-11 place-items-center rounded-lg bg-amber-100 text-amber-700">
-          <ShieldPlus className="h-5 w-5" />
+    <div className="grid gap-6">
+      <form
+        onSubmit={(event) => void handleSubmit(event)}
+        className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+      >
+        <div className="mb-6 flex items-start gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-lg bg-amber-100 text-amber-700">
+            <MailPlus className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Add email
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Grant admin panel access to an existing or future Supabase user.
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Add staff access
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Add an email, username, and role for admin panel login.
-          </p>
+
+        <div className="grid gap-4 md:grid-cols-[1fr_1fr_150px]">
+          <label className="grid gap-2">
+            <span className="text-sm font-medium text-gray-700">Email</span>
+            <input
+              name="email"
+              type="email"
+              required
+              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+            />
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-sm font-medium text-gray-700">Username</span>
+            <input
+              name="username"
+              type="text"
+              required
+              pattern="[a-zA-Z0-9_-]{3,32}"
+              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+            />
+          </label>
+
+          <label className="grid gap-2">
+            <span className="text-sm font-medium text-gray-700">Role</span>
+            <select
+              name="role"
+              required
+              defaultValue="staff"
+              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+            >
+              <option value="staff">Staff</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
         </div>
-      </div>
-
-      <div className="grid gap-4">
-        <label className="grid gap-2">
-          <span className="text-sm font-medium text-gray-700">Email</span>
-          <input
-            name="email"
-            type="email"
-            required
-            className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
-          />
-        </label>
-
-        <label className="grid gap-2">
-          <span className="text-sm font-medium text-gray-700">Username</span>
-          <input
-            name="username"
-            type="text"
-            required
-            pattern="[a-zA-Z0-9_-]{3,32}"
-            className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
-          />
-          <span className="text-xs text-gray-500">
-            3-32 letters, numbers, underscore, or hyphen.
-          </span>
-        </label>
-
-        <label className="grid gap-2">
-          <span className="text-sm font-medium text-gray-700">Role</span>
-          <select
-            name="role"
-            required
-            defaultValue="staff"
-            className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
-          >
-            <option value="staff">Staff</option>
-            <option value="admin">Admin</option>
-          </select>
-        </label>
 
         <button
           type="submit"
           disabled={submitting}
-          className="mt-2 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 text-sm font-semibold text-gray-950 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 text-sm font-semibold text-gray-950 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          Grant Access
+          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldPlus className="h-4 w-4" />}
+          Add Email
         </button>
-      </div>
-    </form>
+      </form>
+
+      <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Active members
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Current staff and admin accounts with dashboard access.
+            </p>
+          </div>
+          <span className="inline-flex w-fit items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700">
+            <BadgeCheck className="h-4 w-4 text-emerald-600" />
+            {members.length} active
+          </span>
+        </div>
+
+        {members.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-500">
+            No active staff or admin members yet.
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {members.map((member) => (
+              <article
+                key={member.id}
+                className="rounded-lg border border-gray-200 bg-gradient-to-br from-white to-gray-50 p-5 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div
+                    className={cn(
+                      "grid h-12 w-12 shrink-0 place-items-center rounded-lg",
+                      member.role === "admin"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-emerald-100 text-emerald-700",
+                    )}
+                  >
+                    {member.role === "admin" ? (
+                      <Crown className="h-5 w-5" />
+                    ) : (
+                      <UserRound className="h-5 w-5" />
+                    )}
+                  </div>
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs font-semibold capitalize",
+                      member.role === "admin"
+                        ? "bg-amber-100 text-amber-800"
+                        : "bg-emerald-100 text-emerald-800",
+                    )}
+                  >
+                    {member.role}
+                  </span>
+                </div>
+
+                <div className="mt-4 min-w-0">
+                  <h3 className="truncate text-base font-semibold text-gray-900">
+                    {member.username ? `@${member.username}` : member.email}
+                  </h3>
+                  <p className="mt-1 truncate text-sm text-gray-500">
+                    {member.email}
+                  </p>
+                  {member.fullName ? (
+                    <p className="mt-1 truncate text-xs text-gray-400">
+                      {member.fullName}
+                    </p>
+                  ) : null}
+                </div>
+
+                <label className="mt-5 grid gap-2">
+                  <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                    Role
+                  </span>
+                  <span className="relative">
+                    <select
+                      defaultValue={member.role}
+                      disabled={updatingMemberId === member.id}
+                      onChange={(event) =>
+                        void handleRoleChange(member.id, event.target.value)
+                      }
+                      className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:opacity-60"
+                    >
+                      <option value="staff">Staff</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    {updatingMemberId === member.id ? (
+                      <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gray-400" />
+                    ) : null}
+                  </span>
+                </label>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
   );
 }

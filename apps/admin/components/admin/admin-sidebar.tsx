@@ -179,7 +179,7 @@ export function AdminSidebar({
               )}
             >
               <ShieldPlus className="h-3.5 w-3.5" />
-              Add Staff
+              Staff Access
             </Link>
           </div>
         ) : null}

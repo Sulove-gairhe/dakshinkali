@@ -2,11 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import {
   getUserRoleFromMetadata,
-  getWebUrl,
   isAdminRole,
 } from "@/lib/auth-urls";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback"];
+const PUBLIC_PATHS = ["/login", "/auth/callback", "/admin/setup-access"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some(
@@ -59,7 +58,13 @@ export async function updateSession(request: NextRequest) {
 
   if (isPublicPath(pathname)) {
     if (user && pathname === "/login") {
-      const role = getUserRoleFromMetadata(user);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+      const role = profile?.role ?? getUserRoleFromMetadata(user);
+
       if (isAdminRole(role)) {
         return NextResponse.redirect(new URL("/admin", request.url));
       }
@@ -82,7 +87,7 @@ export async function updateSession(request: NextRequest) {
 
   const role = profile?.role ?? getUserRoleFromMetadata(user);
   if (!isAdminRole(role)) {
-    return NextResponse.redirect(new URL("/login", getWebUrl()));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return supabaseResponse;
