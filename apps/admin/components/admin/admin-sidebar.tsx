@@ -7,7 +7,6 @@ import {
   Columns3,
   FileText,
   LayoutDashboard,
-  Layers,
   ShieldPlus,
   Package,
   Tag,
@@ -21,11 +20,6 @@ const mainNav = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/categories", label: "Categories", icon: Tag },
-  {
-    href: "/admin/products",
-    label: "Storefront Authoring",
-    icon: Layers,
-  },
 ];
 
 const orderLinks = [

@@ -1,25 +1,30 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   Crown,
   Loader2,
   MailPlus,
   ShieldPlus,
+  Trash2,
   UserRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   addManagedStaffEmail,
+  removeAdminMember,
   updateAdminMemberRole,
   type AdminMember,
 } from "@/lib/admin/login-security";
 import { cn } from "@/lib/cn";
 
 export function ManageStaffForm({ members }: { members: AdminMember[] }) {
+  const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [updatingMemberId, setUpdatingMemberId] = useState<string | null>(null);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,6 +47,25 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
     const result = await updateAdminMemberRole(formData);
     setUpdatingMemberId(null);
     toast[result.status === "success" ? "success" : "error"](result.message);
+  }
+
+  async function handleRemoveMember(member: AdminMember) {
+    const label = member.username ? `@${member.username}` : member.email;
+    const confirmed = window.confirm(`Remove ${label} from admin access and the database?`);
+    if (!confirmed) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("userId", member.id);
+    setRemovingMemberId(member.id);
+    const result = await removeAdminMember(formData);
+    setRemovingMemberId(null);
+    toast[result.status === "success" ? "success" : "error"](result.message);
+
+    if (result.status === "success") {
+      router.refresh();
+    }
   }
 
   return (
@@ -152,16 +176,32 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
                       <UserRound className="h-5 w-5" />
                     )}
                   </div>
-                  <span
-                    className={cn(
-                      "rounded-full px-2.5 py-1 text-xs font-semibold capitalize",
-                      member.role === "admin"
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-emerald-100 text-emerald-800",
-                    )}
-                  >
-                    {member.role}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-1 text-xs font-semibold capitalize",
+                        member.role === "admin"
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-emerald-100 text-emerald-800",
+                      )}
+                    >
+                      {member.role}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${member.username ?? member.email}`}
+                      title="Remove member"
+                      disabled={removingMemberId === member.id}
+                      onClick={() => void handleRemoveMember(member)}
+                      className="grid h-9 w-9 place-items-center rounded-lg border border-red-100 bg-red-50 text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {removingMemberId === member.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-4 min-w-0">

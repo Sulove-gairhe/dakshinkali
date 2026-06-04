@@ -1,5 +1,5 @@
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
-import { Package, Tag, Layers } from "lucide-react";
+import { Package, Tag } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
@@ -43,16 +43,6 @@ export default function AdminDashboardPage() {
           <div>
             <p className="font-semibold">Categories</p>
             <p className="text-sm text-gray-500">Organize product taxonomy</p>
-          </div>
-        </Link>
-        <Link
-          href="/admin/products"
-          className="card-cozy flex items-center gap-3 p-5 hover:border-amber-300"
-        >
-          <Layers className="h-8 w-8 text-amber-600" />
-          <div>
-            <p className="font-semibold">Storefront Authoring</p>
-            <p className="text-sm text-gray-500">Preview & publish products</p>
           </div>
         </Link>
       </div>

@@ -12,6 +12,7 @@ import {
 } from "@/lib/admin/email-otp";
 
 const CREDENTIALS_DONT_MATCH = "Credentials don't match";
+const CREDENTIALS_ALREADY_TAKEN = "Email or username is already taken.";
 const USERNAME_PATTERN = /^[a-z0-9_-]{3,32}$/;
 
 type AdminProfile = {
@@ -98,6 +99,10 @@ const managedEmailSchema = z.object({
 const updateMemberRoleSchema = z.object({
   userId: z.string().uuid(),
   role: z.enum(["staff", "admin"]),
+});
+
+const removeMemberSchema = z.object({
+  userId: z.string().uuid(),
 });
 
 function normalizeEmail(email: string) {
@@ -200,6 +205,50 @@ async function fetchAccessGrant(email: string) {
     username: normalizeUsername(data.username),
     role: data.role as "staff" | "admin",
   } satisfies AdminAccessGrant;
+}
+
+async function findSetupCredentialConflict(input: {
+  email: string;
+  username: string;
+  allowedGrant?: AdminAccessGrant | null;
+}) {
+  const supabase = tryCreateServiceClient();
+  if (!supabase) {
+    return null;
+  }
+
+  const email = normalizeEmail(input.email);
+  const username = normalizeUsername(input.username);
+
+  const { data: profileConflict } = await supabase
+    .from("profiles")
+    .select("id, email, username")
+    .or(`email.eq.${email},username.ilike.${username}`)
+    .limit(1)
+    .maybeSingle();
+
+  if (profileConflict) {
+    return "profile";
+  }
+
+  const { data: grantConflict } = await supabase
+    .from("admin_access_grants")
+    .select("id, email, username")
+    .or(`email.eq.${email},username.ilike.${username}`)
+    .limit(1)
+    .maybeSingle();
+
+  if (grantConflict && grantConflict.id !== input.allowedGrant?.id) {
+    return "grant";
+  }
+
+  const { data: existingUserList, error: listError } = await supabase.auth.admin.listUsers();
+  const users = (existingUserList?.users ?? []) as AdminAuthUser[];
+  const authConflict = listError
+    ? null
+    : users.find((candidate) => candidate.email?.toLowerCase() === email);
+
+  return authConflict ? "auth" : null;
 }
 
 async function updateAuthRole(userId: string, role: "staff" | "admin") {
@@ -443,6 +492,11 @@ export async function beginAdminSetupAccess(
         };
   }
 
+  const conflict = await findSetupCredentialConflict({ email, username });
+  if (conflict) {
+    return { status: "error", message: CREDENTIALS_ALREADY_TAKEN };
+  }
+
   try {
     const metadata = await getRequestMetadata();
     await createAdminEmailOtpChallenge({
@@ -480,6 +534,14 @@ export async function verifyAdminSetupAccessOtp(
   const email = normalizeEmail(parsed.data.email);
   const username = normalizeUsername(parsed.data.username);
   const grant = await fetchAccessGrant(email);
+  const conflict = grant
+    ? null
+    : await findSetupCredentialConflict({ email, username });
+
+  if (conflict) {
+    return { status: "error", message: CREDENTIALS_ALREADY_TAKEN };
+  }
+
   const metadata = await getRequestMetadata();
   const verified = await verifyAdminEmailOtpChallenge({
     email,
@@ -665,6 +727,53 @@ export async function updateAdminMemberRole(
     );
 
   return { status: "success", message: "Member role updated." };
+}
+
+export async function removeAdminMember(
+  formData: FormData,
+): Promise<AdminManageMembersResult> {
+  const parsed = removeMemberSchema.safeParse({
+    userId: formData.get("userId"),
+  });
+
+  if (!parsed.success) {
+    return { status: "error", message: "Invalid member." };
+  }
+
+  const { user } = await requireSuperAdmin();
+  if (parsed.data.userId === user.id) {
+    return { status: "error", message: "You cannot remove your own admin account." };
+  }
+
+  const supabase = tryCreateServiceClient();
+  if (!supabase) {
+    return { status: "error", message: "Admin service role is not configured." };
+  }
+
+  const { data: profile, error: profileFetchError } = await supabase
+    .from("profiles")
+    .select("id, email, role")
+    .eq("id", parsed.data.userId)
+    .maybeSingle();
+
+  if (profileFetchError || !profile?.id || !isAdminRole(profile.role)) {
+    return { status: "error", message: "Member was not found." };
+  }
+
+  await supabase
+    .from("admin_access_grants")
+    .delete()
+    .or(`accepted_user_id.eq.${profile.id},email.eq.${normalizeEmail(profile.email)}`);
+
+  const { error: authDeleteError } = await supabase.auth.admin.deleteUser(profile.id);
+  if (authDeleteError) {
+    console.warn("[ADMIN_MEMBER_AUTH_DELETE_FAILED]", authDeleteError);
+    return { status: "error", message: "Unable to remove member from auth." };
+  }
+
+  await supabase.from("profiles").delete().eq("id", profile.id);
+
+  return { status: "success", message: "Member removed from the database." };
 }
 
 export async function getAdminMembers(): Promise<AdminMember[]> {

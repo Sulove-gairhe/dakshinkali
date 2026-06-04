@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  AlertTriangle,
   Eye,
   EyeOff,
   Loader2,
@@ -134,6 +135,8 @@ export function AdminSetupAccessForm() {
                 </div>
               </div>
 
+              {message ? <Message text={message} tone="error" /> : null}
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="grid gap-2">
                   <span className="text-sm text-slate-300">Email</span>
@@ -206,8 +209,6 @@ export function AdminSetupAccessForm() {
                   />
                 </label>
               </div>
-
-              {message ? <Message text={message} tone="error" /> : null}
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <button
@@ -293,15 +294,47 @@ function Message({
   text: string;
   tone: "error" | "info";
 }) {
+  const isError = tone === "error";
+
   return (
-    <p
+    <div
       className={
-        tone === "error"
-          ? "rounded-lg border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-200"
-          : "rounded-lg border border-yellow-300/20 bg-yellow-300/10 px-3 py-2 text-sm text-yellow-50"
+        isError
+          ? "rounded-lg border border-red-300/25 bg-[linear-gradient(135deg,rgba(248,113,113,0.16),rgba(127,29,29,0.22))] p-4 shadow-lg shadow-red-950/20"
+          : "rounded-lg border border-yellow-300/20 bg-yellow-300/10 p-4 shadow-lg shadow-yellow-950/10"
       }
     >
-      {text}
-    </p>
+      <div className="flex items-start gap-3">
+        <span
+          className={
+            isError
+              ? "grid size-9 shrink-0 place-items-center rounded-lg bg-red-300/15 text-red-200"
+              : "grid size-9 shrink-0 place-items-center rounded-lg bg-yellow-300/15 text-yellow-100"
+          }
+        >
+          <AlertTriangle className="size-4" />
+        </span>
+        <div>
+          <p
+            className={
+              isError
+                ? "text-sm font-semibold text-red-50"
+                : "text-sm font-semibold text-yellow-50"
+            }
+          >
+            {isError ? "Credentials unavailable" : "Verification notice"}
+          </p>
+          <p
+            className={
+              isError
+                ? "mt-1 text-sm leading-6 text-red-100/90"
+                : "mt-1 text-sm leading-6 text-yellow-50/90"
+            }
+          >
+            {text}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
