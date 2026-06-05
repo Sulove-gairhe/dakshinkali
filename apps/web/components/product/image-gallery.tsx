@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Image from 'next/image'
+import { useState } from "react";
+import Image from "next/image";
 
 interface ImageGalleryProps {
-  images: { id: string; src: string; alt: string }[]
-  badge?: string
+  images: { id: string; src: string; alt: string }[];
+  badge?: string;
 }
 
 export function ImageGallery({ images, badge }: ImageGalleryProps) {
-  const [selectedImageId, setSelectedImageId] = useState(images[0]?.id)
-  const selectedImage = images.find((img) => img.id === selectedImageId)
+  const [selectedImageId, setSelectedImageId] = useState(images[0]?.id);
+  const selectedImage = images.find((img) => img.id === selectedImageId);
 
   return (
     <div className="flex flex-col gap-4">
@@ -33,15 +33,15 @@ export function ImageGallery({ images, badge }: ImageGalleryProps) {
       </div>
 
       {/* Thumbnail Gallery */}
-      <div className="grid grid-cols-5 gap-3">
+      <div className="grid grid-cols-5 gap-3 px-1 py-1">
         {images.map((image) => (
           <button
             key={image.id}
             onClick={() => setSelectedImageId(image.id)}
-            className={`relative aspect-square cursor-pointer overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+            className={`relative m-1 aspect-square cursor-pointer overflow-hidden rounded-lg border-2 transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] ${
               selectedImageId === image.id
-                ? 'border-foreground'
-                : 'border-border hover:border-muted-foreground'
+                ? "border-foreground"
+                : "border-border hover:border-muted-foreground"
             }`}
           >
             <Image
@@ -54,5 +54,5 @@ export function ImageGallery({ images, badge }: ImageGalleryProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }

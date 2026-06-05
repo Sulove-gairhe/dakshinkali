@@ -230,7 +230,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {/* Description Tabs + Similar Products */}
       <div className="px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="mx-auto grid max-w-[1460px] gap-8 lg:grid-cols-[minmax(0,1fr)_240px] lg:gap-12 xl:gap-16">
           <div className="min-w-0">
             <DescriptionTabs
               sections={descriptionSections}
@@ -277,71 +277,65 @@ function CurrentProductPreview({
   const color = getProductColor(product);
 
   return (
-    <aside className="block lg:sticky lg:top-24 lg:self-start">
-      <article className="overflow-hidden rounded-xl border border-border bg-card shadow-lg">
-        <div className="border-b border-border/70 bg-muted/40 px-4 py-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-primary">
-            Currently Viewing
-          </p>
-        </div>
-
-        <div className="grid gap-4 p-4 sm:grid-cols-[132px_minmax(0,1fr)] lg:grid-cols-1">
-          <div className="relative aspect-square overflow-hidden rounded-lg bg-white p-4">
+    <aside className="block lg:sticky lg:top-24 lg:justify-self-end lg:self-start xl:translate-x-4 2xl:translate-x-8">
+      <article className="relative mx-auto flex h-[430px] w-[240px] overflow-hidden rounded-xl border border-border bg-card shadow-lg lg:mx-0">
+        <div className="flex w-full flex-col">
+          <div className="relative aspect-square w-full overflow-hidden bg-white p-3">
+            <span className="absolute left-3 top-3 z-10 rounded-md bg-accent/15 px-2 py-0.5 text-[10px] font-bold text-primary ring-1 ring-accent/30">
+              Viewing
+            </span>
             <Image
               src={product.image}
               alt={product.name}
               fill
-              sizes="(min-width: 1280px) 340px, (min-width: 1024px) 300px, 132px"
+              sizes="240px"
               className="object-contain"
             />
           </div>
 
-          <div className="flex min-w-0 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col p-3">
             <p className="text-xs font-semibold text-muted-foreground">
               {product.brand ?? product.category}
             </p>
-            <h3 className="mt-1 line-clamp-2 text-base font-bold leading-snug text-foreground">
+            <h3 className="mt-1 line-clamp-2 text-sm font-bold leading-snug text-foreground">
               {product.name}
             </h3>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="text-xl font-bold text-gray-950">
+            <div className="mt-2 flex items-baseline gap-1.5">
+              <span className="text-base font-bold text-gray-950">
                 {product.currentPrice}
               </span>
               {product.oldPrice && (
-                <span className="text-sm font-semibold text-muted-foreground line-through">
+                <span className="text-xs text-muted-foreground line-through">
                   {product.oldPrice}
                 </span>
               )}
             </div>
 
-            <div className="mt-3 rounded-lg border border-border bg-background px-3 py-2">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                Color
-              </p>
-              <div className="mt-1 flex items-center gap-2">
-                <span
-                  className="h-4 w-4 shrink-0 rounded-full border border-border shadow-inner"
-                  style={{ backgroundColor: getColorSwatch(color) }}
-                />
-                <span className="truncate text-sm font-semibold text-foreground">
-                  {color ?? "As shown"}
-                </span>
-              </div>
+            <div className="mt-2 flex items-center gap-2 rounded-lg border border-border bg-background px-2.5 py-2">
+              <span
+                className="h-4 w-4 shrink-0 rounded-full border border-border shadow-inner"
+                style={{ backgroundColor: getColorSwatch(color) }}
+              />
+              <span className="truncate text-xs font-semibold text-foreground">
+                {color ?? "As shown"}
+              </span>
             </div>
 
             {product.status && (
-              <p className="mt-3 text-xs font-semibold text-muted-foreground">
+              <p className="mt-2 text-xs font-semibold text-muted-foreground">
                 {product.status}
               </p>
             )}
 
+            <div className="flex-1" />
+
             <button
               type="button"
               onClick={onAddToCart}
-              className="mt-4 inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-accent/45 bg-white px-4 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:border-accent hover:bg-accent/10"
+              className="mt-3 inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-accent/45 bg-white px-3 py-2.5 text-xs font-semibold text-primary shadow-sm transition-colors hover:border-accent hover:bg-accent/10"
             >
-              <ShoppingCart className="h-4 w-4" />
+              <ShoppingCart className="h-3.5 w-3.5" />
               {quantityInCart > 0 ? "Add Another" : "Add to Cart"}
             </button>
           </div>

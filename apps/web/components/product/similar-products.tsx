@@ -113,7 +113,7 @@ export function SimilarProducts({ products }: SimilarProductsProps) {
                   maxWidth: "240px",
                   marginRight: isLast ? "1rem" : undefined,
                 }}
-                className="group relative flex shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                className="group relative flex h-[430px] shrink-0 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
               >
                 {badgeItems.length > 0 && (
                   <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-3.5rem)] flex-wrap gap-1">

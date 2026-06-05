@@ -41,18 +41,25 @@ export function ProductCard({
   const badgeItems = badges ?? (badge ? [badge] : []);
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+    <article className="card-base group relative flex h-full flex-col overflow-hidden rounded-xl">
       {/* Badge */}
       {badgeItems.length > 0 && (
         <div className="absolute left-4 top-4 z-10 flex max-w-[calc(100%-5rem)] flex-wrap gap-2">
-          {badgeItems.map((badgeItem) => (
-            <span
-              key={badgeItem}
-              className="inline-block rounded-md bg-accent/15 px-3 py-1 text-xs font-bold text-primary ring-1 ring-accent/30"
-            >
-              {badgeItem}
-            </span>
-          ))}
+          {badgeItems.map((badgeItem) => {
+            const isPremiumBadge = /best|seller|top|pick/i.test(badgeItem);
+
+            return (
+              <span
+                key={badgeItem}
+                className={cn(
+                  isPremiumBadge ? "badge-premium" : "badge-discount",
+                  "inline-block",
+                )}
+              >
+                {badgeItem}
+              </span>
+            );
+          })}
         </div>
       )}
 
@@ -85,7 +92,7 @@ export function ProductCard({
       {/* Product Image */}
       <Link
         href={href}
-        className="relative block aspect-square w-full overflow-hidden bg-white p-4"
+        className="card-img-wrap relative block aspect-square w-full bg-white p-4"
       >
         <Image
           src={image}
@@ -126,11 +133,11 @@ export function ProductCard({
 
         {/* Pricing */}
         <div className="mt-3 flex items-baseline gap-2">
-          <span className="text-xl font-bold text-gray-950">
+          <span className="price text-xl">
             {currentPrice}
           </span>
           {oldPrice && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="price-original text-sm">
               {oldPrice}
             </span>
           )}
@@ -148,7 +155,7 @@ export function ProductCard({
             e.stopPropagation();
             onAddToCart?.(e);
           }}
-          className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-accent/45 bg-white px-4 py-3 text-sm font-semibold text-primary shadow-sm transition-colors duration-300 hover:border-accent hover:bg-accent/10"
+          className="btn-add-cart mt-4 flex cursor-pointer items-center justify-center gap-2"
         >
           <ShoppingCart className="h-5 w-5" />
           {quantityInCart > 0 ? "Add Another" : "Add to Cart"}

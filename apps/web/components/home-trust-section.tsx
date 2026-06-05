@@ -152,22 +152,23 @@ export function HomeTrustSection() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-linear-to-br from-secondary via-background to-surface py-12 sm:py-14 lg:py-16">
-        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent" />
+      <section className="section-navy relative overflow-hidden py-12 sm:py-14 lg:py-16">
+        <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-transparent to-accent/15" />
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-accent/70 to-transparent" />
         <div className="mx-auto flex min-h-full max-w-7xl flex-col justify-center px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
             <div className="max-w-2xl">
-              <p className="text-sm font-bold uppercase tracking-wide text-primary">
+              <p className="text-sm font-bold uppercase tracking-wide text-accent">
                 Dakshinkali Shop
               </p>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+              <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
                 23+ Years of Trusted Electronics
               </h2>
-              <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+              <p className="mt-4 max-w-xl text-base leading-7 text-white/72 sm:text-lg">
                 Branded appliances, reliable service, and fast delivery for
                 families across Nepal.
               </p>
-              <p className="mt-5 max-w-xl text-sm leading-6 text-foreground/70 sm:text-base">
+              <p className="mt-5 max-w-xl text-sm leading-6 text-white/68 sm:text-base">
                 From daily home essentials to big appliance upgrades,
                 Dakshinkali Shop helps local customers and families abroad
                 choose electronics with confidence.
@@ -185,17 +186,17 @@ export function HomeTrustSection() {
                     <span className="relative">Shop Trusted Products</span>
                   </Link>
                 </Button>
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground/75">
-                  <Truck className="size-4 text-primary" aria-hidden="true" />
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/75">
+                  <Truck className="size-4 text-accent" aria-hidden="true" />
                   Free delivery inside Pokhara Valley
                 </span>
               </div>
 
-              <div className="group/help mt-6 rounded-2xl border border-foreground/10 bg-white/0 p-4 shadow-none backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-white/75 hover:shadow-[0_14px_42px_rgba(17,17,17,0.08)] sm:max-w-xl">
-                <p className="text-sm font-bold text-foreground">
+              <div className="group/help mt-6 rounded-2xl border border-white/12 bg-white/8 p-4 shadow-none backdrop-blur-sm transition-all duration-300 hover:border-accent/50 hover:bg-white/12 hover:shadow-[0_14px_42px_rgba(0,0,0,0.18)] sm:max-w-xl">
+                <p className="text-sm font-bold text-white">
                   Need help choosing the right product?
                 </p>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground transition-colors duration-300 group-hover/help:text-foreground/70">
+                <p className="mt-1 text-sm leading-6 text-white/65 transition-colors duration-300 group-hover/help:text-white/80">
                   Chat with us on WhatsApp for quick support.
                 </p>
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -215,7 +216,7 @@ export function HomeTrustSection() {
                   </Button>
                   <button
                     type="button"
-                    className="inline-flex h-11 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-foreground/10 bg-white/80 px-5 text-sm font-bold text-foreground transition-all hover:border-primary/50 hover:bg-white focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+                    className="inline-flex h-11 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-5 text-sm font-bold text-white transition-all hover:border-accent/60 hover:bg-white/16 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
                     popoverTarget="trust-socials-popover"
                     aria-controls="trust-socials-popover"
                   >
@@ -230,12 +231,12 @@ export function HomeTrustSection() {
               <div className="relative mx-auto w-full max-w-155 lg:aspect-[1.05/1] lg:min-h-140">
                 <div className="absolute left-1/2 top-[43%] h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-3xl" />
 
-                <div className="relative z-10 mx-auto h-97.5 w-full max-w-112.5 overflow-hidden rounded-4xl border border-white/80 bg-white/85 shadow-[0_28px_80px_rgba(17,17,17,0.12)] backdrop-blur lg:absolute lg:left-1/2 lg:top-1/2 lg:h-[64%] lg:w-[70%] lg:max-w-none lg:-translate-x-1/2 lg:-translate-y-1/2">
+                <div className="relative z-10 mx-auto h-97.5 w-full max-w-112.5 overflow-hidden rounded-4xl border border-white/80 bg-white/92 shadow-[0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur lg:absolute lg:left-1/2 lg:top-1/2 lg:h-[64%] lg:w-[70%] lg:max-w-none lg:-translate-x-1/2 lg:-translate-y-1/2">
                   <div className="absolute inset-x-8 top-6 flex items-center justify-between">
-                    <span className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
+                    <span className="badge-premium">
                       Branded Appliances
                     </span>
-                    <span className="text-xs font-bold text-foreground/65">
+                    <span className="text-xs font-bold text-gray-700">
                       All Nepal Delivery
                     </span>
                   </div>
@@ -259,7 +260,7 @@ export function HomeTrustSection() {
                     <p className="text-xs font-semibold uppercase tracking-wide text-primary">
                       All-in-one electronics store
                     </p>
-                    <p className="mt-1 text-sm font-bold text-foreground">
+                    <p className="mt-1 text-sm font-bold text-gray-950">
                       Appliances, TVs, kitchen essentials and support.
                     </p>
                   </div>
@@ -288,17 +289,17 @@ export function HomeTrustSection() {
                           ease: "easeInOut",
                         }}
                         whileHover={{ y: -14, scale: 1.03 }}
-                        className={`group rounded-2xl border border-white/80 bg-white/90 p-3 shadow-[0_12px_34px_rgba(17,17,17,0.08)] backdrop-blur transition-all duration-300 hover:border-primary/70 hover:shadow-[0_20px_52px_rgba(17,17,17,0.15)] sm:p-4 lg:absolute lg:w-53.75 ${card.position}`}
+                        className={`group rounded-2xl border border-white/80 bg-white/94 p-3 shadow-[0_12px_34px_rgba(0,0,0,0.16)] backdrop-blur transition-all duration-300 hover:border-accent/70 hover:shadow-[0_20px_52px_rgba(0,0,0,0.22)] sm:p-4 lg:absolute lg:w-53.75 ${card.position}`}
                       >
                         <div className="flex items-start gap-3.5">
-                          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-foreground ring-1 ring-primary/25 sm:size-11">
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/12 text-primary ring-1 ring-accent/30 sm:size-11">
                             <Icon
                               className="size-4.5 sm:size-5"
                               aria-hidden="true"
                             />
                           </span>
                           <div>
-                            <h3 className="text-[15px] font-bold leading-snug text-foreground sm:text-base">
+                            <h3 className="text-[15px] font-bold leading-snug text-gray-950 sm:text-base">
                               {card.title}
                             </h3>
                             <p className="mt-1 max-h-0 translate-y-1 overflow-hidden text-[13px] leading-5 text-muted-foreground opacity-0 transition-all duration-300 group-hover:max-h-24 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:max-h-24 group-focus-within:translate-y-0 group-focus-within:opacity-100">

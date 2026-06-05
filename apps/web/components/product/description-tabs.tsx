@@ -37,18 +37,24 @@ function Collapsible({ children, needsToggle, collapsedClass = 'max-h-48' }: Col
   if (!needsToggle) return <>{children}</>
 
   return (
-    <div>
+    <div className="relative">
       <div
         className={[
-          'overflow-hidden transition-[max-height] motion-reduce:transition-none',
+          'relative overflow-hidden transition-[max-height] motion-reduce:transition-none',
           expanded ? 'max-h-[4000px] duration-500 ease-in-out' : `${collapsedClass} duration-300 ease-in-out`,
         ].join(' ')}
       >
         {children}
+        {!expanded && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background via-background/85 to-background/0 backdrop-blur-[1px]" />
+        )}
       </div>
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="mt-3 cursor-pointer text-[13px] font-medium text-foreground/60 underline-offset-2 transition-colors hover:text-foreground hover:underline"
+        className={[
+          'mx-auto flex cursor-pointer items-center justify-center rounded-full border border-border bg-white/85 px-5 py-2 text-[13px] font-bold text-primary shadow-sm backdrop-blur-md transition-all hover:border-accent hover:bg-white hover:text-primary hover:shadow-md',
+          expanded ? 'mt-4' : 'relative z-10 -mt-8',
+        ].join(' ')}
       >
         {expanded ? 'View less' : 'View more'}
       </button>

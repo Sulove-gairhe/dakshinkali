@@ -82,8 +82,8 @@ export function Navbar({
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? "bg-white/80 backdrop-blur-xl shadow-sm"
-          : "bg-white border-b border-gray-200"
+          ? "border-b border-border/70 bg-white/88 shadow-[0_10px_30px_rgba(8,51,90,0.08)] backdrop-blur-xl"
+          : "border-b border-border/70 bg-white"
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -143,7 +143,7 @@ export function Navbar({
         </div>
       </div>
       <div
-        className="relative z-40 bg-secondary"
+        className="relative z-40 border-t border-border/70 bg-white"
         onMouseLeave={() => setIsBrandsOpen(false)}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -154,7 +154,7 @@ export function Navbar({
             >
               <button
                 type="button"
-                className="flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold text-gray-950 transition-colors duration-300 hover:bg-white/70 hover:text-primary"
+                className="nav-link flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold"
               >
                 BY BRANDS
                 <ChevronDown
@@ -174,7 +174,7 @@ export function Navbar({
                   className={
                     item.highlighted
                       ? "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-primary ring-1 ring-accent/35 transition-colors duration-300 hover:bg-accent/10"
-                      : "shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold text-gray-950 transition-colors duration-300 hover:bg-white/70 hover:text-primary"
+                      : "nav-link shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold"
                   }
                 >
                   {ItemIcon ? <ItemIcon className="h-4 w-4" /> : null}
@@ -227,7 +227,7 @@ function IconButton({
       <div className="relative">
         <Icon className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
         {typeof badge === "number" && badge > 0 && (
-          <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+          <span className="count-pulse absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
             {badge}
           </span>
         )}
@@ -259,7 +259,7 @@ function CartPreviewButton({
         <div className="relative">
           <ShoppingCart className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
           {typeof badge === "number" && badge > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+            <span className="count-pulse absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
               {badge}
             </span>
           )}
@@ -372,7 +372,7 @@ function MobileIconButton({
       <span className="relative">
         <Icon className="h-5 w-5" />
         {typeof badge === "number" && badge > 0 && (
-          <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+          <span className="count-pulse absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
             {badge}
           </span>
         )}
