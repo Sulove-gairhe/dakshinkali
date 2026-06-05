@@ -28,7 +28,7 @@ function BlockRenderer({ block }: { block: BlogContentBlock }) {
   }
   if (block.type === "tip") {
     return (
-      <div className="rounded-xl border border-amber-300/40 bg-[#fff8e7] p-4 text-sm font-semibold leading-6 text-gray-900">
+      <div className="rounded-xl border border-accent/25 bg-accent/10 p-4 text-sm font-semibold leading-6 text-gray-900">
         {block.text}
       </div>
     );
@@ -58,7 +58,7 @@ export function BlogPreview({ form }: { form: BlogFormState }) {
         </div>
       ) : null}
 
-      <p className="text-sm font-bold uppercase tracking-wide text-amber-600">
+      <p className="text-sm font-bold uppercase tracking-wide text-primary">
         {form.category || "Category"}
       </p>
       <h1 className="font-heading mt-3 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

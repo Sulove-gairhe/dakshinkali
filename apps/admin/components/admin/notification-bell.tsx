@@ -92,7 +92,7 @@ export function NotificationBell({
                   <span
                     className={
                       row.count > 0
-                        ? "rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900"
+                        ? "rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary"
                         : "text-xs text-gray-400"
                     }
                   >
@@ -106,7 +106,7 @@ export function NotificationBell({
             <Link
               href="/admin/orders"
               onClick={() => setOpen(false)}
-              className="text-sm font-medium text-amber-700 hover:underline"
+              className="text-sm font-medium text-primary hover:underline"
             >
               View all orders
             </Link>

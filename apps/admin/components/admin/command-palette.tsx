@@ -139,7 +139,7 @@ export function CommandPalette({
                     <button
                       type="button"
                       onClick={() => go(action.href)}
-                      className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-amber-50"
+                      className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-primary/5"
                     >
                       {action.label}
                     </button>

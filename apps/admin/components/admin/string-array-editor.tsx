@@ -38,13 +38,13 @@ export function StringArrayEditor({
             }
           }}
           placeholder={placeholder}
-          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+          className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         />
         <button
           type="button"
           onClick={addItem}
           disabled={maxItems !== undefined && value.length >= maxItems}
-          className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-amber-400 disabled:opacity-50"
+          className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
         >
           Add
         </button>

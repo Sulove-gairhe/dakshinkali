@@ -154,7 +154,7 @@ export function OrderDetailClient({
           {order.customer_phone ? (
             <a
               href={`tel:${order.customer_phone}`}
-              className="mt-1 inline-block text-sm text-amber-700 hover:underline"
+              className="mt-1 inline-block text-sm text-primary hover:underline"
             >
               {order.customer_phone}
             </a>
@@ -196,7 +196,7 @@ export function OrderDetailClient({
                         <button
                           type="button"
                           onClick={() => void openProductQuickView(item.product_id)}
-                          className="text-left font-medium text-amber-800 hover:underline"
+                          className="text-left font-medium text-primary hover:underline"
                         >
                           {item.product_name}
                         </button>
@@ -320,7 +320,7 @@ export function OrderDetailClient({
         <button
           type="button"
           onClick={() => setStatusModalOpen(true)}
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           Update Status
         </button>
@@ -339,7 +339,7 @@ export function OrderDetailClient({
               onClick={() => setMobileTab(tab)}
               className={
                 mobileTab === tab
-                  ? "flex-1 rounded-lg bg-amber-100 py-2 text-sm font-medium"
+                  ? "flex-1 rounded-lg bg-primary/10 py-2 text-sm font-medium"
                   : "flex-1 rounded-lg border border-gray-200 py-2 text-sm"
               }
             >
@@ -441,7 +441,7 @@ export function OrderDetailClient({
             </p>
             <Link
               href={`/admin/products/${productDrawer.id}/edit`}
-              className="inline-block rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
+              className="inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               onClick={() => setProductDrawer(null)}
             >
               Edit product

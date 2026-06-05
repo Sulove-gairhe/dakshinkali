@@ -133,7 +133,7 @@ export function OrdersBoard() {
                         >
                           <Link
                             href={`/admin/orders/${order.id}`}
-                            className="font-mono text-xs font-semibold text-amber-800 hover:underline"
+                            className="font-mono text-xs font-semibold text-primary hover:underline"
                           >
                             {order.order_number}
                           </Link>

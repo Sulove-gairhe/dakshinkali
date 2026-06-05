@@ -22,7 +22,7 @@ export function CategorySelect({
           const cat = active.find((c) => c.id === e.target.value);
           if (cat) onChange(cat.id, cat.name);
         }}
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
       >
         <option value="">Select category</option>
         {active.map((cat) => (
@@ -33,7 +33,7 @@ export function CategorySelect({
       </select>
       <Link
         href="/admin/categories"
-        className="text-xs font-medium text-amber-700 hover:underline"
+        className="text-xs font-medium text-primary hover:underline"
       >
         Manage categories →
       </Link>

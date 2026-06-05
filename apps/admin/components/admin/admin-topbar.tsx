@@ -57,7 +57,7 @@ export function AdminTopbar({
           <p className="text-sm font-medium text-gray-900">{displayName}</p>
           <p className="text-xs text-gray-500">{user?.email}</p>
         </div>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-sm font-semibold text-amber-900">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
           {displayName.charAt(0).toUpperCase()}
         </div>
         <button

@@ -208,7 +208,7 @@ export function statusBadgeClass(status: DbProductStatus): string {
     case "active":
       return "bg-green-100 text-green-800";
     case "low_stock":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-primary/10 text-primary";
     case "out_of_stock":
       return "bg-red-100 text-red-800";
     case "inactive":
@@ -219,7 +219,7 @@ export function statusBadgeClass(status: DbProductStatus): string {
 
 export function publishingBadgeClass(status: string): string {
   return status === "live"
-    ? "bg-amber-100 text-amber-900"
+    ? "bg-primary/10 text-primary"
     : "bg-gray-100 text-gray-700";
 }
 

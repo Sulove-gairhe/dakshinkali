@@ -10,36 +10,36 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // --- YourStore Design Tokens ---
+        // --- Dakshinkali Design Tokens ---
         primary: {
-          DEFAULT: '#3A5A40',
-          dark: '#5C8A63',
+          DEFAULT: '#08335A',
+          dark: '#062947',
           foreground: '#FFFFFF',
         },
         secondary: {
-          DEFAULT: '#FAF3E0',
-          dark: '#1C1A17',
-          foreground: '#2B2B2B',
+          DEFAULT: '#F8FAFC',
+          dark: '#0D467A',
+          foreground: '#08335A',
         },
         accent: {
-          DEFAULT: '#E76F51',
+          DEFAULT: '#359ACF',
           foreground: '#FFFFFF',
         },
         highlight: {
-          DEFAULT: '#F4A261',
-          foreground: '#2B2B2B',
+          DEFAULT: '#5BB4E0',
+          foreground: '#062947',
         },
         surface: {
           DEFAULT: '#FFFFFF',
-          dark: '#242018',
+          dark: '#08335A',
         },
         border: {
-          DEFAULT: '#E5D9C3',
-          dark: '#2E2B26',
+          DEFAULT: '#D7EBF2',
+          dark: '#2585B8',
         },
         muted: {
-          DEFAULT: '#6B7280',
-          foreground: '#9CA3AF',
+          DEFAULT: '#7B9AAD',
+          foreground: '#A9C1D1',
         },
         // shadcn/ui compatibility
         background: 'hsl(var(--background))',
@@ -72,9 +72,9 @@ const config: Config = {
         DEFAULT: '0.5rem',
       },
       boxShadow: {
-        card: '0 2px 12px rgba(58, 90, 64, 0.08)',
-        'card-hover': '0 8px 24px rgba(58, 90, 64, 0.15)',
-        modal: '0 20px 60px rgba(0, 0, 0, 0.15)',
+        card: '0 2px 8px rgba(8, 51, 90, 0.08)',
+        'card-hover': '0 6px 20px rgba(8, 51, 90, 0.12)',
+        modal: '0 12px 40px rgba(8, 51, 90, 0.18)',
       },
       keyframes: {
         'fade-up': {

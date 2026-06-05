@@ -128,7 +128,7 @@ export function BlogPostsList({
         </div>
         <Link
           href="/admin/blog/new"
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-amber-400"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           Create post
         </Link>
@@ -143,7 +143,7 @@ export function BlogPostsList({
           </p>
           <Link
             href="/admin/blog/new"
-            className="mt-4 inline-block rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
+            className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           >
             Create post
           </Link>
@@ -184,7 +184,7 @@ export function BlogPostsList({
                       <div>
                         <p className="font-medium text-gray-900">{post.title}</p>
                         {post.featured ? (
-                          <span className="mt-0.5 inline-flex rounded bg-amber-50 px-1.5 text-[10px] font-semibold text-amber-800">
+                          <span className="mt-0.5 inline-flex rounded bg-primary/5 px-1.5 text-[10px] font-semibold text-primary">
                             Featured
                           </span>
                         ) : null}
@@ -211,7 +211,7 @@ export function BlogPostsList({
                         onClick={() =>
                           router.push(`/admin/blog/${post.id}/edit`)
                         }
-                        className="text-amber-700 hover:text-amber-900"
+                        className="text-primary hover:text-primary"
                         title="Edit"
                       >
                         <Pencil className="h-4 w-4" />
@@ -221,8 +221,8 @@ export function BlogPostsList({
                         onClick={() => void handleToggleFeatured(post)}
                         className={
                           post.featured
-                            ? "text-amber-600"
-                            : "text-gray-400 hover:text-amber-600"
+                            ? "text-primary"
+                            : "text-gray-400 hover:text-primary"
                         }
                         title="Toggle featured"
                       >
@@ -309,7 +309,7 @@ export function BlogPostsList({
             </p>
             <Link
               href={`/admin/blog/${quickView.id}/edit`}
-              className="inline-block rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
+              className="inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               onClick={() => setQuickView(null)}
             >
               Edit post

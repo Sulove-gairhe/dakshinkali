@@ -118,7 +118,7 @@ export function SpecificationBuilder({
                   specs: [...group.specs, { label: "", value: "" }],
                 })
               }
-              className="inline-flex items-center gap-1 text-sm text-amber-700 hover:underline"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
             >
               <Plus className="h-4 w-4" /> Add Spec
             </button>
@@ -130,7 +130,7 @@ export function SpecificationBuilder({
         onClick={() =>
           onChange([...value, { title: "New Group", specs: [{ label: "", value: "" }] }])
         }
-        className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-amber-400 hover:text-amber-800"
+        className="rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-primary/50 hover:text-primary"
       >
         Add Group
       </button>

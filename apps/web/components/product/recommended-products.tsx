@@ -102,13 +102,13 @@ export function RecommendedProducts({ products }: RecommendedProductsProps) {
 
                 {/* Price + reason badges */}
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-sm font-bold text-foreground">
+                  <span className="text-sm font-bold text-gray-950">
                     {product.currentPrice}
                   </span>
                   {product.reasons.map((reason) => (
                     <span
                       key={reason}
-                      className="rounded-full bg-yellow-100 px-1.5 py-0.5 text-[10px] font-medium text-yellow-800"
+                      className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[10px] font-medium text-primary ring-1 ring-accent/25"
                     >
                       {reason}
                     </span>
@@ -133,8 +133,8 @@ export function RecommendedProducts({ products }: RecommendedProductsProps) {
                   }
                   className={`mt-1 flex w-full items-center justify-center gap-1.5 rounded-full py-1.5 text-xs font-semibold transition-colors ${
                     inCart
-                      ? "bg-foreground text-background hover:bg-foreground/90"
-                      : "bg-black text-white hover:bg-black/85"
+                      ? "border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "border border-accent/45 bg-white text-primary shadow-sm hover:border-accent hover:bg-accent/10"
                   }`}
                 >
                   <ShoppingCart className="h-3 w-3" />

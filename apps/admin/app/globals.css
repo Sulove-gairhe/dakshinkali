@@ -3,79 +3,77 @@
 @tailwind utilities;
 
 /* ============================================
-   YourStore — Global CSS Variables
-   Cozy Electronics · Light + Dark Mode
+   Dakshinkali — Global CSS Variables
+   Brand Palette · Light + Dark Mode
    ============================================ */
 
 @layer base {
 
   /* ---- LIGHT MODE ---- */
   :root {
-    /* Admin panel — mirrors apps/web yellow brand tokens */
-    --color-primary: #111111;
-    --color-secondary: #fafafa;
-    --color-accent: #fbbf24;
-    --color-highlight: #ffe566;
-    --color-text: #2B2B2B;
-    --color-text-muted: #6B7280;
-    --color-border: #E5D9C3;
+    --color-primary: #08335A;
+    --color-secondary: #F8FAFC;
+    --color-accent: #359ACF;
+    --color-highlight: #5BB4E0;
+    --color-text: #08335A;
+    --color-text-muted: #7B9AAD;
+    --color-border: #D7EBF2;
     --color-surface: #FFFFFF;
 
-    /* shadcn/ui HSL Variables (mapped to our palette) */
-    --background: 42 70% 96%;          /* #FAF3E0 */
-    --foreground: 0 0% 17%;            /* #2B2B2B */
+    /* shadcn/ui HSL Variables */
+    --background: 210 50% 98%;
+    --foreground: 209 84% 19%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 17%;
+    --card-foreground: 209 84% 19%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 17%;
-    --primary: 130 22% 30%;            /* #3A5A40 */
+    --popover-foreground: 209 84% 19%;
+    --primary: 209 84% 19%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 42 70% 96%;           /* #FAF3E0 */
-    --secondary-foreground: 130 22% 30%;
-    --muted: 42 30% 90%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 14 74% 60%;              /* #E76F51 */
+    --secondary: 202 44% 95%;
+    --secondary-foreground: 209 84% 19%;
+    --muted: 202 44% 95%;
+    --muted-foreground: 206 24% 38%;
+    --accent: 201 62% 51%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 38 43% 84%;              /* #E5D9C3 */
-    --input: 38 43% 84%;
-    --ring: 14 74% 60%;                /* accent as focus ring */
+    --border: 196 51% 90%;
+    --input: 196 51% 90%;
+    --ring: 201 62% 51%;
     --radius: 0.75rem;
   }
 
   /* ---- DARK MODE ---- */
   .dark {
-    /* Brand Colors */
-    --color-primary: #5C8A63;
-    --color-secondary: #1C1A17;
-    --color-accent: #E76F51;
-    --color-highlight: #F4A261;
-    --color-text: #F0EAD6;
-    --color-text-muted: #9CA3AF;
-    --color-border: #2E2B26;
-    --color-surface: #242018;
+    --color-primary: #5BB4E0;
+    --color-secondary: #062947;
+    --color-accent: #359ACF;
+    --color-highlight: #5BB4E0;
+    --color-text: #F8FAFC;
+    --color-text-muted: #A9C1D1;
+    --color-border: #2585B8;
+    --color-surface: #08335A;
 
     /* shadcn/ui HSL Variables */
-    --background: 36 8% 10%;           /* #1C1A17 */
-    --foreground: 42 50% 90%;          /* #F0EAD6 */
-    --card: 36 10% 13%;                /* #242018 */
-    --card-foreground: 42 50% 90%;
-    --popover: 36 10% 13%;
-    --popover-foreground: 42 50% 90%;
-    --primary: 130 20% 45%;            /* #5C8A63 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 36 8% 10%;
-    --secondary-foreground: 42 50% 90%;
-    --muted: 36 8% 18%;
-    --muted-foreground: 220 9% 64%;
-    --accent: 14 74% 60%;              /* unchanged */
+    --background: 208 84% 15%;
+    --foreground: 210 50% 98%;
+    --card: 209 84% 19%;
+    --card-foreground: 210 50% 98%;
+    --popover: 209 84% 19%;
+    --popover-foreground: 210 50% 98%;
+    --primary: 200 68% 62%;
+    --primary-foreground: 208 84% 15%;
+    --secondary: 209 81% 26%;
+    --secondary-foreground: 210 50% 98%;
+    --muted: 209 81% 26%;
+    --muted-foreground: 204 30% 74%;
+    --accent: 201 62% 51%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 36 9% 16%;               /* #2E2B26 */
-    --input: 36 9% 16%;
-    --ring: 14 74% 60%;
+    --border: 201 67% 43%;
+    --input: 201 67% 43%;
+    --ring: 200 68% 62%;
   }
 }
 

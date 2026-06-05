@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, PowerOff, Package } from "lucide-react";
 import type { AdminProductRecord } from "@/lib/admin/types";
@@ -39,6 +40,21 @@ function resolveDisplayPrice(product: AdminProductRecord): string {
   return formatNpr(numeric);
 }
 
+function resolveStorefrontProductUrl(slug: string): string {
+  const configuredBase =
+    process.env.NEXT_PUBLIC_WEB_URL || process.env.NEXT_PUBLIC_SITE_URL;
+
+  if (configuredBase) {
+    return `${configuredBase.replace(/\/$/, "")}/products/${slug}`;
+  }
+
+  const origin = window.location.origin
+    .replace(":3001", ":3000")
+    .replace("admin.dakshinkali.shop", "dakshinkali.shop");
+
+  return `${origin}/products/${slug}`;
+}
+
 // ─── Status pill ────────────────────────────────────────────────────────────
 
 function StatusPill({ product }: { product: AdminProductRecord }) {
@@ -56,8 +72,8 @@ function StatusPill({ product }: { product: AdminProductRecord }) {
   }
   if (pub === "draft") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 ring-1 ring-amber-200">
-        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+      <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary ring-1 ring-accent/25">
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
         Draft
       </span>
     );
@@ -72,8 +88,8 @@ function StatusPill({ product }: { product: AdminProductRecord }) {
   }
   if (status === "low_stock") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-yellow-700 ring-1 ring-yellow-200">
-        <span className="h-1.5 w-1.5 rounded-full bg-yellow-400" />
+      <span className="inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary ring-1 ring-accent/25">
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
         Low Stock
       </span>
     );
@@ -139,12 +155,12 @@ function BadgeRow({ product }: { product: AdminProductRecord }) {
   if (sf.isFeatured)
     badges.push({
       label: "Featured",
-      cls: "bg-amber-50 text-amber-800 ring-amber-200",
+      cls: "bg-accent/10 text-primary ring-accent/25",
     });
   if (sf.isBestSeller)
     badges.push({
       label: "Best Seller",
-      cls: "bg-blue-50 text-blue-700 ring-blue-200",
+      cls: "bg-accent/15 text-primary ring-accent/30",
     });
   if (sf.isNewArrival)
     badges.push({
@@ -159,7 +175,7 @@ function BadgeRow({ product }: { product: AdminProductRecord }) {
     if (norm !== "imported" && norm !== "manual") {
       badges.push({
         label: b,
-        cls: "bg-gray-50 text-gray-700 ring-gray-200",
+      cls: "bg-gray-50 text-gray-700 ring-gray-200",
       });
     }
   });
@@ -198,10 +214,18 @@ export function ProductCard({
   const brand = product.storefront_data?.brand?.trim() || null;
   const category = product.category?.trim() || "Uncategorized";
   const price = resolveDisplayPrice(product);
+  const slug = product.storefront_data?.slug ?? null;
+
+  function handleCardClick(e: React.MouseEvent<HTMLDivElement>) {
+    if ((e.target as HTMLElement).closest("button, a")) return;
+    if (!slug) return;
+    window.location.href = resolveStorefrontProductUrl(slug);
+  }
 
   return (
     <article
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-amber-300 hover:shadow-md focus-within:border-amber-300 focus-within:shadow-md"
+      onClick={handleCardClick}
+      className={`group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-primary/40 hover:shadow-md focus-within:border-primary/40 focus-within:shadow-md${slug ? " cursor-pointer" : ""}`}
       aria-label={product.name}
     >
       {/* ── Hover action buttons (top-right) ── */}
@@ -248,7 +272,7 @@ export function ProductCard({
         {/* Identity */}
         <div className="min-w-0 flex-1 pt-0.5">
           {brand ? (
-            <p className="mb-0.5 truncate text-[10px] font-bold uppercase tracking-widest text-amber-600">
+            <p className="mb-0.5 truncate text-[10px] font-bold uppercase tracking-widest text-accent">
               {brand}
             </p>
           ) : (
@@ -278,7 +302,7 @@ export function ProductCard({
             </span>
           )}
           {product.status === "low_stock" && (
-            <span className="rounded-full bg-yellow-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-yellow-700">
+            <span className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary ring-1 ring-accent/25">
               Low Stock
             </span>
           )}

@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Scale } from "lucide-react";
+import { Heart, Scale, ShoppingCart } from "lucide-react";
 import type { ProductImage, StoreProduct } from "@/lib/store-products";
 import {
   getRecommendedProducts,
@@ -13,6 +14,7 @@ import { ImageGallery } from "./image-gallery";
 import { VariantSelector } from "./variant-selector";
 import { DescriptionTabs } from "./description-tabs";
 import { SimilarProducts } from "./similar-products";
+import { Footer } from "@/components/layout/Footer";
 
 interface ProductDetailProps {
   product: StoreProduct;
@@ -20,7 +22,7 @@ interface ProductDetailProps {
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter();
-  const { addItem } = useCart();
+  const { addItem, getQuantity } = useCart();
   const [quantity, setQuantity] = useState(1);
   const badge = product.badge ?? product.badges?.[0];
   const images = getProductImages(product);
@@ -228,18 +230,163 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {/* Description Tabs + Similar Products */}
       <div className="px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <DescriptionTabs
-            sections={descriptionSections}
-            specifications={product.specifications}
-            boxContents={product.boxContents}
-            deliveryInfo={product.deliveryInfo}
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="min-w-0">
+            <DescriptionTabs
+              sections={descriptionSections}
+              specifications={product.specifications}
+              boxContents={product.boxContents}
+              deliveryInfo={product.deliveryInfo}
+            />
+            <SimilarProducts products={recommendations} />
+          </div>
+
+          <CurrentProductPreview
+            product={product}
+            quantityInCart={getQuantity(product.id)}
+            onAddToCart={() =>
+              addItem({
+                id: product.id,
+                slug: product.slug,
+                name: product.name,
+                shortDescription: product.shortDescription,
+                image: product.image,
+                currentPrice: product.currentPrice,
+                oldPrice: product.oldPrice,
+                href: `/products/${product.slug}`,
+                price: parseProductPrice(product.currentPrice),
+              })
+            }
           />
-          <SimilarProducts products={recommendations} />
         </div>
       </div>
+      <Footer />
     </main>
   );
+}
+
+function CurrentProductPreview({
+  product,
+  quantityInCart,
+  onAddToCart,
+}: {
+  product: StoreProduct;
+  quantityInCart: number;
+  onAddToCart: () => void;
+}) {
+  const color = getProductColor(product);
+
+  return (
+    <aside className="block lg:sticky lg:top-24 lg:self-start">
+      <article className="overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+        <div className="border-b border-border/70 bg-muted/40 px-4 py-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">
+            Currently Viewing
+          </p>
+        </div>
+
+        <div className="grid gap-4 p-4 sm:grid-cols-[132px_minmax(0,1fr)] lg:grid-cols-1">
+          <div className="relative aspect-square overflow-hidden rounded-lg bg-white p-4">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(min-width: 1280px) 340px, (min-width: 1024px) 300px, 132px"
+              className="object-contain"
+            />
+          </div>
+
+          <div className="flex min-w-0 flex-col">
+            <p className="text-xs font-semibold text-muted-foreground">
+              {product.brand ?? product.category}
+            </p>
+            <h3 className="mt-1 line-clamp-2 text-base font-bold leading-snug text-foreground">
+              {product.name}
+            </h3>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-xl font-bold text-gray-950">
+                {product.currentPrice}
+              </span>
+              {product.oldPrice && (
+                <span className="text-sm font-semibold text-muted-foreground line-through">
+                  {product.oldPrice}
+                </span>
+              )}
+            </div>
+
+            <div className="mt-3 rounded-lg border border-border bg-background px-3 py-2">
+              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                Color
+              </p>
+              <div className="mt-1 flex items-center gap-2">
+                <span
+                  className="h-4 w-4 shrink-0 rounded-full border border-border shadow-inner"
+                  style={{ backgroundColor: getColorSwatch(color) }}
+                />
+                <span className="truncate text-sm font-semibold text-foreground">
+                  {color ?? "As shown"}
+                </span>
+              </div>
+            </div>
+
+            {product.status && (
+              <p className="mt-3 text-xs font-semibold text-muted-foreground">
+                {product.status}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={onAddToCart}
+              className="mt-4 inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-accent/45 bg-white px-4 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:border-accent hover:bg-accent/10"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {quantityInCart > 0 ? "Add Another" : "Add to Cart"}
+            </button>
+          </div>
+        </div>
+      </article>
+    </aside>
+  );
+}
+
+function getProductColor(product: StoreProduct): string | null {
+  const colorVariant = product.variants?.find((variant) =>
+    /colou?r/i.test(variant.label),
+  );
+  const selectedColor =
+    colorVariant?.options.find((option) => option.selected)?.label ??
+    colorVariant?.options[0]?.label;
+
+  if (selectedColor) return selectedColor;
+
+  for (const section of product.specifications ?? []) {
+    const colorSpec = section.specs.find((spec) => /colou?r/i.test(spec.label));
+    if (colorSpec?.value) return colorSpec.value;
+  }
+
+  return null;
+}
+
+function getColorSwatch(color: string | null): string {
+  const normalized = color?.toLowerCase() ?? "";
+
+  if (normalized.includes("black")) return "#111827";
+  if (normalized.includes("white")) return "#f8fafc";
+  if (normalized.includes("silver") || normalized.includes("steel")) {
+    return "#cbd5e1";
+  }
+  if (normalized.includes("grey") || normalized.includes("gray")) {
+    return "#9ca3af";
+  }
+  if (normalized.includes("blue")) return "#2563eb";
+  if (normalized.includes("red") || normalized.includes("wine")) {
+    return "#991b1b";
+  }
+  if (normalized.includes("maroon")) return "#7f1d1d";
+
+  return "#e5e7eb";
 }
 
 function getProductImages(product: StoreProduct): ProductImage[] {

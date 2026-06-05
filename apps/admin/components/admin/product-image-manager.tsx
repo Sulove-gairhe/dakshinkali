@@ -112,7 +112,7 @@ export function ProductImageManager({
       >
         <p className="text-sm text-gray-600">
           Drag and drop images, or{" "}
-          <label className="cursor-pointer font-medium text-amber-700 hover:underline">
+          <label className="cursor-pointer font-medium text-primary hover:underline">
             browse
             <input
               type="file"
@@ -128,7 +128,7 @@ export function ProductImageManager({
           JPEG, PNG, WebP · max 5MB each · up to {MAX_IMAGES} images
         </p>
         {uploading ? (
-          <p className="mt-2 text-xs text-amber-700">Uploading…</p>
+          <p className="mt-2 text-xs text-primary">Uploading…</p>
         ) : null}
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -163,7 +163,7 @@ export function ProductImageManager({
                           </div>
                         )}
                         {index === 0 ? (
-                          <span className="absolute left-1 top-1 rounded bg-amber-500 px-1.5 py-0.5 text-[10px] font-semibold text-gray-900">
+                          <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
                             Primary
                           </span>
                         ) : null}

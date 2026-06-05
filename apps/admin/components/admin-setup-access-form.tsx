@@ -214,7 +214,7 @@ export function AdminSetupAccessForm() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-300 px-4 font-semibold text-black transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-300 px-4 font-semibold text-primary-foreground transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
                   Continue Setup
@@ -229,8 +229,8 @@ export function AdminSetupAccessForm() {
             </form>
           ) : (
             <form onSubmit={(event) => void handleOtpSubmit(event)} className="grid gap-5">
-              <div className="rounded-lg border border-yellow-300/20 bg-yellow-300/10 p-5">
-                <h2 className="font-semibold text-yellow-50">Verify approval code</h2>
+              <div className="rounded-lg border border-primary/20 bg-primary/10 p-5">
+                <h2 className="font-semibold text-white">Verify approval code</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
                   An approval code was sent to the administrator. Enter the
                   6-digit code to continue.
@@ -252,7 +252,7 @@ export function AdminSetupAccessForm() {
                   onChange={(event) =>
                     setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))
                   }
-                  className="h-14 rounded-lg border border-white/10 bg-black/30 px-4 text-center text-xl font-semibold tracking-[0.35em] text-white outline-none transition focus:border-yellow-300/60 focus:ring-2 focus:ring-yellow-300/20"
+                  className="h-14 rounded-lg border border-white/10 bg-black/30 px-4 text-center text-xl font-semibold tracking-[0.35em] text-white outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                 />
               </label>
 
@@ -262,7 +262,7 @@ export function AdminSetupAccessForm() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-yellow-300 px-4 font-semibold text-black transition hover:bg-yellow-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-primary px-4 font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
                   Verify Code
@@ -301,7 +301,7 @@ function Message({
       className={
         isError
           ? "rounded-lg border border-red-300/25 bg-[linear-gradient(135deg,rgba(248,113,113,0.16),rgba(127,29,29,0.22))] p-4 shadow-lg shadow-red-950/20"
-          : "rounded-lg border border-yellow-300/20 bg-yellow-300/10 p-4 shadow-lg shadow-yellow-950/10"
+          : "rounded-lg border border-primary/20 bg-primary/10 p-4 shadow-lg shadow-primary/10"
       }
     >
       <div className="flex items-start gap-3">
@@ -309,7 +309,7 @@ function Message({
           className={
             isError
               ? "grid size-9 shrink-0 place-items-center rounded-lg bg-red-300/15 text-red-200"
-              : "grid size-9 shrink-0 place-items-center rounded-lg bg-yellow-300/15 text-yellow-100"
+              : "grid size-9 shrink-0 place-items-center rounded-lg bg-accent/15 text-white"
           }
         >
           <AlertTriangle className="size-4" />
@@ -319,7 +319,7 @@ function Message({
             className={
               isError
                 ? "text-sm font-semibold text-red-50"
-                : "text-sm font-semibold text-yellow-50"
+                : "text-sm font-semibold text-white"
             }
           >
             {isError ? "Credentials unavailable" : "Verification notice"}
@@ -328,7 +328,7 @@ function Message({
             className={
               isError
                 ? "mt-1 text-sm leading-6 text-red-100/90"
-                : "mt-1 text-sm leading-6 text-yellow-50/90"
+                : "mt-1 text-sm leading-6 text-white/90"
             }
           >
             {text}

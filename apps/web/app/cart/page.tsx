@@ -79,7 +79,7 @@ export default function CartPage() {
                         </p>
                       </div>
                       <div className="shrink-0 text-left sm:text-right">
-                        <p className="font-bold">{item.currentPrice}</p>
+                        <p className="font-bold text-gray-950">{item.currentPrice}</p>
                         {item.oldPrice && (
                           <p className="text-sm text-muted-foreground line-through">
                             {item.oldPrice}
@@ -116,7 +116,7 @@ export default function CartPage() {
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <p className="text-sm font-bold">
+                        <p className="text-sm font-bold text-gray-950">
                           {formatPrice(item.unitPrice * item.quantity)}
                         </p>
                         <button
@@ -171,7 +171,7 @@ export default function CartPage() {
                 <div className="border-t border-border pt-4">
                   <div className="flex items-center justify-between">
                     <span className="font-bold">Grand Total</span>
-                    <span className="text-xl font-bold">
+                    <span className="text-xl font-bold text-gray-950">
                       {formatPrice(grandTotal)}
                     </span>
                   </div>

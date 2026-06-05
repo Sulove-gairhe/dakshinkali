@@ -27,9 +27,9 @@ export default function AdminDashboardPage() {
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <Link
           href="/admin/products"
-          className="card-cozy flex items-center gap-3 p-5 hover:border-amber-300"
+          className="card-cozy flex items-center gap-3 p-5 hover:border-primary/40"
         >
-          <Package className="h-8 w-8 text-amber-600" />
+          <Package className="h-8 w-8 text-primary" />
           <div>
             <p className="font-semibold">Products</p>
             <p className="text-sm text-gray-500">Manage catalog & publishing</p>
@@ -37,9 +37,9 @@ export default function AdminDashboardPage() {
         </Link>
         <Link
           href="/admin/categories"
-          className="card-cozy flex items-center gap-3 p-5 hover:border-amber-300"
+          className="card-cozy flex items-center gap-3 p-5 hover:border-primary/40"
         >
-          <Tag className="h-8 w-8 text-amber-600" />
+          <Tag className="h-8 w-8 text-primary" />
           <div>
             <p className="font-semibold">Categories</p>
             <p className="text-sm text-gray-500">Organize product taxonomy</p>

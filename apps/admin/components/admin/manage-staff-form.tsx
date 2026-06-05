@@ -30,7 +30,9 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
     event.preventDefault();
     setSubmitting(true);
 
-    const result = await addManagedStaffEmail(new FormData(event.currentTarget));
+    const result = await addManagedStaffEmail(
+      new FormData(event.currentTarget),
+    );
     setSubmitting(false);
 
     toast[result.status === "success" ? "success" : "error"](result.message);
@@ -51,7 +53,9 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
 
   async function handleRemoveMember(member: AdminMember) {
     const label = member.username ? `@${member.username}` : member.email;
-    const confirmed = window.confirm(`Remove ${label} from admin access and the database?`);
+    const confirmed = window.confirm(
+      `Remove ${label} from admin access and the database?`,
+    );
     if (!confirmed) {
       return;
     }
@@ -75,15 +79,13 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
         className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
       >
         <div className="mb-6 flex items-start gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-lg bg-amber-100 text-amber-700">
+          <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary">
             <MailPlus className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              Add email
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900">Add email</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Grant admin panel access to an existing or future Supabase user.
+              Grant admin panel access to an existing or future staff/admin.
             </p>
           </div>
         </div>
@@ -95,7 +97,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
               name="email"
               type="email"
               required
-              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
             />
           </label>
 
@@ -106,7 +108,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
               type="text"
               required
               pattern="[a-zA-Z0-9_-]{3,32}"
-              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
             />
           </label>
 
@@ -116,7 +118,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
               name="role"
               required
               defaultValue="staff"
-              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+              className="h-11 rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
             >
               <option value="staff">Staff</option>
               <option value="admin">Admin</option>
@@ -127,9 +129,13 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 text-sm font-semibold text-gray-950 transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-5 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldPlus className="h-4 w-4" />}
+          {submitting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ShieldPlus className="h-4 w-4" />
+          )}
           Add Email
         </button>
       </form>
@@ -166,7 +172,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
                     className={cn(
                       "grid h-12 w-12 shrink-0 place-items-center rounded-lg",
                       member.role === "admin"
-                        ? "bg-amber-100 text-amber-700"
+                        ? "bg-primary/10 text-primary"
                         : "bg-emerald-100 text-emerald-700",
                     )}
                   >
@@ -181,7 +187,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
                       className={cn(
                         "rounded-full px-2.5 py-1 text-xs font-semibold capitalize",
                         member.role === "admin"
-                          ? "bg-amber-100 text-amber-800"
+                          ? "bg-primary/10 text-primary"
                           : "bg-emerald-100 text-emerald-800",
                       )}
                     >
@@ -229,7 +235,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
                       onChange={(event) =>
                         void handleRoleChange(member.id, event.target.value)
                       }
-                      className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 disabled:opacity-60"
+                      className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-60"
                     >
                       <option value="staff">Staff</option>
                       <option value="admin">Admin</option>

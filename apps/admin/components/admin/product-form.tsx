@@ -171,13 +171,13 @@ export function ProductForm({
                 <span
                   className={
                     form.publishingStatus === "live"
-                      ? "rounded bg-amber-100 px-2 py-0.5 text-amber-900"
+                      ? "rounded bg-primary/10 px-2 py-0.5 text-primary"
                       : "rounded bg-gray-100 px-2 py-0.5"
                   }
                 >
                   {form.publishingStatus}
                 </span>
-                {dirty ? <span className="text-amber-700">● Unsaved changes</span> : null}
+                {dirty ? <span className="text-primary">● Unsaved changes</span> : null}
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -211,7 +211,7 @@ export function ProductForm({
                   void persist("draft", false);
                   setPreviewOpen(true);
                 }}
-                className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+                className="rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-sm text-primary"
               >
                 Save & Preview
               </button>
@@ -219,7 +219,7 @@ export function ProductForm({
                 type="button"
                 disabled={saving}
                 onClick={() => void persist("live", true)}
-                className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-amber-400"
+                className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Publish
               </button>
@@ -233,7 +233,7 @@ export function ProductForm({
                 onClick={() => setTab(label)}
                 className={
                   tab === label
-                    ? "whitespace-nowrap rounded-lg bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-900"
+                    ? "whitespace-nowrap rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
                     : "whitespace-nowrap rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
                 }
               >
@@ -375,11 +375,11 @@ export function ProductForm({
 
           {tab === "SEO & Search" && (
             <div className="space-y-6">
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                <h3 className="text-sm font-semibold text-amber-900">
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                <h3 className="text-sm font-semibold text-primary">
                   Smart SEO Generator
                 </h3>
-                <p className="mt-1 text-xs text-amber-700">
+                <p className="mt-1 text-xs text-primary">
                   Generate SEO title, description, and search terms from your
                   product data.
                 </p>
@@ -419,12 +419,12 @@ export function ProductForm({
                       setIsGeneratorUnlocked(true);
                       toast.success("SEO suggestions generated");
                     }}
-                    className="rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-amber-400"
+                    className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                   >
                     {seoSuggestion ? "Regenerate" : "Generate SEO"}
                   </button>
                   {seoSuggestion && (
-                    <span className="self-center text-xs text-amber-700">
+                    <span className="self-center text-xs text-primary">
                       Variation {seoSuggestion.variationIndex + 1} of{" "}
                       {MAX_VARIATIONS}
                     </span>
@@ -471,7 +471,7 @@ export function ProductForm({
                           duration: 4000,
                         });
                       }}
-                      className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm hover:bg-amber-100"
+                      className="rounded-lg border border-primary/40 px-3 py-1.5 text-sm hover:bg-primary/10"
                     >
                       Apply Suggestions
                     </button>
@@ -479,13 +479,13 @@ export function ProductForm({
                 </div>
                 {seoSuggestion && seoSuggestion.sourceFields.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1.5">
-                    <span className="text-xs text-amber-700">
+                    <span className="text-xs text-primary">
                       Generated from:
                     </span>
                     {seoSuggestion.sourceFields.map((field) => (
                       <span
                         key={field}
-                        className="rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800"
+                        className="rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary"
                       >
                         {field}
                       </span>
@@ -499,7 +499,7 @@ export function ProductForm({
                   {seoWarnings.map((w, i) => (
                     <p
                       key={i}
-                      className="rounded-lg bg-yellow-50 px-3 py-2 text-xs text-yellow-800"
+                      className="rounded-lg bg-primary/5 px-3 py-2 text-xs text-primary"
                     >
                       {w}
                     </p>
@@ -562,7 +562,7 @@ export function ProductForm({
                           seoPreviewDescription.length > 160
                             ? "text-red-500"
                             : seoPreviewDescription.length < 120
-                              ? "text-amber-500"
+                              ? "text-primary"
                               : "text-gray-400"
                         }`}
                       >

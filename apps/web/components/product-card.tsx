@@ -48,7 +48,7 @@ export function ProductCard({
           {badgeItems.map((badgeItem) => (
             <span
               key={badgeItem}
-              className="inline-block rounded-md bg-primary px-3 py-1 text-xs font-bold text-primary-foreground"
+              className="inline-block rounded-md bg-accent/15 px-3 py-1 text-xs font-bold text-primary ring-1 ring-accent/30"
             >
               {badgeItem}
             </span>
@@ -69,7 +69,7 @@ export function ProductCard({
             : `Add ${name} to wishlist`
         }
         className={cn(
-          "absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-foreground shadow-md ring-1 ring-border transition-colors hover:bg-white",
+          "absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-primary shadow-md ring-1 ring-border transition-colors hover:bg-white hover:text-primary/80",
           isWishlisted && "text-red-600",
         )}
       >
@@ -77,7 +77,7 @@ export function ProductCard({
       </button>
 
       {quantityInCart > 0 && (
-        <div className="absolute right-4 top-16 z-10 flex h-8 min-w-8 items-center justify-center rounded-full bg-secondary px-2 text-sm font-bold text-secondary-foreground shadow-lg ring-2 ring-white">
+        <div className="absolute right-4 top-16 z-10 flex h-8 min-w-8 items-center justify-center rounded-full bg-primary px-2 text-sm font-bold text-primary-foreground shadow-lg ring-2 ring-white">
           {quantityInCart}
         </div>
       )}
@@ -112,7 +112,7 @@ export function ProductCard({
         </p>
 
         <div className="mt-3 flex items-start gap-1.5 border-t border-border/70 pt-3 text-xs font-medium text-muted-foreground">
-          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-700 dark:text-amber-300" />
+          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
           <span className="line-clamp-1">
             <span className="font-semibold text-stone-700 dark:text-stone-200">
               Warranty:
@@ -126,7 +126,7 @@ export function ProductCard({
 
         {/* Pricing */}
         <div className="mt-3 flex items-baseline gap-2">
-          <span className="text-xl font-bold text-foreground">
+          <span className="text-xl font-bold text-gray-950">
             {currentPrice}
           </span>
           {oldPrice && (
@@ -148,7 +148,7 @@ export function ProductCard({
             e.stopPropagation();
             onAddToCart?.(e);
           }}
-          className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-secondary px-4 py-3 text-sm font-semibold text-secondary-foreground transition-colors duration-300 hover:bg-secondary/90"
+          className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-accent/45 bg-white px-4 py-3 text-sm font-semibold text-primary shadow-sm transition-colors duration-300 hover:border-accent hover:bg-accent/10"
         >
           <ShoppingCart className="h-5 w-5" />
           {quantityInCart > 0 ? "Add Another" : "Add to Cart"}

@@ -19,6 +19,7 @@ import { CompareProvider } from "@/components/compare/CompareProvider";
 import { CompareToggle } from "@/components/compare/CompareToggle";
 import { CompareDrawer } from "@/components/compare/CompareDrawer";
 import { CompareModal } from "@/components/compare/CompareModal";
+import { Footer } from "@/components/layout/Footer";
 import {
   normalizeSort,
   searchProducts,
@@ -215,6 +216,7 @@ export function SearchResultsClient() {
 
         <CompareDrawer />
         <CompareModal />
+        <Footer />
       </main>
     </CompareProvider>
   );
@@ -289,7 +291,7 @@ function EmptySearchState({
           <button
             type="button"
             onClick={onClearBrand}
-            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/15"
+            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/90"
           >
             Clear Brand
           </button>
@@ -298,7 +300,7 @@ function EmptySearchState({
           <button
             type="button"
             onClick={onClearCategory}
-            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/15"
+            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/90"
           >
             Clear Category
           </button>
@@ -307,7 +309,7 @@ function EmptySearchState({
           <button
             type="button"
             onClick={onClearAll}
-            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/15"
+            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/90"
           >
             Clear All Filters
           </button>
@@ -316,7 +318,7 @@ function EmptySearchState({
           <Link
             key={link.href}
             href={link.href}
-            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/15"
+            className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/90"
           >
             {link.label}
           </Link>

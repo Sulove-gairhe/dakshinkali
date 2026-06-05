@@ -5,119 +5,119 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================
-   V0 Yellow Theme + Existing Project Fonts/Utilities
+   Dakshinkali Brand Theme + Existing Project Fonts/Utilities
    ============================================ */
 
 :root {
-  --color-primary: #111111;
-  --color-accent: #fbbf24;
-  --color-highlight: #ffe566;
-  --color-bg: #fafafa;
+  --color-primary: #08335A;
+  --color-accent: #359ACF;
+  --color-highlight: #5BB4E0;
+  --color-bg: #F8FAFC;
   --color-surface: #ffffff;
-  --color-cream: #f5f5f5;
-  --color-text: #111111;
-  --color-text-muted: #6b7280;
-  --color-border: #e5e7eb;
+  --color-cream: #EDF4F8;
+  --color-text: #111827;
+  --color-text-muted: #7B9AAD;
+  --color-border: #D7EBF2;
 
-  --background: #fafafa;
-  --foreground: #111111;
+  --background: #F8FAFC;
+  --foreground: #111827;
 
   --card: #ffffff;
-  --card-foreground: #111111;
+  --card-foreground: #111827;
 
   --popover: #ffffff;
-  --popover-foreground: #111111;
+  --popover-foreground: #111827;
 
-  --primary: #fbbf24;
-  --primary-foreground: #111111;
+  --primary: #08335A;
+  --primary-foreground: #ffffff;
 
-  --secondary: #111111;
-  --secondary-foreground: #ffffff;
+  --secondary: #EDF4F8;
+  --secondary-foreground: #08335A;
 
-  --muted: #f5f5f5;
-  --muted-foreground: #6b7280;
+  --muted: #EDF4F8;
+  --muted-foreground: #4A6478;
 
-  --accent: #fbbf24;
-  --accent-foreground: #111111;
+  --accent: #359ACF;
+  --accent-foreground: #ffffff;
 
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: #EF4444;
   --destructive-foreground: #ffffff;
 
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --ring: #fbbf24;
+  --border: #D7EBF2;
+  --input: #D7EBF2;
+  --ring: #359ACF;
 
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-1: #08335A;
+  --chart-2: #359ACF;
+  --chart-3: #7B9AAD;
+  --chart-4: #10B981;
+  --chart-5: #F59E0B;
 
   --radius: 0.625rem;
 
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #08335A;
+  --sidebar-primary: #08335A;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #EDF4F8;
+  --sidebar-accent-foreground: #08335A;
+  --sidebar-border: #D7EBF2;
+  --sidebar-ring: #359ACF;
 }
 
 .dark {
-  --color-primary: #fbbf24;
-  --color-accent: #fbbf24;
-  --color-highlight: #ffe566;
-  --color-bg: #111111;
-  --color-surface: #111111;
-  --color-cream: #1f1f1f;
-  --color-text: #fafafa;
-  --color-text-muted: #a1a1aa;
-  --color-border: #2a2a2a;
+  --color-primary: #5BB4E0;
+  --color-accent: #359ACF;
+  --color-highlight: #5BB4E0;
+  --color-bg: #062947;
+  --color-surface: #08335A;
+  --color-cream: #0D467A;
+  --color-text: #F8FAFC;
+  --color-text-muted: #A9C1D1;
+  --color-border: #2585B8;
 
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --background: #062947;
+  --foreground: #F8FAFC;
 
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
+  --card: #08335A;
+  --card-foreground: #F8FAFC;
 
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: #08335A;
+  --popover-foreground: #F8FAFC;
 
-  --primary: #fbbf24;
-  --primary-foreground: #111111;
+  --primary: #5BB4E0;
+  --primary-foreground: #062947;
 
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary: #0D467A;
+  --secondary-foreground: #F8FAFC;
 
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --muted: #0D467A;
+  --muted-foreground: #A9C1D1;
 
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #359ACF;
+  --accent-foreground: #ffffff;
 
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.985 0 0);
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
 
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: #fbbf24;
+  --border: #2585B8;
+  --input: #2585B8;
+  --ring: #5BB4E0;
 
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-1: #5BB4E0;
+  --chart-2: #359ACF;
+  --chart-3: #A9C1D1;
+  --chart-4: #10B981;
+  --chart-5: #F59E0B;
 
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  --sidebar: #08335A;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #5BB4E0;
+  --sidebar-primary-foreground: #062947;
+  --sidebar-accent: #0D467A;
+  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-border: #2585B8;
+  --sidebar-ring: #5BB4E0;
 }
 
 @theme inline {
@@ -200,7 +200,7 @@
    ============================================ */
 
 .view-all-btn {
-  background-image: radial-gradient(circle at center, #fbbf24 0%, #fbbf24 0%, transparent 0%);
+  background-image: radial-gradient(circle at center, #359ACF 0%, #359ACF 0%, transparent 0%);
   padding-right: 0.75rem;
   gap: 0;
   transition: 
@@ -212,7 +212,7 @@
 }
 
 .view-all-btn:hover {
-  background-image: radial-gradient(circle at center, #fbbf24 0%, #fbbf24 100%, transparent 100%);
+  background-image: radial-gradient(circle at center, #359ACF 0%, #359ACF 100%, transparent 100%);
   padding-right: 1.5rem;
   gap: 0.5rem;
 }
@@ -225,7 +225,7 @@
 .btn-cta {
   @apply rounded-full px-6 py-2.5 text-sm font-semibold transition-transform duration-150 hover:scale-[1.03] active:scale-[0.97];
   background-color: var(--color-accent);
-  color: #111111;
+  color: #ffffff;
 }
 
 .btn-cta:hover {

@@ -46,7 +46,7 @@ export function StoreProductPreviewPanel({
             onClick={() => setTab(key)}
             className={
               tab === key
-                ? "flex-1 border-b-2 border-amber-500 py-2 text-sm font-medium text-amber-900"
+                ? "flex-1 border-b-2 border-primary py-2 text-sm font-medium text-primary"
                 : "flex-1 py-2 text-sm text-gray-600 hover:bg-gray-50"
             }
           >
@@ -73,7 +73,7 @@ export function StoreProductPreviewPanel({
             </div>
             <div className="space-y-2 p-4">
               {preview.badge ? (
-                <span className="inline-block rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900">
+                <span className="inline-block rounded bg-accent/15 px-2 py-0.5 text-xs font-medium text-primary ring-1 ring-accent/25">
                   {preview.badge}
                 </span>
               ) : null}

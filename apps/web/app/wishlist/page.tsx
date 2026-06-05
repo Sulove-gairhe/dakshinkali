@@ -99,7 +99,7 @@ export default function WishlistPage() {
                     </p>
 
                     <div className="mt-4 flex items-baseline gap-2">
-                      <span className="text-xl font-bold">
+                      <span className="text-xl font-bold text-gray-950">
                         {item.currentPrice}
                       </span>
                       {item.oldPrice && (
@@ -141,7 +141,7 @@ export default function WishlistPage() {
                 <p className="text-sm text-muted-foreground">
                   Saved item value
                 </p>
-                <p className="text-xl font-bold">
+                <p className="text-xl font-bold text-gray-950">
                   {formatPrice(
                     items.reduce(
                       (total, item) =>

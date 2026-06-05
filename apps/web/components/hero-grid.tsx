@@ -66,7 +66,7 @@ export function HeroGrid({
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-black/10" />
           <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10">
-            <span className="inline-block rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground mb-3">
+            <span className="inline-block rounded-full bg-accent/90 px-3 py-1 text-xs font-semibold text-white mb-3">
               {primary.badge}
             </span>
             <h2 className="mb-2 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
@@ -77,7 +77,7 @@ export function HeroGrid({
             </p>
             <button
               type="button"
-              className="cursor-pointer rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors duration-300 hover:bg-primary/90"
+              className="cursor-pointer rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors duration-300 hover:bg-accent"
             >
               {primary.buttonLabel || "Shop Now"}
             </button>
@@ -86,7 +86,7 @@ export function HeroGrid({
 
         <a
           href={secondary.href || "#"}
-          className="group relative overflow-hidden rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(251,191,36,0.15)] lg:col-span-5 min-h-[240px] block"
+          className="group relative overflow-hidden rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(8,51,90,0.15)] lg:col-span-5 min-h-[240px] block"
         >
           <Image
             src={secondary.imageSrc}
@@ -96,7 +96,7 @@ export function HeroGrid({
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-black/20" />
           <div className="absolute bottom-0 left-0 right-0 p-6">
-            <span className="inline-block rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground mb-2">
+            <span className="inline-block rounded-full bg-accent/90 px-3 py-1 text-xs font-semibold text-white mb-2">
               {secondary.badge}
             </span>
             <h3 className="mb-1 text-lg font-bold text-white sm:text-xl">
@@ -118,7 +118,7 @@ export function HeroGrid({
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-black/20" />
           <div className="absolute bottom-0 left-0 right-0 p-6">
-            <span className="inline-block rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground mb-2">
+            <span className="inline-block rounded-full bg-accent/90 px-3 py-1 text-xs font-semibold text-white mb-2">
               {tertiary.badge}
             </span>
             <h3 className="mb-1 text-lg font-bold text-white sm:text-xl">

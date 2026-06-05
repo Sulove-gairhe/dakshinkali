@@ -57,7 +57,7 @@ export function RelatedProductSelector({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search products by name or slug"
-        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+        className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
       />
       {results.length > 0 ? (
         <ul className="max-h-40 overflow-auto rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -65,7 +65,7 @@ export function RelatedProductSelector({
             <li key={item.id}>
               <button
                 type="button"
-                className="w-full px-3 py-2 text-left text-sm hover:bg-amber-50"
+                className="w-full px-3 py-2 text-left text-sm hover:bg-primary/5"
                 onClick={() => addSlug(item.slug, item.name)}
               >
                 <span className="font-medium">{item.name}</span>
@@ -79,7 +79,7 @@ export function RelatedProductSelector({
         {value.map((slug) => (
           <span
             key={slug}
-            className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-900 ring-1 ring-amber-200"
+            className="inline-flex items-center gap-1 rounded-full bg-primary/5 px-3 py-1 text-xs text-primary ring-1 ring-primary/20"
           >
             {labels[slug] ?? slug}
             <button

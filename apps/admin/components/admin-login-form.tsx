@@ -50,14 +50,14 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
 
   return (
     <main className="min-h-screen bg-[#080a0f] text-white">
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(250,204,21,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(250,204,21,0.08)_1px,transparent_1px)] bg-[size:44px_44px] opacity-25" />
-      <div className="absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_50%_0%,rgba(234,179,8,0.22),transparent_62%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(53,154,207,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(53,154,207,0.10)_1px,transparent_1px)] bg-[size:44px_44px] opacity-25" />
+      <div className="absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_50%_0%,rgba(53,154,207,0.24),transparent_62%)]" />
 
       <section className="relative mx-auto grid min-h-screen w-full max-w-2xl place-items-center px-5 py-10">
         <div className="w-full rounded-lg border border-white/10 bg-[#10131a]/95 p-6 shadow-2xl shadow-black/50 backdrop-blur sm:p-9">
           <div className="mb-8 flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-yellow-300">
+              <p className="text-sm font-medium text-accent">
                 Dakshinkali Admin
               </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-normal">
@@ -67,7 +67,7 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
                 Secure access for authorized staff only.
               </p>
             </div>
-            <div className="grid size-11 place-items-center rounded-lg border border-yellow-300/20 bg-yellow-300/10 text-yellow-200">
+            <div className="grid size-11 place-items-center rounded-lg border border-primary/20 bg-primary/10 text-accent">
               <Lock className="size-5" />
             </div>
           </div>
@@ -91,7 +91,7 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
                 required
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
-                className="h-14 rounded-lg border border-white/10 bg-black/30 px-4 text-white outline-none transition focus:border-yellow-300/60 focus:ring-2 focus:ring-yellow-300/20"
+                className="h-14 rounded-lg border border-white/10 bg-black/30 px-4 text-white outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
               />
             </label>
 
@@ -105,7 +105,7 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
                   required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="h-14 w-full rounded-lg border border-white/10 bg-black/30 px-4 pr-12 text-white outline-none transition focus:border-yellow-300/60 focus:ring-2 focus:ring-yellow-300/20"
+                  className="h-14 w-full rounded-lg border border-white/10 bg-black/30 px-4 pr-12 text-white outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                 />
                 <button
                   type="button"
@@ -131,7 +131,7 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
             <button
               type="submit"
               disabled={submitting}
-              className="mt-1 inline-flex h-14 items-center justify-center gap-2 rounded-lg bg-yellow-300 px-4 font-semibold text-black transition hover:bg-yellow-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-1 inline-flex h-14 items-center justify-center gap-2 rounded-lg bg-primary px-4 font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? <Loader2 className="size-4 animate-spin" /> : null}
               Continue Securely
@@ -155,7 +155,7 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
 
           <p className="mt-5 text-sm text-slate-400">
             Storefront:{" "}
-            <Link className="text-yellow-200 hover:text-yellow-100" href={webUrl}>
+            <Link className="text-accent hover:text-primary-foreground/90" href={webUrl}>
               Back to shop
             </Link>
           </p>
@@ -177,7 +177,7 @@ function IconBadge({
       title={title}
       className={cn(
         "grid h-14 place-items-center rounded-lg border border-white/10",
-        "bg-white/[0.04] text-yellow-200 shadow-inner shadow-white/5",
+        "bg-white/[0.04] text-accent shadow-inner shadow-white/5",
       )}
     >
       {icon}

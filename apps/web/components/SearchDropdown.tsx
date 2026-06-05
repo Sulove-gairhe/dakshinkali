@@ -300,7 +300,7 @@ function InventoryBadge({
       className={cn(
         "shrink-0 rounded-full px-2 py-1 text-[11px] font-bold",
         status === "In Stock" && "bg-cyan-100 text-cyan-800",
-        status === "Low Stock" && "bg-amber-100 text-amber-800",
+        status === "Low Stock" && "bg-primary/10 text-primary",
         status === "Out of Stock" && "bg-red-50 text-red-700",
       )}
     >
@@ -365,7 +365,7 @@ function EmptyState() {
           <Link
             key={link.href}
             href={link.href}
-            className="rounded-full border border-border px-3 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/15"
+            className="rounded-full border border-border px-3 py-2 text-sm font-bold text-foreground transition-colors hover:border-primary hover:bg-primary/90"
           >
             {link.label}
           </Link>

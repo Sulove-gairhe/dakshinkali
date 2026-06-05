@@ -155,7 +155,7 @@ export function DescriptionSectionBuilder({
             },
           ])
         }
-        className="inline-flex items-center gap-1 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm hover:border-amber-400"
+        className="inline-flex items-center gap-1 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm hover:border-primary/50"
       >
         <Plus className="h-4 w-4" /> Add section
       </button>

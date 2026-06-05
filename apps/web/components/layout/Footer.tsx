@@ -104,7 +104,7 @@ export function Footer() {
             >
               <span className="relative size-12 overflow-hidden rounded-full border border-white/10 bg-white">
                 <Image
-                  src="/images/logo-placeholder.jpeg"
+                  src="/images/logo-placeholder.webp"
                   alt="Dakshinkali Electronics logo"
                   fill
                   sizes="48px"

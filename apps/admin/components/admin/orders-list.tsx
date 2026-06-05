@@ -170,7 +170,7 @@ export function OrdersList() {
           {hasFilters ? (
             <button
               type="button"
-              className="mt-3 text-sm text-amber-700 hover:underline"
+              className="mt-3 text-sm text-primary hover:underline"
               onClick={() => {
                 setSearch("");
                 setStatus("");
@@ -215,7 +215,7 @@ export function OrdersList() {
                     onClick={() => setQuickView(order)}
                     className={`cursor-pointer border-t border-gray-100 hover:bg-gray-50/50 ${
                       highlightProof || highlightApproval
-                        ? "border-l-4 border-l-amber-500 bg-amber-50/40"
+                        ? "border-l-4 border-l-primary bg-primary/5"
                         : ""
                     }`}
                   >
@@ -261,7 +261,7 @@ export function OrdersList() {
                       <div className="flex gap-2">
                         <Link
                           href={`/admin/orders/${order.id}`}
-                          className="text-amber-700 hover:text-amber-900"
+                          className="text-primary hover:text-primary"
                           title="View"
                         >
                           <Eye className="h-4 w-4" />
@@ -352,7 +352,7 @@ export function OrdersList() {
             </p>
             <Link
               href={`/admin/orders/${quickView.id}`}
-              className="inline-block rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
+              className="inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               onClick={() => setQuickView(null)}
             >
               View full order

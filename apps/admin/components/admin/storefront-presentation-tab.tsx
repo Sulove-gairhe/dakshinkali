@@ -23,7 +23,7 @@ function Toggle({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
       />
     </label>
   );

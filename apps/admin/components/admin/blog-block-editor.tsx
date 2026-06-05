@@ -90,7 +90,7 @@ export function BlogBlockEditor({
                           >
                             <GripVertical className="h-4 w-4" />
                           </button>
-                          <span className="text-xs font-semibold uppercase tracking-wide text-amber-800">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-primary">
                             {BLOCK_LABELS[block.type]}
                           </span>
                         </div>
@@ -155,7 +155,7 @@ export function BlogBlockEditor({
         <button
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-amber-400 hover:bg-amber-50"
+          className="inline-flex items-center gap-2 rounded-lg border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-700 hover:border-primary/50 hover:bg-primary/5"
         >
           <Plus className="h-4 w-4" />
           Add block
@@ -168,7 +168,7 @@ export function BlogBlockEditor({
               <button
                 key={type}
                 type="button"
-                className="block w-full px-3 py-2 text-left text-sm hover:bg-amber-50"
+                className="block w-full px-3 py-2 text-left text-sm hover:bg-primary/5"
                 onClick={() => {
                   onChange([...value, newBlock(type)]);
                   setMenuOpen(false);

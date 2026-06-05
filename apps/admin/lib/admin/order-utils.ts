@@ -60,7 +60,7 @@ export function orderStatusBadgeClass(status: OrderStatus): string {
     case "pending":
       return "bg-gray-100 text-gray-700";
     case "pending_admin_approval":
-      return "bg-amber-100 text-amber-900";
+      return "bg-primary/10 text-primary";
     case "confirmed":
       return "bg-blue-100 text-blue-800";
     case "processing":
@@ -81,7 +81,7 @@ export function paymentStatusBadgeClass(status: PaymentStatus): string {
     case "paid":
       return "bg-green-100 text-green-800";
     case "pending_verification":
-      return "bg-amber-100 text-amber-900";
+      return "bg-primary/10 text-primary";
     case "failed":
       return "bg-red-100 text-red-800";
     case "refunded":

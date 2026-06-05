@@ -116,13 +116,13 @@ export function CategoriesManager({
             placeholder="Search categories…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="w-full rounded-lg border border-gray-200 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
           />
         </div>
         <button
           type="button"
           onClick={openCreate}
-          className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-amber-400"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           Create category
         </button>
@@ -136,7 +136,7 @@ export function CategoriesManager({
           <button
             type="button"
             onClick={openCreate}
-            className="mt-4 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
+            className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           >
             Create category
           </button>
@@ -178,7 +178,7 @@ export function CategoriesManager({
                     <button
                       type="button"
                       onClick={() => openEdit(cat)}
-                      className="text-amber-700 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       Edit
                     </button>
@@ -251,7 +251,7 @@ export function CategoriesManager({
                   type="button"
                   disabled={saving || !name.trim()}
                   onClick={() => void handleSave()}
-                  className="flex-1 rounded-lg bg-amber-500 py-2 text-sm font-medium text-gray-900"
+                  className="flex-1 rounded-lg bg-primary py-2 text-sm font-medium text-primary-foreground"
                 >
                   {saving ? "Saving…" : "Save"}
                 </button>

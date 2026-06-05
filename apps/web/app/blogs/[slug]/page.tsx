@@ -150,7 +150,7 @@ function BlogContentBlockRenderer({ block }: { block: BlogContentBlock }) {
 
   if (block.type === "tip") {
     return (
-      <div className="rounded-xl border border-primary/25 bg-[#fff8e7] p-4 text-sm font-semibold leading-6 text-foreground">
+      <div className="rounded-xl border border-primary/25 bg-primary/5 p-4 text-sm font-semibold leading-6 text-foreground">
         {block.text}
       </div>
     );

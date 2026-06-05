@@ -47,7 +47,7 @@ export function getAdminUrl() {
     process.env.NEXT_PUBLIC_ADMIN_URL ||
     (process.env.NODE_ENV === "development"
       ? "http://localhost:3001"
-      : "https://dakshinkali-admin.vercel.app")
+      : "https://admin.dakshinkali.shop")
   );
 }
 

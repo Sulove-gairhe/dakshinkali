@@ -48,7 +48,7 @@ export function OrderProofViewer({
           {/* TODO: Remove manual upload once checkout populates proof_file_url */}
           Checkout may store proof metadata in notes until the upload pipeline is wired.
         </p>
-        <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-amber-400">
+        <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
           <Upload className="h-4 w-4" />
           {uploading ? "Uploading…" : "Upload proof manually"}
           <input
@@ -106,7 +106,7 @@ export function OrderProofViewer({
               href={proofUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-gray-900"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             >
               Open PDF in new tab
             </a>
@@ -124,7 +124,7 @@ export function OrderProofViewer({
               href={proofUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 inline-block text-amber-700 underline"
+              className="mt-2 inline-block text-primary underline"
             >
               {proofUrl}
             </a>

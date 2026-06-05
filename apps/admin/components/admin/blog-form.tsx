@@ -280,7 +280,7 @@ export function BlogForm({
                 {form.status}
               </span>
               {dirty ? (
-                <span className="text-amber-700">● Unsaved changes</span>
+                <span className="text-primary">● Unsaved changes</span>
               ) : null}
             </div>
           </div>
@@ -307,7 +307,7 @@ export function BlogForm({
               type="button"
               disabled={saving}
               onClick={() => void handlePublish()}
-              className="rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-amber-400"
+              className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               Publish
             </button>
@@ -316,7 +316,7 @@ export function BlogForm({
       </div>
 
       {restoreOffer ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
           <span>A local draft was found. Restore unsaved changes?</span>
           <div className="flex gap-2">
             <button
@@ -328,7 +328,7 @@ export function BlogForm({
             </button>
             <button
               type="button"
-              className="rounded bg-amber-500 px-3 py-1 font-medium text-gray-900"
+              className="rounded bg-primary px-3 py-1 font-medium text-primary-foreground"
               onClick={() => {
                 setForm(restoreOffer);
                 setDirty(true);
@@ -349,8 +349,8 @@ export function BlogForm({
             onClick={() => setTab(t)}
             className={
               tab === t
-                ? "border-b-2 border-amber-500 px-3 py-2 text-sm font-medium text-amber-900"
-                : "px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
+                ? "border-b-2 border-primary px-3 py-2 text-sm font-medium text-primary"
+                : "px-3 py-2 text-sm text-gray-600 hover:text-primary"
             }
           >
             {t}
@@ -589,7 +589,7 @@ export function BlogForm({
               <p className="text-gray-600">Slug preview</p>
               <p className="font-mono text-gray-900">{form.slug || "—"}</p>
               <p className="mt-3 text-gray-600">Storefront URL</p>
-              <p className="break-all font-mono text-amber-800">
+              <p className="break-all font-mono text-primary">
                 {siteUrl}
                 {storefrontPath}
               </p>

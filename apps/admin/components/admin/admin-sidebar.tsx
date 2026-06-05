@@ -83,7 +83,7 @@ export function AdminSidebar({
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 active
-                  ? "border-l-4 border-amber-500 bg-amber-50 text-amber-900"
+                  ? "border-l-4 border-primary bg-primary/5 text-primary"
                   : "border-l-4 border-transparent text-gray-700 hover:bg-gray-50",
               )}
             >
@@ -136,7 +136,7 @@ export function AdminSidebar({
                 className={cn(
                   "flex items-center justify-between rounded-lg py-2 pl-8 pr-3 text-sm transition-colors",
                   active
-                    ? "bg-amber-50 font-medium text-amber-900"
+                    ? "bg-primary/5 font-medium text-primary"
                     : "text-gray-700 hover:bg-gray-50",
                 )}
               >
@@ -147,7 +147,7 @@ export function AdminSidebar({
                   {item.label}
                 </span>
                 {badge > 0 ? (
-                  <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-gray-900">
+                  <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold text-primary ring-1 ring-accent/25">
                     {badge}
                   </span>
                 ) : null}
@@ -168,7 +168,7 @@ export function AdminSidebar({
               className={cn(
                 "flex items-center gap-2 rounded-lg py-2 pl-8 pr-3 text-sm transition-colors",
                 pathname.startsWith("/admin/manage/staff")
-                  ? "bg-amber-50 font-medium text-amber-900"
+                  ? "bg-primary/5 font-medium text-primary"
                   : "text-gray-700 hover:bg-gray-50",
               )}
             >

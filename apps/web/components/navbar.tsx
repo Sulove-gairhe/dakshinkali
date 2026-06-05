@@ -54,7 +54,7 @@ const defaultMenuItems: MenuItem[] = [
 
 export function Navbar({
   brandName = "Dakshinkali Electronics",
-  brandLogoSrc = "/images/logo-placeholder.jpeg",
+  brandLogoSrc = "/images/logo-placeholder.webp",
   searchPlaceholder = "Search for TVs, refrigerators, appliances...",
   cartCount = 0,
   wishlistCount = 0,
@@ -98,10 +98,10 @@ export function Navbar({
                   className="h-full w-full object-contain p-0.5"
                 />
               </div>
-              <span className="hidden text-lg font-bold text-foreground lg:block">
+              <span className="hidden text-lg font-bold text-gray-950 lg:block">
                 {brandName}
               </span>
-              <span className="hidden text-lg font-bold text-foreground sm:block lg:hidden">
+              <span className="hidden text-lg font-bold text-gray-950 sm:block lg:hidden">
                 {mobileBrandName}
               </span>
             </Link>
@@ -154,7 +154,7 @@ export function Navbar({
             >
               <button
                 type="button"
-                className="flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-secondary-foreground transition-colors duration-300 hover:bg-white/10 hover:text-primary"
+                className="flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold text-gray-950 transition-colors duration-300 hover:bg-white/70 hover:text-primary"
               >
                 BY BRANDS
                 <ChevronDown
@@ -173,8 +173,8 @@ export function Navbar({
                   href={item.href || "#"}
                   className={
                     item.highlighted
-                      ? "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-primary/20 px-3 py-1.5 text-sm font-medium text-primary transition-colors duration-300 hover:bg-primary/30"
-                      : "shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-secondary-foreground transition-colors duration-300 hover:bg-white/10 hover:text-primary"
+                      ? "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-primary ring-1 ring-accent/35 transition-colors duration-300 hover:bg-accent/10"
+                      : "shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold text-gray-950 transition-colors duration-300 hover:bg-white/70 hover:text-primary"
                   }
                 >
                   {ItemIcon ? <ItemIcon className="h-4 w-4" /> : null}
@@ -222,7 +222,7 @@ function IconButton({
   return (
     <a
       href={href}
-      className="group flex flex-col items-center gap-1 text-foreground"
+      className="group flex flex-col items-center gap-1 text-gray-900"
     >
       <div className="relative">
         <Icon className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
@@ -232,7 +232,7 @@ function IconButton({
           </span>
         )}
       </div>
-      <span className="text-[10px] font-medium uppercase tracking-wide text-foreground">
+      <span className="text-[10px] font-medium uppercase tracking-wide text-gray-900">
         {label}
       </span>
     </a>
@@ -254,7 +254,7 @@ function CartPreviewButton({
     <div className="group/cart relative">
       <a
         href={href}
-        className="group flex flex-col items-center gap-1 text-foreground"
+        className="group flex flex-col items-center gap-1 text-gray-900"
       >
         <div className="relative">
           <ShoppingCart className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
@@ -264,7 +264,7 @@ function CartPreviewButton({
             </span>
           )}
         </div>
-        <span className="text-[10px] font-medium uppercase tracking-wide text-foreground">
+        <span className="text-[10px] font-medium uppercase tracking-wide text-gray-900">
           Cart
         </span>
       </a>
@@ -277,7 +277,7 @@ function CartPreviewButton({
                 Cart Preview
               </h3>
               {typeof badge === "number" && badge > 0 && (
-                <span className="mt-1 inline-flex rounded-full bg-yellow-200 px-2.5 py-1 text-xs font-bold text-black">
+                <span className="mt-1 inline-flex rounded-full bg-accent/15 px-2.5 py-1 text-xs font-bold text-primary ring-1 ring-accent/25">
                   {badge} {badge === 1 ? "item" : "items"}
                 </span>
               )}

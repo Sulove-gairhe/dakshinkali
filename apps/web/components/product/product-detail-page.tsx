@@ -73,7 +73,7 @@ export default function ProductDetailPage() {
           {/* Info */}
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <span className="inline-block rounded bg-yellow-400 px-2 py-1 text-xs font-semibold text-black">
+              <span className="inline-block rounded bg-accent/15 px-2 py-1 text-xs font-semibold text-primary ring-1 ring-accent/30">
                 {product.badge}
               </span>
               <span className="text-sm text-muted-foreground">
@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
             </div>
             <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-2xl font-semibold text-primary">
+              <span className="text-2xl font-semibold text-gray-950">
                 Rs {product.price.toLocaleString()}
               </span>
               <span className="text-lg line-through text-muted-foreground">
@@ -90,7 +90,7 @@ export default function ProductDetailPage() {
               </span>
             </div>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-yellow-500 font-bold">
+              <span className="text-accent font-bold">
                 ★ {product.rating}
               </span>
               <span className="text-sm text-muted-foreground">
@@ -103,10 +103,10 @@ export default function ProductDetailPage() {
               ))}
             </ul>
             <div className="flex gap-4 mb-6">
-              <button className="cursor-pointer rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground">
+              <button className="cursor-pointer rounded-md border border-accent/45 bg-white px-6 py-3 font-medium text-primary shadow-sm transition-colors hover:border-accent hover:bg-accent/10">
                 Add to Cart
               </button>
-              <button className="cursor-pointer rounded-md bg-yellow-400 px-6 py-3 font-medium text-black">
+              <button className="cursor-pointer rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground">
                 Buy Now
               </button>
             </div>

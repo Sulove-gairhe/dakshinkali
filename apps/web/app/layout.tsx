@@ -17,9 +17,9 @@ export const metadata = {
   title: "Dakshinkali Electronics",
   description: "E-commerce storefront",
   icons: {
-    icon: "/images/logo-placeholder.jpeg",
-    shortcut: "/images/logo-placeholder.jpeg",
-    apple: "/images/logo-placeholder.jpeg",
+    icon: "/images/logo-placeholder white.png",
+    shortcut: "/images/logo-placeholder white.png",
+    apple: "/images/logo-placeholder white.png",
   },
 };
 
@@ -41,7 +41,10 @@ export default async function RootLayout({
     >
       <body>
         <AppProviders>
-          <SearchDataProvider dbProducts={dbProducts} dbCategories={dbCategories}>
+          <SearchDataProvider
+            dbProducts={dbProducts}
+            dbCategories={dbCategories}
+          >
             {children}
           </SearchDataProvider>
         </AppProviders>

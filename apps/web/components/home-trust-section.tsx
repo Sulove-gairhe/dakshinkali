@@ -152,7 +152,7 @@ export function HomeTrustSection() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-linear-to-br from-[#fff8e7] via-background to-[#fffdf7] py-12 sm:py-14 lg:py-16">
+      <section className="relative overflow-hidden bg-linear-to-br from-secondary via-background to-surface py-12 sm:py-14 lg:py-16">
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent" />
         <div className="mx-auto flex min-h-full max-w-7xl flex-col justify-center px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
@@ -177,7 +177,7 @@ export function HomeTrustSection() {
                 <Button
                   asChild
                   size="lg"
-                  className="group/trust-cta relative h-12 overflow-hidden rounded-full px-6 text-sm font-bold shadow-[0_14px_35px_rgba(251,191,36,0.28)] hover:-translate-y-0.5 hover:bg-primary/90"
+                  className="group/trust-cta relative h-12 overflow-hidden rounded-full px-6 text-sm font-bold shadow-[0_14px_35px_rgba(8,51,90,0.18)] hover:-translate-y-0.5 hover:bg-primary/90"
                 >
                   <Link href="/products">
                     <span className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 skew-x-[-18deg] bg-white/40 transition-transform duration-700 group-hover/trust-cta:translate-x-[470%]" />
@@ -344,7 +344,7 @@ export function HomeTrustSection() {
           Connect With Dakshinkali Shop
         </h3>
         <div className="mt-6 grid gap-3">
-          <div className="rounded-2xl border border-border bg-[#fff8e7]/60 p-4">
+          <div className="rounded-2xl border border-border bg-primary/5 p-4">
             <div className="flex items-start gap-3">
               <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-foreground shadow-sm">
                 <PhoneCall className="size-5" aria-hidden="true" />
@@ -362,7 +362,7 @@ export function HomeTrustSection() {
             href="https://www.instagram.com/dakshinkalielectronics/?hl=en"
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center justify-between rounded-2xl border border-border bg-[#fff8e7]/60 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:bg-[#fff8e7]"
+            className="group flex items-center justify-between rounded-2xl border border-border bg-primary/5 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10"
           >
             <span className="flex items-center gap-3 font-bold text-foreground">
               <span className="flex size-10 items-center justify-center rounded-full bg-white text-[#E4405F] shadow-sm">
@@ -380,7 +380,7 @@ export function HomeTrustSection() {
             href="http://facebook.com/search/top?q=dakshinkali%20electronics%20center"
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center justify-between rounded-2xl border border-border bg-[#fff8e7]/60 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:bg-[#fff8e7]"
+            className="group flex items-center justify-between rounded-2xl border border-border bg-primary/5 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10"
           >
             <span className="flex items-center gap-3 font-bold text-foreground">
               <span className="flex size-10 items-center justify-center rounded-full bg-white text-[#1877F2] shadow-sm">
