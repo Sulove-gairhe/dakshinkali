@@ -14,21 +14,61 @@
 
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
-(node:29820) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/sulov/OneDrive/Desktop/dakshinkali/apps/web/tailwind.config.ts?id=1780764049415 is not specified and it doesn't parse as CommonJS.
+(node:12120) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/sulov/OneDrive/Desktop/dakshinkali/apps/web/tailwind.config.ts?id=1780743915986 is not specified and it doesn't parse as CommonJS.
 Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
 To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\package.json.
 (Use `node --trace-warnings ...` to show where the warning was created)
-✓ Compiled successfully in 9.6s
+✓ Compiled successfully in 23.7s
   Running TypeScript ...
-  Finished TypeScript in 11.7s ...
+  Finished TypeScript in 41s ...
   Collecting page data using 11 workers ...
-  Generating static pages using 11 workers (0/22) ...
+  Generating static pages using 11 workers (0/20) ...
+[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
 [db-products] Unexpected error: Error: Dynamic server usage: Route /_not-found couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /_not-found couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -37,8 +77,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /_not-found couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -47,8 +87,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /account couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -57,8 +97,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /account couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -67,8 +107,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -77,8 +117,29 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+  Generating static pages using 11 workers (5/20) 
+[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -87,8 +148,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -97,89 +158,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-  Generating static pages using 11 workers (5/22) 
-[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
-    at stringify (<anonymous>) {
-  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -188,8 +168,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /blogs couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -198,38 +178,18 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /blogs couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error: Error: Dynamic server usage: Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
-    at stringify (<anonymous>) {
-  description: "Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
-    at stringify (<anonymous>) {
-  description: "Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
 }
 [db-products] Unexpected error: Error: Dynamic server usage: Route /checkout couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /checkout couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -238,18 +198,58 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /checkout couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
+    at stringify (<anonymous>) {
+  description: "Route /blogs/[slug] couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error: Error: Dynamic server usage: Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
+    at stringify (<anonymous>) {
+  description: "Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
+    at stringify (<anonymous>) {
+  description: "Route /cards couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
 }
 [db-products] Unexpected error: Error: Dynamic server usage: Route /cart couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /cart couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -258,8 +258,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /cart couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -268,8 +268,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /login couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -278,20 +278,20 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /login couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
 }
-  Generating static pages using 11 workers (10/22) 
-  Generating static pages using 11 workers (16/22) 
+  Generating static pages using 11 workers (10/20) 
+  Generating static pages using 11 workers (15/20) 
 [db-products] Unexpected error: Error: Dynamic server usage: Route / couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route / couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -300,8 +300,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route / couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -310,8 +310,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6583)
-    at v (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_0swppzo._.js:1:15407)
+    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6531)
+    at u (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_13stsnl._.js:1:16320)
     at stringify (<anonymous>) {
   description: "Route / couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -320,8 +320,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6583)
-    at v (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_0swppzo._.js:1:15456)
+    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6531)
+    at u (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_13stsnl._.js:1:16369)
     at stringify (<anonymous>) {
   description: "Route / couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -330,8 +330,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6583)
-    at v (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_0swppzo._.js:1:15509)
+    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6531)
+    at u (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_13stsnl._.js:1:16422)
     at stringify (<anonymous>) {
   description: "Route / couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -340,8 +340,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6583)
-    at v (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_0swppzo._.js:1:15565)
+    at c$ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6531)
+    at u (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_apps_web_13stsnl._.js:1:16478)
     at stringify (<anonymous>) {
   description: "Route / couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -350,8 +350,8 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /search couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -360,49 +360,18 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /search couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error: Error: Dynamic server usage: Route /sitemap.xml couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at S (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\[root-of-the-server]__0v3joss._.js:8:36619)
-    at p (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\OneDrive_Desktop_dakshinkali_0gbs9qq._.js:1:10888)
-    at rY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\OneDrive_Desktop_dakshinkali_0gbs9qq._.js:55:1887)
-    at a (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\[root-of-the-server]__11aw502._.js:1:2253)
-    at x (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\0073_next_dist_esm_build_templates_app-route_0-4bckt.js:1:369)
-    at T (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\0073_next_dist_esm_build_templates_app-route_0-4bckt.js:1:15909)
-    at R (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\0073_next_dist_esm_build_templates_app-route_0-4bckt.js:1:17115) {
-  description: "Route /sitemap.xml couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error: Error: Dynamic server usage: Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
-    at stringify (<anonymous>) {
-  description: "Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
-    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
-    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
-    at stringify (<anonymous>) {
-  description: "Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
 }
 [db-products] Unexpected error: Error: Dynamic server usage: Route /wishlist couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7016)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30661)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
     at stringify (<anonymous>) {
   description: "Route /wishlist couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
@@ -411,13 +380,33 @@ To eliminate this warning, add "type": "module" to C:\Users\sulov\OneDrive\Deskt
     at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
     at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
     at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
-    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:8048)
-    at ax (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:30687)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
     at stringify (<anonymous>) {
   description: "Route /wishlist couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
   digest: 'DYNAMIC_SERVER_USAGE'
 }
-✓ Generating static pages using 11 workers (22/22) in 1104ms
+[db-products] Unexpected error: Error: Dynamic server usage: Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c_ (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:6964)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29933)
+    at stringify (<anonymous>) {
+  description: "Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[db-products] Unexpected error fetching categories: Error: Dynamic server usage: Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at y (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\0073_next_dist_0zz_~hh._.js:1:12729)
+    at n (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:1:13033)
+    at cY (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:55:734)
+    at c1 (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\OneDrive_Desktop_dakshinkali_0e.y5j7._.js:59:7996)
+    at av (C:\Users\sulov\OneDrive\Desktop\dakshinkali\apps\web\.next\server\chunks\ssr\[root-of-the-server]__06-rdgl._.js:1:29959)
+    at stringify (<anonymous>) {
+  description: "Route /signup couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+✓ Generating static pages using 11 workers (20/20) in 2.4s
   Finalizing page optimization ...
 
 Route (app)
@@ -428,24 +417,17 @@ Route (app)
 ├ ƒ /auth/callback
 ├ ƒ /blogs
 ├ ƒ /blogs/[slug]
-├ ƒ /brands/[brand]
-├ ƒ /brands/[brand]/[category]
 ├ ƒ /cards
 ├ ƒ /cart
-├ ƒ /categories/[category]
-├ ƒ /categories/samsung-tv
 ├ ƒ /checkout
 ├ ƒ /login
 ├ ƒ /products/[slug]
-├ ○ /robots.txt
 ├ ƒ /search
 ├ ƒ /signup
-├ ƒ /sitemap.xml
 └ ƒ /wishlist
 
 
 ƒ Proxy (Middleware)
 
-○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand
 

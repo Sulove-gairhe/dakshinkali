@@ -69,7 +69,7 @@ export function AccountMenu({ className, variant = "desktop" }: AccountMenuProps
             className,
           )}
         >
-          <User className="h-5 w-5" />
+        <User className="h-5 w-5" />
         </Link>
       );
     }

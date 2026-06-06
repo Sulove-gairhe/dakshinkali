@@ -97,12 +97,7 @@ const productImages = [
 
 function InstagramBrandIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="size-5"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24" fill="none">
       <rect
         x="4"
         y="4"
@@ -186,8 +181,11 @@ export function HomeTrustSection() {
                     <span className="relative">Shop Trusted Products</span>
                   </Link>
                 </Button>
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/75">
-                  <Truck className="size-4 text-accent" aria-hidden="true" />
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground/75">
+                  <Truck
+                    className="size-4"
+                    aria-hidden="true"
+                  />
                   Free delivery inside Pokhara Valley
                 </span>
               </div>
@@ -210,7 +208,10 @@ export function HomeTrustSection() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <MessageCircle className="size-4" aria-hidden="true" />
+                      <MessageCircle
+                        className="size-4"
+                        aria-hidden="true"
+                      />
                       Chat on WhatsApp
                     </a>
                   </Button>
@@ -220,7 +221,10 @@ export function HomeTrustSection() {
                     popoverTarget="trust-socials-popover"
                     aria-controls="trust-socials-popover"
                   >
-                    <Share2 className="size-4" aria-hidden="true" />
+                    <Share2
+                      className="size-4"
+                      aria-hidden="true"
+                    />
                     Socials
                   </button>
                 </div>
@@ -233,9 +237,7 @@ export function HomeTrustSection() {
 
                 <div className="relative z-10 mx-auto h-97.5 w-full max-w-112.5 overflow-hidden rounded-4xl border border-white/80 bg-white/92 shadow-[0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur lg:absolute lg:left-1/2 lg:top-1/2 lg:h-[64%] lg:w-[70%] lg:max-w-none lg:-translate-x-1/2 lg:-translate-y-1/2">
                   <div className="absolute inset-x-8 top-6 flex items-center justify-between">
-                    <span className="badge-premium">
-                      Branded Appliances
-                    </span>
+                    <span className="badge-premium">Branded Appliances</span>
                     <span className="text-xs font-bold text-gray-700">
                       All Nepal Delivery
                     </span>
@@ -276,9 +278,9 @@ export function HomeTrustSection() {
                         animate={
                           shouldFloat
                             ? {
-                              x: [0, card.drift, -card.drift * 0.45, 0],
-                              y: [0, -13, 6, 0],
-                              rotate: [0, card.tilt, -card.tilt, 0],
+                                x: [0, card.drift, -card.drift * 0.45, 0],
+                                y: [0, -13, 6, 0],
+                                rotate: [0, card.tilt, -card.tilt, 0],
                               }
                             : { x: 0, y: 0, rotate: 0 }
                         }
@@ -292,9 +294,9 @@ export function HomeTrustSection() {
                         className={`group rounded-2xl border border-white/80 bg-white/94 p-3 shadow-[0_12px_34px_rgba(0,0,0,0.16)] backdrop-blur transition-all duration-300 hover:border-accent/70 hover:shadow-[0_20px_52px_rgba(0,0,0,0.22)] sm:p-4 lg:absolute lg:w-53.75 ${card.position}`}
                       >
                         <div className="flex items-start gap-3.5">
-                          <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-muted text-foreground sm:size-11">
+                          <span className="icon-gold-ring flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 sm:size-11">
                             <Icon
-                              className="size-4.5 sm:size-5 text-foreground"
+                              className="size-4.5 sm:size-5"
                               aria-hidden="true"
                             />
                           </span>
@@ -347,7 +349,7 @@ export function HomeTrustSection() {
         <div className="mt-6 grid gap-3">
           <div className="rounded-2xl border border-border bg-primary/5 p-4">
             <div className="flex items-start gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-foreground shadow-sm">
+              <span className="icon-gold-ring flex size-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
                 <PhoneCall className="size-5" aria-hidden="true" />
               </span>
               <div>
@@ -366,13 +368,13 @@ export function HomeTrustSection() {
             className="group flex items-center justify-between rounded-2xl border border-border bg-primary/5 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10"
           >
             <span className="flex items-center gap-3 font-bold text-foreground">
-              <span className="flex size-10 items-center justify-center rounded-full bg-white text-[#E4405F] shadow-sm">
+              <span className="icon-gold-ring flex size-10 items-center justify-center rounded-full bg-white shadow-sm text-[#E4405F]">
                 <InstagramBrandIcon />
               </span>
               Instagram
             </span>
             <ExternalLink
-              className="size-4 text-muted-foreground transition-colors group-hover:text-foreground"
+              className="size-4 transition-colors group-hover:text-foreground"
               aria-hidden="true"
             />
           </a>
@@ -384,13 +386,13 @@ export function HomeTrustSection() {
             className="group flex items-center justify-between rounded-2xl border border-border bg-primary/5 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:bg-primary/10"
           >
             <span className="flex items-center gap-3 font-bold text-foreground">
-              <span className="flex size-10 items-center justify-center rounded-full bg-white text-[#1877F2] shadow-sm">
+              <span className="icon-gold-ring flex size-10 items-center justify-center rounded-full bg-white shadow-sm text-[#1877F2]">
                 <FacebookBrandIcon />
               </span>
               Facebook
             </span>
             <ExternalLink
-              className="size-4 text-muted-foreground transition-colors group-hover:text-foreground"
+              className="size-4 transition-colors group-hover:text-foreground"
               aria-hidden="true"
             />
           </a>

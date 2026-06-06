@@ -66,7 +66,9 @@ function StoreDetailValue({ label, value }: { label: string; value: string }) {
     );
   }
 
-  return <p className="mt-1 text-sm leading-6 text-muted-foreground">{value}</p>;
+  return (
+    <p className="mt-1 text-sm leading-6 text-muted-foreground">{value}</p>
+  );
 }
 
 export function StoreLocation() {

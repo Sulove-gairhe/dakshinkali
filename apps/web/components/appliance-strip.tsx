@@ -1,23 +1,34 @@
-"use client"
+"use client";
 
 type ApplianceItem = {
-  label: string
-  href?: string
-  icon: React.ReactNode
-}
+  label: string;
+  href?: string;
+  icon: React.ReactNode;
+};
 
 type ApplianceStripProps = {
-  title?: string
-  appliances?: ApplianceItem[]
-}
+  title?: string;
+  appliances?: ApplianceItem[];
+};
 
 const defaultAppliances: ApplianceItem[] = [
   {
     label: "Televisions",
     href: "/search?category=televisions",
     icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-8 w-8 text-foreground"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 20.25h12m-7.5-3v3m3-3v3m-10.125-3h17.25c.621 0 1.125-.504 1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125Z"
+        />
       </svg>
     ),
   },
@@ -25,8 +36,19 @@ const defaultAppliances: ApplianceItem[] = [
     label: "Washing Machines",
     href: "/search?category=washing-machine",
     icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 3.75h13.5a1.5 1.5 0 011.5 1.5v13.5a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-8 w-8 text-foreground"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5.25 3.75h13.5a1.5 1.5 0 011.5 1.5v13.5a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V5.25a1.5 1.5 0 011.5-1.5z"
+        />
         <circle cx="12" cy="13" r="4" strokeWidth={1.5} />
         <path strokeLinecap="round" strokeLinejoin="round" d="M7 6.5h2" />
         <circle cx="16" cy="6.5" r="0.5" fill="currentColor" />
@@ -37,8 +59,19 @@ const defaultAppliances: ApplianceItem[] = [
     label: "Refrigerators",
     href: "/search?category=refrigerator",
     icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-8 w-8 text-foreground"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6 3h12a1 1 0 011 1v16a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"
+        />
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 10h14" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 6v2" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 13v4" />
@@ -49,8 +82,19 @@ const defaultAppliances: ApplianceItem[] = [
     label: "Air Conditioner",
     href: "/search?q=air%20conditioner",
     icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-8 w-8 text-foreground"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 6h18a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z"
+        />
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 14v2" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M10 14v3" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M14 14v3" />
@@ -63,8 +107,19 @@ const defaultAppliances: ApplianceItem[] = [
     label: "Water Geyser",
     href: "/search?q=water%20geyser",
     icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 4h8a2 2 0 012 2v12a2 2 0 01-2 2H8a2 2 0 01-2-2V6a2 2 0 012-2z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-8 w-8 text-foreground"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M8 4h8a2 2 0 012 2v12a2 2 0 01-2 2H8a2 2 0 01-2-2V6a2 2 0 012-2z"
+        />
         <circle cx="12" cy="12" r="3" strokeWidth={1.5} />
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 20v2" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M10 2h4" />
@@ -75,9 +130,24 @@ const defaultAppliances: ApplianceItem[] = [
     label: "Water Dispenser",
     href: "/search?category=water-dispenser",
     icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 4h6a1 1 0 011 1v2H8V5a1 1 0 011-1z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h10a1 1 0 011 1v12a1 1 0 01-1 1H7a1 1 0 01-1-1V8a1 1 0 011-1z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-8 w-8 text-foreground"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9 4h6a1 1 0 011 1v2H8V5a1 1 0 011-1z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M7 7h10a1 1 0 011 1v12a1 1 0 01-1 1H7a1 1 0 01-1-1V8a1 1 0 011-1z"
+        />
         <path strokeLinecap="round" strokeLinejoin="round" d="M10 11h4" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 11v3" />
       </svg>
@@ -87,16 +157,31 @@ const defaultAppliances: ApplianceItem[] = [
     label: "Oven",
     href: "/search?q=oven",
     icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-8 w-8 text-foreground">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 10h14v7H5v-7z" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-8 w-8 text-foreground"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5 10h14v7H5v-7z"
+        />
         <circle cx="7" cy="7.5" r="0.75" fill="currentColor" />
         <circle cx="10" cy="7.5" r="0.75" fill="currentColor" />
         <circle cx="13" cy="7.5" r="0.75" fill="currentColor" />
       </svg>
     ),
   },
-]
+];
 
 export function ApplianceStrip({
   title = "FEATURED PRODUCTS",
@@ -115,7 +200,7 @@ export function ApplianceStrip({
               href={appliance.href || "#"}
               className="group flex min-w-[80px] flex-col items-center gap-3"
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-primary bg-muted text-foreground">
+              <div className="icon-gold-ring flex h-16 w-16 items-center justify-center rounded-2xl bg-muted transition-all duration-300 hover:bg-primary/10">
                 {appliance.icon}
               </div>
               <span className="whitespace-nowrap text-center text-xs font-medium text-foreground sm:text-sm">
@@ -126,5 +211,5 @@ export function ApplianceStrip({
         </div>
       </div>
     </section>
-  )
+  );
 }
