@@ -44,7 +44,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
     { label: "Home", href: "/" },
     {
       label: product.category,
-      href: `/search?category=${encodeURIComponent(product.category)}`,
+      href: `/categories/${encodeURIComponent(product.category)}`,
     },
     { label: product.name },
   ];

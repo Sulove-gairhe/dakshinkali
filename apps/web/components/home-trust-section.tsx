@@ -292,9 +292,9 @@ export function HomeTrustSection() {
                         className={`group rounded-2xl border border-white/80 bg-white/94 p-3 shadow-[0_12px_34px_rgba(0,0,0,0.16)] backdrop-blur transition-all duration-300 hover:border-accent/70 hover:shadow-[0_20px_52px_rgba(0,0,0,0.22)] sm:p-4 lg:absolute lg:w-53.75 ${card.position}`}
                       >
                         <div className="flex items-start gap-3.5">
-                          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/12 text-primary ring-1 ring-accent/30 sm:size-11">
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-muted text-foreground sm:size-11">
                             <Icon
-                              className="size-4.5 sm:size-5"
+                              className="size-4.5 sm:size-5 text-foreground"
                               aria-hidden="true"
                             />
                           </span>

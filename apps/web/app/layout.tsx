@@ -3,6 +3,7 @@ import { Figtree, Nunito, Poppins } from "next/font/google";
 import { AppProviders } from "@/components/providers";
 import { SearchDataProvider } from "@/components/search-data-provider";
 import { fetchDbProducts, fetchDbCategories } from "@/lib/db-products";
+import { absoluteUrl, getSiteUrl, SITE_NAME } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -14,8 +15,30 @@ const poppins = Poppins({
 const nunito = Nunito({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata = {
-  title: "Dakshinkali Electronics",
-  description: "E-commerce storefront",
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: SITE_NAME,
+    template: `%s`,
+  },
+  description:
+    "Shop TVs, refrigerators, washing machines, kitchen appliances, and electronics in Nepal at Dakshinkali Electronics.",
+  alternates: {
+    canonical: absoluteUrl("/"),
+  },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description:
+      "Shop electronics and home appliances in Nepal at Dakshinkali Electronics.",
+    url: absoluteUrl("/"),
+  },
+  twitter: {
+    card: "summary",
+    title: SITE_NAME,
+    description:
+      "Shop electronics and home appliances in Nepal at Dakshinkali Electronics.",
+  },
   icons: {
     icon: "/images/logo-placeholder white.png",
     shortcut: "/images/logo-placeholder white.png",

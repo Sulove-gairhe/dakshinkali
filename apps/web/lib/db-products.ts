@@ -144,6 +144,8 @@ function mapRowToStoreProduct(row: DbProductRow): StoreProduct | null {
         isBestSeller: sd.isBestSeller ?? false,
         isNewArrival: sd.isNewArrival ?? false,
         isActive: true,
+        seoTitle: sd.seoTitle,
+        seoDescription: sd.seoDescription,
     };
 }
 

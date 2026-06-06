@@ -60,6 +60,8 @@ export type StoreProduct = {
   isBestSeller?: boolean;
   isNewArrival?: boolean;
   isActive?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
 };
 
 type StoreProductRecord = Omit<StoreProduct, "href"> & { href?: string };

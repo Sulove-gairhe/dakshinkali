@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { CategorySelect } from "./category-select";
 import { DescriptionSectionBuilder } from "./description-section-builder";
@@ -157,27 +159,36 @@ export function ProductForm({
       <div className="min-w-0 flex-1">
         <div className="sticky top-14 z-20 -mx-4 border-b border-gray-200 bg-white/95 px-4 py-3 backdrop-blur md:-mx-6 md:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) =>
-                  updateForm((f) => ({ ...f, name: e.target.value }))
-                }
-                className="w-full min-w-[200px] bg-transparent text-xl font-semibold text-gray-900 focus:outline-none"
-                placeholder="Product name"
-              />
-              <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                <span
-                  className={
-                    form.publishingStatus === "live"
-                      ? "rounded bg-primary/10 px-2 py-0.5 text-primary"
-                      : "rounded bg-gray-100 px-2 py-0.5"
+            <div className="flex items-center gap-3">
+              <Link
+                href="/admin/products"
+                className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Link>
+              <div>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) =>
+                    updateForm((f) => ({ ...f, name: e.target.value }))
                   }
-                >
-                  {form.publishingStatus}
-                </span>
-                {dirty ? <span className="text-primary">● Unsaved changes</span> : null}
+                  className="w-full min-w-[200px] bg-transparent text-xl font-semibold text-gray-900 focus:outline-none"
+                  placeholder="Product name"
+                />
+                <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                  <span
+                    className={
+                      form.publishingStatus === "live"
+                        ? "rounded bg-primary/10 px-2 py-0.5 text-primary"
+                        : "rounded bg-gray-100 px-2 py-0.5"
+                    }
+                  >
+                    {form.publishingStatus}
+                  </span>
+                  {dirty ? <span className="text-primary">● Unsaved changes</span> : null}
+                </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -199,7 +210,7 @@ export function ProductForm({
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => {
+                onClick={async () => {
                   const validation = validateStorefrontLiveData(
                     form,
                     form.storefrontData,
@@ -208,12 +219,19 @@ export function ProductForm({
                     setPublishErrors(validation.errors);
                     return;
                   }
-                  void persist("draft", false);
-                  setPreviewOpen(true);
+                  await persist("draft", false);
+                  const slug =
+                    form.storefrontData.slug?.trim() ||
+                    slugifyProductName(form.name);
+                  window.open(
+                    `${window.location.origin.replace(":3001", ":3000")}/products/${slug}`,
+                    "_blank",
+                  );
                 }}
-                className="rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-sm text-primary"
+                className="flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-sm text-primary"
               >
                 Save & Preview
+                <ExternalLink className="h-3.5 w-3.5" />
               </button>
               <button
                 type="button"

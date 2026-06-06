@@ -143,12 +143,6 @@ export function StorefrontPresentationTab({
 
       <div>
         <label className="text-sm font-medium text-gray-700">Collection</label>
-        <input
-          type="text"
-          value={sf.collection ?? ""}
-          onChange={(e) => patch({ collection: e.target.value || undefined })}
-          className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
-        />
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">

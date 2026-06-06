@@ -18,8 +18,6 @@ import {
   getCategoryDisplayName,
   getSearchTerms,
   indexedProducts,
-  normalizeBrandSlug,
-  normalizeCategorySlug,
   normalizeText,
   scoreValues,
   slugify,
@@ -357,7 +355,7 @@ function toBrandOption(brand: {
     id: brand.slug,
     label: brand.name,
     slug: brand.slug,
-    href: `/search?brand=${brand.slug}`,
+    href: `/brands/${brand.slug}`,
   };
 }
 
@@ -371,7 +369,7 @@ function toCategoryOption(category: {
     id: category.slug,
     label: category.name,
     slug: category.slug,
-    href: `/search?category=${category.slug}`,
+    href: `/categories/${category.slug}`,
   };
 }
 

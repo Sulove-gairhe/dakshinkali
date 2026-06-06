@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import type {
   ProductDescriptionSection,
@@ -14,31 +14,42 @@ interface DescriptionTabsProps {
   deliveryInfo?: string[]
 }
 
-// ─── Thresholds ────────────────────────────────────────────────────────────────
-// Description: collapse if total text > 400 chars OR more than 2 sections
-const DESCRIPTION_CHAR_THRESHOLD = 400
-const DESCRIPTION_SECTION_THRESHOLD = 2
-
-// Specs: collapse if total spec rows > 10
-const SPEC_ROW_THRESHOLD = 10
+// ─── Thresholds (in pixels — must match the Tailwind max-h classes below) ────
+const DESCRIPTION_COLLAPSED_PX = 256 // max-h-64 = 16rem
+const SPEC_COLLAPSED_PX = 320 // max-h-80 = 20rem
 
 // ─── Collapsible wrapper ───────────────────────────────────────────────────────
 interface CollapsibleProps {
   children: React.ReactNode
-  /** Whether the content is long enough to need collapsing */
-  needsToggle: boolean
-  /** Collapsed height in Tailwind max-h value (e.g. "max-h-48") */
-  collapsedClass?: string
+  /** Collapsed height in Tailwind max-h class (e.g. "max-h-64") */
+  collapsedClass: string
+  /** Collapsed height in pixels — content taller than this triggers the toggle */
+  collapsedHeightPx: number
 }
 
-function Collapsible({ children, needsToggle, collapsedClass = 'max-h-48' }: CollapsibleProps) {
+function Collapsible({ children, collapsedClass, collapsedHeightPx }: CollapsibleProps) {
   const [expanded, setExpanded] = useState(false)
+  const [needsToggle, setNeedsToggle] = useState(true)
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    const el = contentRef.current
+    if (!el) return
+    const measure = () => {
+      setNeedsToggle(el.scrollHeight > collapsedHeightPx)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [collapsedHeightPx])
 
   if (!needsToggle) return <>{children}</>
 
   return (
     <div className="relative">
       <div
+        ref={contentRef}
         className={[
           'relative overflow-hidden transition-[max-height] motion-reduce:transition-none',
           expanded ? 'max-h-[4000px] duration-500 ease-in-out' : `${collapsedClass} duration-300 ease-in-out`,
@@ -62,24 +73,6 @@ function Collapsible({ children, needsToggle, collapsedClass = 'max-h-48' }: Col
   )
 }
 
-/** Collapsible body text for a single description section. */
-function CollapsibleBody({ paragraphs }: { paragraphs: string[] }) {
-  const totalChars = paragraphs.join(' ').length
-  const needsToggle = totalChars > 280 || paragraphs.length > 2
-
-  return (
-    <Collapsible needsToggle={needsToggle} collapsedClass="max-h-[5.5rem]">
-      <div className="space-y-4">
-        {paragraphs.map((paragraph, i) => (
-          <p key={i} className="leading-relaxed text-muted-foreground">
-            {paragraph}
-          </p>
-        ))}
-      </div>
-    </Collapsible>
-  )
-}
-
 export function DescriptionTabs({
   sections = [],
   specifications = [],
@@ -94,17 +87,6 @@ export function DescriptionTabs({
     specificationGroups.length > 0 ||
     boxContents.length > 0 ||
     deliveryInfo.length > 0
-
-  // Compute whether description tab needs a top-level collapse
-  const totalDescriptionChars = sections.flatMap((s) => s.body ?? []).join(' ').length
-  const descriptionNeedsToggle =
-    totalDescriptionChars > DESCRIPTION_CHAR_THRESHOLD ||
-    sections.length > DESCRIPTION_SECTION_THRESHOLD
-
-  // Compute whether spec tab needs a top-level collapse
-  const totalSpecRows = specificationGroups.reduce((sum, g) => sum + g.specs.length, 0)
-    + boxContents.length + deliveryInfo.length
-  const specNeedsToggle = totalSpecRows > SPEC_ROW_THRESHOLD
 
   return (
     <div className="mt-12">
@@ -130,7 +112,10 @@ export function DescriptionTabs({
       {/* Tab Content */}
       <div className="mt-8">
         {activeTab === 'description' && (
-          <Collapsible needsToggle={descriptionNeedsToggle} collapsedClass="max-h-64">
+          <Collapsible
+            collapsedClass="max-h-64"
+            collapsedHeightPx={DESCRIPTION_COLLAPSED_PX}
+          >
             <div className="space-y-8">
               {sections.length > 0 ? (
                 sections.map((section, index) => (
@@ -146,7 +131,16 @@ export function DescriptionTabs({
                       </h4>
                     )}
                     {section.body && (
-                      <CollapsibleBody paragraphs={section.body} />
+                      <div className="space-y-4">
+                        {section.body.map((paragraph, i) => (
+                          <p
+                            key={i}
+                            className="leading-relaxed text-muted-foreground"
+                          >
+                            {paragraph}
+                          </p>
+                        ))}
+                      </div>
                     )}
                     {section.image && (
                       <div className="relative my-6 aspect-video w-full overflow-hidden rounded-lg">
@@ -188,7 +182,10 @@ export function DescriptionTabs({
         {activeTab === 'specification' && (
           <>
             {hasSpecificationContent ? (
-              <Collapsible needsToggle={specNeedsToggle} collapsedClass="max-h-80">
+              <Collapsible
+                collapsedClass="max-h-80"
+                collapsedHeightPx={SPEC_COLLAPSED_PX}
+              >
                 <div className="space-y-8">
                 {specificationGroups.map((group) => (
                   <section key={group.title}>

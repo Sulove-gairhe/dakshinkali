@@ -139,7 +139,7 @@ export function Footer() {
                     rel="noreferrer"
                     aria-label={social.label}
                     title={social.label}
-                    className="inline-flex size-14 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white shadow-lg transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b1117]"
+                    className="inline-flex size-14 items-center justify-center rounded-full border-2 border-primary bg-white/8 text-white shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b1117]"
                   >
                     <Icon aria-hidden="true" />
                   </a>

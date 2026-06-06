@@ -344,9 +344,9 @@ function SearchSkeleton() {
 
 function EmptyState() {
   const quickLinks = [
-    { label: "Televisions", href: "/search?category=televisions" },
-    { label: "Refrigerators", href: "/search?category=refrigerator" },
-    { label: "Washing Machines", href: "/search?category=washing-machine" },
+    { label: "Televisions", href: "/categories/televisions" },
+    { label: "Refrigerators", href: "/categories/refrigerator" },
+    { label: "Washing Machines", href: "/categories/washing-machine" },
   ];
 
   return (

@@ -35,10 +35,10 @@ const sortOptions: { label: string; value: SearchSort }[] = [
 ];
 
 const emptyStateLinks = [
-  { label: "Televisions", href: "/search?category=televisions" },
-  { label: "Refrigerators", href: "/search?category=refrigerator" },
-  { label: "Washing Machines", href: "/search?category=washing-machine" },
-  { label: "Kitchen Appliances", href: "/search?category=kitchen-appliances" },
+  { label: "Televisions", href: "/categories/televisions" },
+  { label: "Refrigerators", href: "/categories/refrigerator" },
+  { label: "Washing Machines", href: "/categories/washing-machine" },
+  { label: "Kitchen Appliances", href: "/categories/kitchen-appliance" },
 ];
 
 export function SearchResultsClient() {

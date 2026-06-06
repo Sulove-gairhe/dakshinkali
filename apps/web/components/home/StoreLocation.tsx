@@ -106,8 +106,8 @@ export function StoreLocation() {
             className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6"
           >
             <div className="flex items-start gap-3 border-b border-border pb-5">
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/15 text-foreground ring-1 ring-primary/25">
-                <Store className="size-5" aria-hidden="true" />
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-muted text-foreground">
+                <Store className="size-5 text-foreground" aria-hidden="true" />
               </span>
               <div>
                 <h3 className="text-lg font-bold text-foreground">
