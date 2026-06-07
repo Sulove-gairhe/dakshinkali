@@ -127,11 +127,14 @@ export function StoreLocation() {
                   <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
                     {detail.label === "Address" && (
                       <MapPin className="size-3.5" aria-hidden="true" />
+                      <MapPin className="size-3.5" aria-hidden="true" />
                     )}
                     {detail.label === "Phone" && (
                       <Phone className="size-3.5" aria-hidden="true" />
+                      <Phone className="size-3.5" aria-hidden="true" />
                     )}
                     {detail.label === "WhatsApp" && (
+                      <MessageCircle className="size-3.5" aria-hidden="true" />
                       <MessageCircle className="size-3.5" aria-hidden="true" />
                     )}
                     {detail.label}
@@ -152,6 +155,7 @@ export function StoreLocation() {
               rel="noreferrer"
               className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground transition-colors hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-auto"
             >
+              <Navigation className="size-4" aria-hidden="true" />
               <Navigation className="size-4" aria-hidden="true" />
               Get directions
             </a>
