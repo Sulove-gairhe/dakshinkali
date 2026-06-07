@@ -425,6 +425,15 @@
   backdrop-filter: blur(6px);
 }
 
+.icon-gold-ring {
+  border: 1.5px solid var(--color-primary);
+  transition: border-color 0.3s ease;
+}
+
+.icon-gold-ring:hover {
+  border-color: var(--color-highlight);
+}
+
 .trust-socials-popover:popover-open {
   animation: trust-socials-pop 180ms ease-out;
 }

@@ -225,7 +225,7 @@ function IconButton({
       className="group flex flex-col items-center gap-1 text-gray-900"
     >
       <div className="relative">
-        <Icon className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
+        <Icon className="h-5 w-5" />
         {typeof badge === "number" && badge > 0 && (
           <span className="count-pulse absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
             {badge}
@@ -257,7 +257,7 @@ function CartPreviewButton({
         className="group flex flex-col items-center gap-1 text-gray-900"
       >
         <div className="relative">
-          <ShoppingCart className="h-5 w-5 transition-colors duration-300 group-hover:text-primary" />
+          <ShoppingCart className="h-5 w-5" />
           {typeof badge === "number" && badge > 0 && (
             <span className="count-pulse absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
               {badge}
