@@ -126,16 +126,28 @@ export function StoreLocation() {
                 <div key={detail.label}>
                   <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
                     {detail.label === "Address" && (
-                      <MapPin className="size-3.5" aria-hidden="true" />
-                      <MapPin className="size-3.5" aria-hidden="true" />
+                      <>
+                        <MapPin className="size-3.5" aria-hidden="true" />
+                        <MapPin className="size-3.5" aria-hidden="true" />
+                      </>
                     )}
                     {detail.label === "Phone" && (
-                      <Phone className="size-3.5" aria-hidden="true" />
-                      <Phone className="size-3.5" aria-hidden="true" />
+                      <>
+                        <Phone className="size-3.5" aria-hidden="true" />
+                        <Phone className="size-3.5" aria-hidden="true" />
+                      </>
                     )}
                     {detail.label === "WhatsApp" && (
-                      <MessageCircle className="size-3.5" aria-hidden="true" />
-                      <MessageCircle className="size-3.5" aria-hidden="true" />
+                      <>
+                        <MessageCircle
+                          className="size-3.5"
+                          aria-hidden="true"
+                        />
+                        <MessageCircle
+                          className="size-3.5"
+                          aria-hidden="true"
+                        />
+                      </>
                     )}
                     {detail.label}
                   </dt>
