@@ -63,6 +63,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
         oldPrice: product.oldPrice,
         href: `/products/${product.slug}`,
         price: parseProductPrice(product.currentPrice),
+        category: product.category,
+        categoryId: product.categoryId ?? null,
       });
     }
     setQuantity(1);
@@ -255,6 +257,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 oldPrice: product.oldPrice,
                 href: `/products/${product.slug}`,
                 price: parseProductPrice(product.currentPrice),
+                category: product.category,
+                categoryId: product.categoryId ?? null,
               })
             }
           />

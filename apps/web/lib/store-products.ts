@@ -45,6 +45,7 @@ export type StoreProduct = {
   href: string;
   brand: string;
   category: string;
+  categoryId?: string | null;
   collection?: string;
   status?: StoreProductStatus;
   searchTerms?: string[];

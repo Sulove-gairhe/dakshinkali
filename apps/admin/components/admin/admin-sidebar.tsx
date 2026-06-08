@@ -7,6 +7,7 @@ import {
   Columns3,
   FileText,
   LayoutDashboard,
+  Percent,
   ShieldPlus,
   Package,
   Tag,
@@ -20,6 +21,7 @@ const mainNav = [
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/categories", label: "Categories", icon: Tag },
+  { href: "/admin/coupons", label: "Coupons", icon: Percent },
 ];
 
 const orderLinks = [

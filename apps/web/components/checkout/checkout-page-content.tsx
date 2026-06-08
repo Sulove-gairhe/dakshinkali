@@ -56,7 +56,15 @@ function notifyAdminOfPayment(orderNumber: string, customerEmail: string): void 
 export function CheckoutPageContent() {
   const router = useRouter();
   const { user, profile, loading, isAuthenticated, session, supabase } = useAuth();
-  const { items, itemCount, subtotal, clearCart } = useCart();
+  const {
+    items,
+    itemCount,
+    subtotal,
+    appliedCoupon,
+    applyCoupon,
+    clearCart,
+    clearCoupon,
+  } = useCart();
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
@@ -130,7 +138,24 @@ export function CheckoutPageContent() {
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const deliveryFee = 150;
-    const totalAmount = subtotal + deliveryFee;
+    let validatedCoupon = appliedCoupon;
+    if (appliedCoupon) {
+      try {
+        validatedCoupon = await applyCoupon(appliedCoupon.code);
+      } catch (error) {
+        setSubmitError(
+          error instanceof Error
+            ? error.message
+            : "Coupon could not be validated. Please review your cart.",
+        );
+        setSubmitting(false);
+        return;
+      }
+    }
+
+    const discountAmount = validatedCoupon?.discountAmount ?? 0;
+    const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+    const totalAmount = discountedSubtotal + deliveryFee;
     const isFonepay = paymentMethod === "fonepay";
     // TODO: After applying supabase/migrations/20260526000000_add_proof_columns_complete.sql
     //       via Supabase Dashboard SQL Editor, change to:
@@ -205,6 +230,7 @@ export function CheckoutPageContent() {
               country: "Nepal",
             },
             paymentMethod: mappedPaymentMethod,
+            couponCode: validatedCoupon?.code ?? null,
             notes: orderNotes,
           }),
         });
@@ -240,10 +266,13 @@ export function CheckoutPageContent() {
             shipping_state: formData.provinceCity,
             shipping_postal_code: "44600",
             shipping_country: "Nepal",
-            subtotal: subtotal,
+            subtotal: discountedSubtotal,
             shipping_cost: deliveryFee,
             tax: 0,
             total: totalAmount,
+            coupon_code: validatedCoupon?.code ?? null,
+            discount_amount: discountAmount,
+            original_subtotal: subtotal,
             payment_method: mappedPaymentMethod,
             payment_status: "pending",
             // Proof metadata is stored in notes as JSON (schema-safe fallback).
@@ -331,6 +360,7 @@ export function CheckoutPageContent() {
         address: `${formData.fullAddress}, ${formData.provinceCity}`,
       });
       clearCart();
+      clearCoupon();
     }
 
     setSubmitting(false);

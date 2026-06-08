@@ -426,8 +426,14 @@
 }
 
 .icon-gold-ring {
-  border: 1.5px solid var(--color-primary);
+  border: 1.5px solid var(--color-gold);
+  background-color: transparent;
   transition: border-color 0.3s ease;
+}
+
+.icon-gold-ring svg {
+  fill: none;
+  stroke: currentColor;
 }
 
 .icon-gold-ring:hover {

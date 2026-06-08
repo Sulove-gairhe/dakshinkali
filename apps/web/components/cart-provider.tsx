@@ -37,6 +37,8 @@ export type CartProduct = {
   amount?: string | number;
   oldPrice?: string;
   href: string;
+  category?: string;
+  categoryId?: string | null;
 };
 
 export type CartItem = CartProduct & {
@@ -45,15 +47,27 @@ export type CartItem = CartProduct & {
   unitPrice: number;
 };
 
+export type AppliedCoupon = {
+  code: string;
+  discountAmount: number;
+  originalAmount: number;
+  finalAmount: number;
+  message: string;
+};
+
 type CartContextValue = {
   items: CartItem[];
   itemCount: number;
   subtotal: number;
+  appliedCoupon: AppliedCoupon | null;
+  discountedSubtotal: number;
   addItem: (product: CartProduct) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   getQuantity: (productId: string) => number;
   clearCart: () => void;
+  applyCoupon: (code: string) => Promise<AppliedCoupon>;
+  clearCoupon: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -143,6 +157,7 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
   const storageKeyRef = useRef(storageKey);
 
   const [items, setItems] = useState<CartItem[]>([]);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   // Load cart from the correct user-scoped key whenever userId changes.
@@ -160,6 +175,7 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
   }, [isReady, items]);
 
   const addItem = useCallback((product: CartProduct) => {
+    setAppliedCoupon(null);
     setItems((currentItems) => {
       const existingItem = currentItems.find((item) => item.id === product.id);
       const unitPrice = getProductPrice(product);
@@ -200,6 +216,7 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
     setItems((currentItems) =>
       currentItems.filter((item) => item.id !== productId),
     );
+    setAppliedCoupon(null);
   }, []);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
@@ -212,6 +229,7 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
         item.id === productId ? { ...item, quantity } : item,
       );
     });
+    setAppliedCoupon(null);
   }, []);
 
   const getQuantity = useCallback(
@@ -222,6 +240,48 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
 
   const clearCart = useCallback(() => {
     setItems([]);
+    setAppliedCoupon(null);
+  }, []);
+
+  const applyCoupon = useCallback(
+    async (code: string) => {
+      const response = await fetch("/api/coupons/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code,
+          items: items.map((item) => ({
+            productId: item.id,
+            productSlug: item.slug,
+            productName: item.name,
+            categoryId: item.categoryId ?? null,
+            categoryName: item.category ?? null,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.valid) {
+        throw new Error(result.message || "Unable to apply coupon.");
+      }
+
+      const coupon: AppliedCoupon = {
+        code: result.code,
+        discountAmount: Number(result.discountAmount) || 0,
+        originalAmount: Number(result.originalAmount) || 0,
+        finalAmount: Number(result.finalAmount) || 0,
+        message: result.message,
+      };
+      setAppliedCoupon(coupon);
+      return coupon;
+    },
+    [items],
+  );
+
+  const clearCoupon = useCallback(() => {
+    setAppliedCoupon(null);
   }, []);
 
   const value = useMemo(
@@ -232,13 +292,38 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
         (total, item) => total + item.unitPrice * item.quantity,
         0,
       ),
+      appliedCoupon,
+      discountedSubtotal: appliedCoupon
+        ? Math.max(
+            0,
+            items.reduce(
+              (total, item) => total + item.unitPrice * item.quantity,
+              0,
+            ) - appliedCoupon.discountAmount,
+          )
+        : items.reduce(
+            (total, item) => total + item.unitPrice * item.quantity,
+            0,
+          ),
       addItem,
       removeItem,
       updateQuantity,
       getQuantity,
       clearCart,
+      applyCoupon,
+      clearCoupon,
     }),
-    [addItem, clearCart, getQuantity, items, removeItem, updateQuantity],
+    [
+      addItem,
+      appliedCoupon,
+      applyCoupon,
+      clearCart,
+      clearCoupon,
+      getQuantity,
+      items,
+      removeItem,
+      updateQuantity,
+    ],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -108,7 +108,7 @@ function InstagramBrandIcon() {
         strokeWidth="2"
       />
       <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="2" />
-      <circle cx="16.7" cy="7.3" r="1.1" fill="currentColor" />
+      <circle cx="16.7" cy="7.3" r="1.1" stroke="currentColor" strokeWidth="2" />
     </svg>
   );
 }
@@ -119,9 +119,14 @@ function FacebookBrandIcon() {
       aria-hidden="true"
       className="size-5"
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
     >
-      <path d="M14.2 8.4V6.9c0-.7.5-1.1 1.2-1.1h1.5V3.2c-.7-.1-1.5-.2-2.2-.2-2.3 0-3.9 1.4-3.9 3.9v1.5H8.4v3h2.4V21h3.1v-9.6h2.5l.4-3h-2.6Z" />
+      <path
+        d="M14.2 8.4V6.9c0-.7.5-1.1 1.2-1.1h1.5V3.2c-.7-.1-1.5-.2-2.2-.2-2.3 0-3.9 1.4-3.9 3.9v1.5H8.4v3h2.4V21h3.1v-9.6h2.5l.4-3h-2.6Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
     </svg>
   );
 }

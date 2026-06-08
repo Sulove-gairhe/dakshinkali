@@ -34,3 +34,20 @@ export {
     ProductImageStorage,
     ensureStorageBucket,
 } from './storage.config';
+
+export {
+    calculateCouponDiscount,
+    getApplicableSubtotal,
+    getCouponStatus,
+    normalizeCouponCode,
+    validateCouponForCart,
+    type CouponApplicabilityType,
+    type CouponCalculation,
+    type CouponCartItem,
+    type CouponDiscountType,
+    type CouponRecord,
+    type CouponStatus,
+    type CouponValidationFailure,
+    type CouponValidationResult,
+    type CouponValidationSuccess,
+} from './coupons';

@@ -33,6 +33,9 @@ export interface OrderEntity {
     subtotal: number;
     shippingCost: number;
     tax: number;
+    couponCode: string | null;
+    discountAmount: number;
+    originalSubtotal: number | null;
     total: number;
     paymentMethod: PaymentMethod;
     paymentStatus: PaymentStatus;
@@ -77,6 +80,9 @@ export interface CreateOrderRecord {
     subtotal: number;
     shippingCost: number;
     tax: number;
+    couponCode?: string | null;
+    discountAmount?: number;
+    originalSubtotal?: number | null;
     total: number;
     paymentMethod: PaymentMethod;
     paymentStatus: PaymentStatus;
