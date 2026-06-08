@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdminUser } from "@/lib/admin/auth-server";
+import { createServiceClient } from "@/lib/supabase/service-server";
 import {
   canShipOrder,
   getValidNextStatuses,
@@ -14,15 +15,39 @@ import type {
   AdminOrderRecord,
   OrderListFilters,
   OrderStatus,
+  PaymentStatus,
   PaymentMethod,
+} from "@/lib/admin/order-types";
+import {
+  COD_PAYMENT_METHOD,
+  FONEPAY_PAYMENT_METHODS,
 } from "@/lib/admin/order-types";
 
 const PROOF_BUCKET = "order-proofs";
+const QR_PAYMENT_METHODS = [...FONEPAY_PAYMENT_METHODS] satisfies PaymentMethod[];
+const APPROVAL_STATUSES: OrderStatus[] = ["pending", "pending_admin_approval"];
+const QR_PENDING_PAYMENT_STATUSES = ["pending", "pending_verification"];
+const ORDER_LIST_SELECT =
+  "*, order_items(id, order_id, product_id, product_name, quantity)";
+
+function isQrPaymentMethod(method: PaymentMethod) {
+  return (QR_PAYMENT_METHODS as PaymentMethod[]).includes(method);
+}
 
 const orderIdSchema = z.string().uuid();
 
+async function requireAdminOrderAccess() {
+  const { user, profile } = await requireAdminUser();
+
+  return {
+    supabase: createServiceClient(),
+    user,
+    profile,
+  };
+}
+
 async function appendStatusHistory(
-  supabase: Awaited<ReturnType<typeof requireAdminUser>>["supabase"],
+  supabase: Awaited<ReturnType<typeof requireAdminOrderAccess>>["supabase"],
   orderId: string,
   status: string,
   notes: string | null,
@@ -37,7 +62,7 @@ async function appendStatusHistory(
 }
 
 async function fetchOrderById(
-  supabase: Awaited<ReturnType<typeof requireAdminUser>>["supabase"],
+  supabase: Awaited<ReturnType<typeof requireAdminOrderAccess>>["supabase"],
   orderId: string,
 ): Promise<AdminOrderRecord | null> {
   const { data: orderRow, error } = await supabase
@@ -66,26 +91,64 @@ async function fetchOrderById(
   });
 }
 
+async function updateOrderWithOptionalProofCleanup(
+  supabase: Awaited<ReturnType<typeof requireAdminOrderAccess>>["supabase"],
+  orderId: string,
+  payload: Record<string, unknown>,
+) {
+  const first = await supabase
+    .from("orders")
+    .update(payload)
+    .eq("id", orderId)
+    .select()
+    .single();
+
+  if (!first.error || !isMissingProofCleanupColumn(first.error)) {
+    return first;
+  }
+
+  const { proof_cleanup_status: _proofCleanupStatus, ...fallbackPayload } = payload;
+  return supabase
+    .from("orders")
+    .update(fallbackPayload)
+    .eq("id", orderId)
+    .select()
+    .single();
+}
+
+function isMissingProofCleanupColumn(error: { message?: string; code?: string }) {
+  return (
+    error.code === "PGRST204" ||
+    error.message?.includes("proof_cleanup_status") ||
+    error.message?.includes("schema cache")
+  );
+}
+
 export async function getOrderNavCounts(): Promise<{
   pendingVerification: number;
   pendingApproval: number;
+  awaitingApproval: number;
 }> {
-  const { supabase } = await requireAdminUser();
+  const { supabase } = await requireAdminOrderAccess();
 
   const [verification, approval] = await Promise.all([
     supabase
       .from("orders")
       .select("id", { count: "exact", head: true })
-      .eq("payment_status", "pending_verification"),
+      .in("payment_method", QR_PAYMENT_METHODS)
+      .in("status", APPROVAL_STATUSES)
+      .in("payment_status", QR_PENDING_PAYMENT_STATUSES),
     supabase
       .from("orders")
       .select("id", { count: "exact", head: true })
-      .eq("status", "pending_admin_approval"),
+      .eq("payment_method", COD_PAYMENT_METHOD)
+      .in("status", APPROVAL_STATUSES),
   ]);
 
   return {
     pendingVerification: verification.count ?? 0,
     pendingApproval: approval.count ?? 0,
+    awaitingApproval: (verification.count ?? 0) + (approval.count ?? 0),
   };
 }
 
@@ -97,7 +160,7 @@ export async function listAdminOrders(
   page: number;
   pageSize: number;
 }> {
-  const { supabase } = await requireAdminUser();
+  const { supabase } = await requireAdminOrderAccess();
   const page = filters.page ?? 1;
   const pageSize = filters.pageSize ?? 25;
   const from = (page - 1) * pageSize;
@@ -105,7 +168,7 @@ export async function listAdminOrders(
 
   let query = supabase
     .from("orders")
-    .select("*, order_items(count)", { count: "exact" })
+    .select(ORDER_LIST_SELECT, { count: "exact" })
     .order("created_at", { ascending: false });
 
   if (filters.status) {
@@ -115,7 +178,10 @@ export async function listAdminOrders(
     query = query.eq("payment_status", filters.paymentStatus);
   }
   if (filters.paymentMethod) {
-    query = query.eq("payment_method", filters.paymentMethod);
+    query =
+      filters.paymentMethod === "fonepay_qr_group"
+        ? query.in("payment_method", QR_PAYMENT_METHODS)
+        : query.eq("payment_method", filters.paymentMethod);
   }
   if (filters.dateFrom) {
     query = query.gte("created_at", filters.dateFrom);
@@ -146,17 +212,107 @@ export async function listAdminOrders(
   };
 }
 
+type ApprovalKind = "cod" | "qr";
+
+export async function listAwaitingApprovalOrders({
+  kind,
+  search,
+  page = 1,
+  pageSize = 10,
+}: {
+  kind: ApprovalKind;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<{
+  orders: AdminOrderRecord[];
+  total: number;
+  page: number;
+  pageSize: number;
+}> {
+  const { supabase } = await requireAdminOrderAccess();
+  const safePage = Math.max(1, page);
+  const safePageSize = Math.min(Math.max(1, pageSize), 25);
+  const from = (safePage - 1) * safePageSize;
+  const to = from + safePageSize - 1;
+
+  let query = supabase
+    .from("orders")
+    .select(ORDER_LIST_SELECT, { count: "exact" })
+    .order("created_at", { ascending: false });
+
+  if (kind === "cod") {
+    query = query
+      .eq("payment_method", COD_PAYMENT_METHOD)
+      .in("status", APPROVAL_STATUSES);
+  } else {
+    query = query
+      .in("payment_method", QR_PAYMENT_METHODS)
+      .in("status", APPROVAL_STATUSES)
+      .in("payment_status", QR_PENDING_PAYMENT_STATUSES);
+  }
+
+  const term = search?.trim().replace(/[%_]/g, "");
+  if (term) {
+    query = query.or(
+      `order_number.ilike.${term}%,customer_name.ilike.%${term}%,customer_email.ilike.%${term}%,customer_phone.ilike.%${term}%`,
+    );
+  }
+
+  const { data, error, count } = await query.range(from, to);
+  if (error) throw new Error(error.message);
+
+  return {
+    orders: (data ?? []).map((row) =>
+      mapOrderRow(row as Record<string, unknown>),
+    ),
+    total: count ?? 0,
+    page: safePage,
+    pageSize: safePageSize,
+  };
+}
+
+export async function getAwaitingApprovalSummary(): Promise<{
+  total: number;
+  cod: number;
+  qr: number;
+}> {
+  const { supabase } = await requireAdminOrderAccess();
+
+  const [cod, qr] = await Promise.all([
+    supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("payment_method", COD_PAYMENT_METHOD)
+      .in("status", APPROVAL_STATUSES),
+    supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .in("payment_method", QR_PAYMENT_METHODS)
+      .in("status", APPROVAL_STATUSES)
+      .in("payment_status", QR_PENDING_PAYMENT_STATUSES),
+  ]);
+
+  const codCount = cod.count ?? 0;
+  const qrCount = qr.count ?? 0;
+  return {
+    total: codCount + qrCount,
+    cod: codCount,
+    qr: qrCount,
+  };
+}
+
 export async function getAdminOrder(
   orderId: string,
 ): Promise<AdminOrderRecord | null> {
   const parsed = orderIdSchema.safeParse(orderId);
   if (!parsed.success) return null;
-  const { supabase } = await requireAdminUser();
+  const { supabase } = await requireAdminOrderAccess();
   return fetchOrderById(supabase, parsed.data);
 }
 
 export async function listBoardOrders(): Promise<AdminOrderRecord[]> {
-  const { supabase } = await requireAdminUser();
+  const { supabase } = await requireAdminOrderAccess();
   const boardStatuses: OrderStatus[] = [
     "pending",
     "confirmed",
@@ -167,7 +323,7 @@ export async function listBoardOrders(): Promise<AdminOrderRecord[]> {
 
   const { data, error } = await supabase
     .from("orders")
-    .select("*, order_items(count)")
+    .select(ORDER_LIST_SELECT)
     .in("status", boardStatuses)
     .order("created_at", { ascending: false })
     .limit(200);
@@ -184,10 +340,16 @@ export async function approveOrderPayment(
 ): Promise<ActionResult<AdminOrderRecord>> {
   try {
     const parsed = orderIdSchema.parse(orderId);
-    const { supabase, user } = await requireAdminUser();
+    const { supabase, user } = await requireAdminOrderAccess();
     const order = await fetchOrderById(supabase, parsed);
     if (!order) return { success: false, error: "Order not found" };
-    if (order.payment_status !== "pending_verification") {
+    if (!isQrPaymentMethod(order.payment_method)) {
+      return {
+        success: false,
+        error: "Order is not a QR payment order",
+      };
+    }
+    if (!QR_PENDING_PAYMENT_STATUSES.includes(order.payment_status)) {
       return {
         success: false,
         error: "Order is not awaiting payment verification",
@@ -203,12 +365,11 @@ export async function approveOrderPayment(
       payload.admin_notes = adminNote.trim();
     }
 
-    const { data, error } = await supabase
-      .from("orders")
-      .update(payload)
-      .eq("id", parsed)
-      .select()
-      .single();
+    const { data, error } = await updateOrderWithOptionalProofCleanup(
+      supabase,
+      parsed,
+      payload,
+    );
 
     if (error) return { success: false, error: error.message };
 
@@ -241,10 +402,16 @@ export async function rejectOrderPayment(
 ): Promise<ActionResult<AdminOrderRecord>> {
   try {
     const parsed = orderIdSchema.parse(orderId);
-    const { supabase, user } = await requireAdminUser();
+    const { supabase, user } = await requireAdminOrderAccess();
     const order = await fetchOrderById(supabase, parsed);
     if (!order) return { success: false, error: "Order not found" };
-    if (order.payment_status !== "pending_verification") {
+    if (!isQrPaymentMethod(order.payment_method)) {
+      return {
+        success: false,
+        error: "Order is not a QR payment order",
+      };
+    }
+    if (!QR_PENDING_PAYMENT_STATUSES.includes(order.payment_status)) {
       return {
         success: false,
         error: "Order is not awaiting payment verification",
@@ -260,12 +427,11 @@ export async function rejectOrderPayment(
       payload.admin_notes = adminNote.trim();
     }
 
-    const { data, error } = await supabase
-      .from("orders")
-      .update(payload)
-      .eq("id", parsed)
-      .select()
-      .single();
+    const { data, error } = await updateOrderWithOptionalProofCleanup(
+      supabase,
+      parsed,
+      payload,
+    );
 
     if (error) return { success: false, error: error.message };
 
@@ -297,13 +463,13 @@ export async function confirmCodOrder(
 ): Promise<ActionResult<AdminOrderRecord>> {
   try {
     const parsed = orderIdSchema.parse(orderId);
-    const { supabase, user } = await requireAdminUser();
+    const { supabase, user } = await requireAdminOrderAccess();
     const order = await fetchOrderById(supabase, parsed);
     if (!order) return { success: false, error: "Order not found" };
-    if (order.payment_method !== "cash_on_delivery") {
+    if (order.payment_method !== COD_PAYMENT_METHOD) {
       return { success: false, error: "Not a cash on delivery order" };
     }
-    if (order.status !== "pending_admin_approval") {
+    if (!APPROVAL_STATUSES.includes(order.status)) {
       return {
         success: false,
         error: "Order is not awaiting COD approval",
@@ -348,13 +514,13 @@ export async function cancelCodOrder(
 ): Promise<ActionResult<AdminOrderRecord>> {
   try {
     const parsed = orderIdSchema.parse(orderId);
-    const { supabase, user } = await requireAdminUser();
+    const { supabase, user } = await requireAdminOrderAccess();
     const order = await fetchOrderById(supabase, parsed);
     if (!order) return { success: false, error: "Order not found" };
-    if (order.payment_method !== "cash_on_delivery") {
+    if (order.payment_method !== COD_PAYMENT_METHOD) {
       return { success: false, error: "Not a cash on delivery order" };
     }
-    if (order.status !== "pending_admin_approval") {
+    if (!APPROVAL_STATUSES.includes(order.status)) {
       return {
         success: false,
         error: "Order is not awaiting COD approval",
@@ -409,6 +575,18 @@ const updateStatusSchema = z.object({
   note: z.string().max(2000).optional(),
 });
 
+const updatePaymentStatusSchema = z.object({
+  orderId: z.string().uuid(),
+  paymentStatus: z.enum([
+    "pending",
+    "pending_verification",
+    "paid",
+    "failed",
+    "refunded",
+  ]),
+  note: z.string().max(2000).optional(),
+});
+
 export async function updateOrderStatus(
   orderId: string,
   newStatus: OrderStatus,
@@ -416,7 +594,7 @@ export async function updateOrderStatus(
 ): Promise<ActionResult<AdminOrderRecord>> {
   try {
     const input = updateStatusSchema.parse({ orderId, newStatus, note });
-    const { supabase, user } = await requireAdminUser();
+    const { supabase, user } = await requireAdminOrderAccess();
     const order = await fetchOrderById(supabase, input.orderId);
     if (!order) return { success: false, error: "Order not found" };
 
@@ -472,6 +650,60 @@ export async function updateOrderStatus(
   }
 }
 
+export async function updateOrderPaymentStatus(
+  orderId: string,
+  paymentStatus: PaymentStatus,
+  note?: string,
+): Promise<ActionResult<AdminOrderRecord>> {
+  try {
+    const input = updatePaymentStatusSchema.parse({
+      orderId,
+      paymentStatus,
+      note,
+    });
+    const { supabase, user } = await requireAdminOrderAccess();
+    const order = await fetchOrderById(supabase, input.orderId);
+    if (!order) return { success: false, error: "Order not found" };
+
+    const payload: Record<string, unknown> = {
+      payment_status: input.paymentStatus,
+    };
+    if (input.note?.trim()) payload.admin_notes = input.note.trim();
+
+    const { data, error } = await supabase
+      .from("orders")
+      .update(payload)
+      .eq("id", input.orderId)
+      .select()
+      .single();
+
+    if (error) return { success: false, error: error.message };
+
+    await appendStatusHistory(
+      supabase,
+      input.orderId,
+      order.status,
+      input.note?.trim() || `Payment status updated to ${input.paymentStatus}`,
+      user.id,
+    );
+
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${input.orderId}`);
+    revalidatePath("/admin/orders/approval");
+    revalidatePath("/admin/orders/board");
+    return {
+      success: true,
+      data: mapOrderRow(data as Record<string, unknown>),
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error:
+        err instanceof Error ? err.message : "Failed to update payment status",
+    };
+  }
+}
+
 export async function uploadOrderProof(
   formData: FormData,
 ): Promise<ActionResult<AdminOrderRecord>> {
@@ -495,7 +727,7 @@ export async function uploadOrderProof(
       return { success: false, error: "File too large (max 5MB)" };
     }
 
-    const { supabase, user } = await requireAdminUser();
+    const { supabase, user } = await requireAdminOrderAccess();
     const order = await fetchOrderById(supabase, orderId);
     if (!order) return { success: false, error: "Order not found" };
 
@@ -531,6 +763,9 @@ export async function uploadOrderProof(
           ? "pending_verification"
           : order.payment_status,
     };
+    if (order.status === "pending" && order.payment_method !== COD_PAYMENT_METHOD) {
+      updatePayload.status = "pending_admin_approval";
+    }
 
     const { data, error } = await supabase
       .from("orders")
@@ -544,7 +779,7 @@ export async function uploadOrderProof(
     await appendStatusHistory(
       supabase,
       orderId,
-      order.status,
+      (updatePayload.status as string | undefined) ?? order.status,
       "Payment proof uploaded by admin",
       user.id,
     );

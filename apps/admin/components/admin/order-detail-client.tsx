@@ -14,9 +14,14 @@ import {
   cancelCodOrder,
   confirmCodOrder,
   rejectOrderPayment,
+  updateOrderPaymentStatus,
   updateOrderStatus,
 } from "@/lib/admin/actions/orders";
-import type { AdminOrderRecord, OrderStatus } from "@/lib/admin/order-types";
+import type {
+  AdminOrderRecord,
+  OrderStatus,
+  PaymentStatus,
+} from "@/lib/admin/order-types";
 import {
   canShipOrder,
   formatFileSize,
@@ -25,8 +30,10 @@ import {
   formatShippingAddress,
   getValidNextStatuses,
   orderStatusBadgeClass,
+  orderStatusLabel,
   paymentMethodLabel,
   paymentStatusBadgeClass,
+  paymentStatusLabel,
 } from "@/lib/admin/utils";
 import { shippingAddressFromOrder } from "@/lib/admin/order-utils";
 
@@ -35,7 +42,8 @@ type ConfirmAction =
   | { type: "reject" }
   | { type: "confirmCod" }
   | { type: "cancelCod" }
-  | { type: "status"; status: OrderStatus };
+  | { type: "status"; status: OrderStatus }
+  | { type: "paymentStatus"; paymentStatus: PaymentStatus };
 
 export function OrderDetailClient({
   initialOrder,
@@ -48,6 +56,9 @@ export function OrderDetailClient({
   const [mobileTab, setMobileTab] = useState<"details" | "proof">("details");
   const [confirm, setConfirm] = useState<ConfirmAction | null>(null);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus | "">("");
+  const [selectedPaymentStatus, setSelectedPaymentStatus] =
+    useState<PaymentStatus>(order.payment_status);
   const [busy, setBusy] = useState(false);
   const [productDrawer, setProductDrawer] = useState<{
     id: string;
@@ -85,7 +96,7 @@ export function OrderDetailClient({
       }
       setProductDrawer(data);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load product");
+      toast.error(err instanceof Error ? err.message : "Couldn't load product details");
     } finally {
       setProductLoading(false);
     }
@@ -111,6 +122,13 @@ export function OrderDetailClient({
       case "status":
         result = await updateOrderStatus(order.id, confirm.status, adminNote);
         break;
+      case "paymentStatus":
+        result = await updateOrderPaymentStatus(
+          order.id,
+          confirm.paymentStatus,
+          adminNote,
+        );
+        break;
     }
     setBusy(false);
     setConfirm(null);
@@ -121,6 +139,7 @@ export function OrderDetailClient({
       return;
     }
     setOrder({ ...order, ...result.data, order_items: items, order_status_history: history });
+    setSelectedPaymentStatus(result.data.payment_status);
     toast.success("Order updated");
     await refresh();
   }
@@ -138,12 +157,12 @@ export function OrderDetailClient({
             {order.status === "pending_admin_approval" && (
               <Bell className="mr-1 inline h-3 w-3" />
             )}
-            {order.status.replace(/_/g, " ")}
+            {orderStatusLabel(order.status)}
           </span>
           <span
             className={`rounded-full px-2 py-0.5 text-xs ${paymentStatusBadgeClass(order.payment_status)}`}
           >
-            {order.payment_status}
+            {paymentStatusLabel(order.payment_status)}
           </span>
         </div>
 
@@ -250,6 +269,57 @@ export function OrderDetailClient({
               </p>
             </div>
           ) : null}
+          <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Update payment status
+                </h3>
+                <p className="mt-1 text-xs text-gray-500">
+                  Current: {paymentStatusLabel(order.payment_status)}
+                </p>
+              </div>
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs ${paymentStatusBadgeClass(order.payment_status)}`}
+              >
+                {paymentStatusLabel(order.payment_status)}
+              </span>
+            </div>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <select
+                value={selectedPaymentStatus}
+                onChange={(event) =>
+                  setSelectedPaymentStatus(event.target.value as PaymentStatus)
+                }
+                className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              >
+                {[
+                  "pending",
+                  "pending_verification",
+                  "paid",
+                  "failed",
+                  "refunded",
+                ].map((status) => (
+                  <option key={status} value={status}>
+                    {paymentStatusLabel(status as PaymentStatus)}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                disabled={busy || selectedPaymentStatus === order.payment_status}
+                onClick={() =>
+                  setConfirm({
+                    type: "paymentStatus",
+                    paymentStatus: selectedPaymentStatus,
+                  })
+                }
+                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Save payment status
+              </button>
+            </div>
+          </div>
         </section>
 
         <div>
@@ -299,7 +369,7 @@ export function OrderDetailClient({
             type="button"
             disabled={busy}
             onClick={() => setConfirm({ type: "confirmCod" })}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white"
+            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500/30"
           >
             Confirm COD Order
           </button>
@@ -307,7 +377,7 @@ export function OrderDetailClient({
             type="button"
             disabled={busy}
             onClick={() => setConfirm({ type: "cancelCod" })}
-            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700"
+            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500/20"
           >
             Cancel Order
           </button>
@@ -319,8 +389,11 @@ export function OrderDetailClient({
       <div>
         <button
           type="button"
-          onClick={() => setStatusModalOpen(true)}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          onClick={() => {
+            setSelectedStatus(validNext[0] ?? "");
+            setStatusModalOpen(true);
+          }}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 active:translate-y-px"
         >
           Update Status
         </button>
@@ -408,7 +481,7 @@ export function OrderDetailClient({
         width="md"
       >
         {productLoading ? (
-          <p className="text-sm text-gray-500">Loading…</p>
+          <p className="text-sm text-gray-500">Fetching details...</p>
         ) : productDrawer ? (
           <div className="space-y-4 text-sm">
             {productDrawer.imageUrl ? (
@@ -477,11 +550,23 @@ export function OrderDetailClient({
         title: `Change status to ${confirm && "status" in confirm ? confirm.status : ""}?`,
         description: "This updates the order fulfillment status.",
       },
+      paymentStatus: {
+        title: `Change payment status to ${
+          confirm && "paymentStatus" in confirm
+            ? paymentStatusLabel(confirm.paymentStatus)
+            : ""
+        }?`,
+        description: "This updates the payment status shown in All Orders.",
+      },
     };
 
     if (!confirm) return null;
     const key =
-      confirm.type === "status" ? "status" : confirm.type;
+      confirm.type === "status"
+        ? "status"
+        : confirm.type === "paymentStatus"
+          ? "paymentStatus"
+          : confirm.type;
     const c = copy[key as keyof typeof copy];
 
     return (
@@ -508,7 +593,7 @@ export function OrderDetailClient({
         <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
           <h3 className="text-lg font-semibold">Update status</h3>
           <p className="mt-1 text-sm text-gray-600">
-            Current: {order.status.replace(/_/g, " ")}
+            Current: {orderStatusLabel(order.status)}
           </p>
           <div className="mt-4 space-y-2">
             {validNext.map((next) => {
@@ -525,21 +610,43 @@ export function OrderDetailClient({
                       ? "Cannot ship — payment not verified"
                       : undefined
                   }
-                  onClick={() => setConfirm({ type: "status", status: next })}
-                  className="block w-full rounded-lg border border-gray-200 px-3 py-2 text-left text-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={() => setSelectedStatus(next)}
+                  className={`block w-full rounded-lg border px-3 py-2 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    selectedStatus === next
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-gray-200 hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+                  }`}
                 >
-                  {next.replace(/_/g, " ")}
+                  {orderStatusLabel(next)}
                 </button>
               );
             })}
+            {validNext.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-sm text-gray-500">
+                No next status is available for this order.
+              </p>
+            ) : null}
           </div>
-          <button
-            type="button"
-            className="mt-4 w-full rounded-lg border border-gray-200 py-2 text-sm"
-            onClick={() => setStatusModalOpen(false)}
-          >
-            Close
-          </button>
+          <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              onClick={() => setStatusModalOpen(false)}
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              disabled={!selectedStatus || busy}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={() => {
+                if (!selectedStatus) return;
+                setConfirm({ type: "status", status: selectedStatus });
+              }}
+            >
+              Confirm status
+            </button>
+          </div>
         </div>
       </div>
     );

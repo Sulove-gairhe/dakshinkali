@@ -76,6 +76,27 @@ export function orderStatusBadgeClass(status: OrderStatus): string {
   }
 }
 
+export function orderStatusLabel(status: OrderStatus): string {
+  switch (status) {
+    case "pending":
+      return "Pending";
+    case "pending_admin_approval":
+      return "Waiting for Approval";
+    case "confirmed":
+      return "Confirmed";
+    case "processing":
+      return "Processing";
+    case "shipped":
+      return "Shipped";
+    case "delivered":
+      return "Delivered";
+    case "cancelled":
+      return "Cancelled";
+    default:
+      return "Unknown";
+  }
+}
+
 export function paymentStatusBadgeClass(status: PaymentStatus): string {
   switch (status) {
     case "paid":
@@ -88,6 +109,23 @@ export function paymentStatusBadgeClass(status: PaymentStatus): string {
       return "bg-gray-100 text-gray-600";
     default:
       return "bg-gray-100 text-gray-700";
+  }
+}
+
+export function paymentStatusLabel(status: PaymentStatus): string {
+  switch (status) {
+    case "pending":
+      return "Payment Pending";
+    case "pending_verification":
+      return "Waiting for Payment Verification";
+    case "paid":
+      return "Paid";
+    case "failed":
+      return "Payment Rejected";
+    case "refunded":
+      return "Refunded";
+    default:
+      return "Unknown";
   }
 }
 
@@ -110,18 +148,39 @@ export function formatNprPrice(amount: number): string {
   return `Rs. ${Math.round(amount).toLocaleString("en-NP")}`;
 }
 
+export function orderItemPreview(
+  order: import("./order-types").AdminOrderRecord,
+): { title: string; detail: string } {
+  const items = order.order_items ?? [];
+  const count = order.item_count ?? items.length;
+  const firstName = items[0]?.product_name?.trim();
+
+  if (!firstName) {
+    return {
+      title: count > 0 ? `${count} item${count === 1 ? "" : "s"}` : "No items",
+      detail: "Item details unavailable",
+    };
+  }
+
+  const extraCount = Math.max(0, count - 1);
+  return {
+    title: extraCount > 0 ? `${firstName} +${extraCount} more` : firstName,
+    detail: `${count} item${count === 1 ? "" : "s"} in order`,
+  };
+}
+
 export function paymentMethodLabel(method: PaymentMethod): string {
   switch (method) {
     case "cash_on_delivery":
       return "Cash on Delivery";
     case "fonepay_qr":
-      return "Fonepay QR";
+      return "Fonepay / QR Payment";
     case "esewa":
       return "eSewa";
     case "khalti":
       return "Khalti";
     case "bank_transfer":
-      return "Bank Transfer";
+      return "Fonepay / QR Payment";
     default:
       return method;
   }

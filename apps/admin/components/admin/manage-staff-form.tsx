@@ -54,7 +54,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
   async function handleRemoveMember(member: AdminMember) {
     const label = member.username ? `@${member.username}` : member.email;
     const confirmed = window.confirm(
-      `Remove ${label} from admin access and the database?`,
+      `Remove ${label} from your team?`,
     );
     if (!confirmed) {
       return;
@@ -85,7 +85,7 @@ export function ManageStaffForm({ members }: { members: AdminMember[] }) {
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Add email</h2>
             <p className="mt-1 text-sm text-gray-500">
-              Grant admin panel access to an existing or future staff/admin.
+              Give access to admin panel to an existing or future staff/admin.
             </p>
           </div>
         </div>

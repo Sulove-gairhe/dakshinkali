@@ -56,7 +56,7 @@ export function RelatedProductSelector({
         type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search products by name or slug"
+        placeholder="Search products by name"
         className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
       />
       {results.length > 0 ? (

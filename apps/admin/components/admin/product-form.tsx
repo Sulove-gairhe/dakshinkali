@@ -35,7 +35,7 @@ const TABS = [
   "Storefront",
   "Specifications",
   "Rich Description",
-  "SEO & Search",
+  "Search & Visibility",
   "Variants",
 ] as const;
 
@@ -148,7 +148,7 @@ export function ProductForm({
         }));
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Save failed");
+      toast.error(err instanceof Error ? err.message : "Couldn't save. Please try again");
     } finally {
       setSaving(false);
     }
@@ -391,7 +391,7 @@ export function ProductForm({
             />
           )}
 
-          {tab === "SEO & Search" && (
+          {tab === "Search & Visibility" && (
             <div className="space-y-6">
               <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
                 <h3 className="text-sm font-semibold text-primary">
@@ -435,11 +435,11 @@ export function ProductForm({
                         validation.warnings.map((w) => w.message),
                       );
                       setIsGeneratorUnlocked(true);
-                      toast.success("SEO suggestions generated");
+                      toast.success("Search tips generated");
                     }}
                     className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                   >
-                    {seoSuggestion ? "Regenerate" : "Generate SEO"}
+                    {seoSuggestion ? "Regenerate" : "Generate search tips"}
                   </button>
                   {seoSuggestion && (
                     <span className="self-center text-xs text-primary">
@@ -467,7 +467,7 @@ export function ProductForm({
                             searchTerms: seoPreviewSearchTerms,
                           },
                         }));
-                        toast("SEO suggestions applied", {
+                        toast("Search tips applied", {
                           action: {
                             label: "Undo",
                             onClick: () => {
@@ -483,7 +483,7 @@ export function ProductForm({
                                 },
                               }));
                               previousSeoStateRef.current = null;
-                              toast.success("SEO undo successful");
+                              toast.success("Changes undone");
                             },
                           },
                           duration: 4000,

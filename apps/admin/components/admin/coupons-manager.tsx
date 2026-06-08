@@ -118,7 +118,7 @@ export function CouponsManager({
 
   function openCreate() {
     if (setupRequired) {
-      toast.error("Apply the coupon database migration before creating coupons.");
+      toast.error("Please set up the coupon feature before creating coupons.");
       return;
     }
     setEditing(null);
@@ -151,7 +151,7 @@ export function CouponsManager({
       setDrawerOpen(false);
       toast.success(editing ? "Coupon updated" : "Coupon created");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unable to save coupon";
+      const message = err instanceof Error ? err.message : "Couldn't save coupon";
       setError(message);
       toast.error(message);
     } finally {
@@ -171,7 +171,7 @@ export function CouponsManager({
       );
       toast.success("Coupon activated");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unable to update coupon");
+      toast.error(err instanceof Error ? err.message : "Couldn't update coupon");
     }
   }
 
@@ -190,7 +190,7 @@ export function CouponsManager({
         toast.success("Coupon disabled");
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Action failed");
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setConfirm(null);
     }
@@ -758,12 +758,8 @@ function SetupRequiredBanner() {
         <div>
           <h2 className="text-sm font-bold">Coupon database setup required</h2>
           <p className="mt-1 text-sm leading-6 text-amber-800">
-            Apply{" "}
-            <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-xs">
-              supabase/migrations/20260607000000_create_coupons.sql
-            </code>{" "}
-            to your Supabase project, then reload this page. The admin UI is ready,
-            but Supabase has not exposed the <code>public.coupons</code> table yet.
+            Please set up the coupon feature in your database, then reload this page. The admin panel is ready,
+            but the coupon data needs to be activated first.
           </p>
         </div>
       </div>

@@ -50,6 +50,16 @@ export class OrderRepository {
             throw new Error('Failed to create order from cart: No order ID returned');
         }
 
+        if (record.status) {
+            const { error: statusError } = await this.supabase
+                .from('orders')
+                .update({ status: record.status })
+                .eq('id', orderId);
+            if (statusError) {
+                throw new Error(`Failed to update created order status: ${statusError.message}`);
+            }
+        }
+
         const created = await this.findById(orderId);
         if (!created) {
             throw new Error('Failed to load created order');
@@ -77,6 +87,7 @@ export class OrderRepository {
             coupon_code: record.couponCode || null,
             discount_amount: record.discountAmount || 0,
             original_subtotal: record.originalSubtotal ?? record.subtotal,
+            status: record.status || 'pending',
             payment_method: record.paymentMethod,
             payment_status: record.paymentStatus,
             notes: record.notes || null,

@@ -141,7 +141,7 @@ export function OrderSummary() {
                   </div>
                   <p className="mt-2 flex items-center gap-1.5 font-medium text-emerald-700">
                     <ShieldCheck className="h-3.5 w-3.5" />
-                    Server verified for this cart
+                    Ready to go!
                   </p>
                 </div>
               ) : null}

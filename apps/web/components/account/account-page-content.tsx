@@ -12,7 +12,6 @@ import {
   MapPin,
   PackageCheck,
   Phone,
-  ShieldCheck,
   User,
 } from "lucide-react";
 import { useAuth } from "@dakshinkali/auth";
@@ -54,7 +53,7 @@ export function AccountPageContent() {
       setOrders([]);
       if (!API_URL) {
         setOrdersMessage(
-          "Order history will appear here when the storefront API is connected.",
+          "Order history will appear here once you start shopping.",
         );
       }
       return;
@@ -79,7 +78,7 @@ export function AccountPageContent() {
         });
 
         if (!response.ok) {
-          throw new Error("Unable to load your orders right now.");
+          throw new Error("Couldn't load your orders right now.");
         }
 
         const payload = (await response.json()) as {
@@ -116,7 +115,7 @@ export function AccountPageContent() {
   if (loading || !isAuthenticated || !user) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        Loading your account...
+        Opening your account...
       </main>
     );
   }
@@ -135,14 +134,9 @@ export function AccountPageContent() {
 
   const accountDetails = [
     { label: "Name", value: displayName, icon: User },
-    {
-      label: "Account type",
-      value: memberRole,
-      icon: ShieldCheck,
-    },
     { label: "Email address", value: displayEmail, icon: Mail },
     {
-      label: "User ID",
+      label: "Member ID",
       value: user.id.slice(0, 8) + "…",
       icon: Phone,
     },
@@ -186,7 +180,7 @@ export function AccountPageContent() {
               label="Your orders"
               value={
                 ordersLoading
-                  ? "Loading..."
+                  ? "Fetching your orders..."
                   : `${orders.length} on record`
               }
             />
@@ -307,7 +301,7 @@ export function AccountPageContent() {
               ) : (
                 <div className="mt-5 rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
                   {ordersLoading
-                    ? "Loading orders..."
+                    ? "Fetching your orders..."
                     : ordersMessage ?? "No orders yet."}
                 </div>
               )}
@@ -370,8 +364,8 @@ export function AccountPageContent() {
                 <div>
                   <h2 className="text-lg font-bold">Wishlist</h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Saved items are stored in this browser. Sign in keeps your
-                    profile and orders in sync when the API is enabled.
+                    Saved items are stored on this device. Sign in to keep your
+                    profile and orders safe across all your devices.
                   </p>
                   <Link
                     href="/wishlist"

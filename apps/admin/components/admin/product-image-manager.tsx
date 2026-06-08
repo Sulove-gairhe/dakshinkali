@@ -40,7 +40,7 @@ export function ProductImageManager({
       if (!files?.length) return;
       setError(null);
       if (sorted.length >= MAX_IMAGES) {
-        setError("Max 5 images reached");
+        setError("You can add up to 5 images");
         return;
       }
 
@@ -49,7 +49,7 @@ export function ProductImageManager({
         const next = [...sorted];
         for (const file of Array.from(files)) {
           if (next.length >= MAX_IMAGES) {
-            setError("Max 5 images reached");
+            setError("You can add up to 5 images");
             break;
           }
           const validation = validateImageFile(file);
@@ -67,7 +67,7 @@ export function ProductImageManager({
         }
         onChange(next.map((img, index) => ({ ...img, order: index })));
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Upload failed");
+        setError(err instanceof Error ? err.message : "Upload didn't work. Please try again");
       } finally {
         setUploading(false);
       }
@@ -94,7 +94,7 @@ export function ProductImageManager({
         .map((img, index) => ({ ...img, order: index }));
       onChange(remaining);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Delete failed");
+      setError(err instanceof Error ? err.message : "Couldn't delete. Please try again");
     } finally {
       setPendingDelete(null);
     }
@@ -207,7 +207,7 @@ export function ProductImageManager({
       <ConfirmModal
         open={!!pendingDelete}
         title="Delete image?"
-        description="This will remove the image from storage and the product gallery."
+        description="This will remove the image from your product."
         confirmLabel="Delete image"
         onCancel={() => setPendingDelete(null)}
         onConfirm={() => void confirmDelete()}

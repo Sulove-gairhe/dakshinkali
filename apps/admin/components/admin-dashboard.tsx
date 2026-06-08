@@ -37,7 +37,7 @@ export function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [status, setStatus] = useState("Loading admin dashboard...");
+  const [status, setStatus] = useState("Opening your dashboard...");
 
   const headers = useMemo(
     () => ({
@@ -85,12 +85,12 @@ export function AdminDashboard() {
       await action();
       setStatus(`${label} complete`);
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Request failed");
+      setStatus(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     }
   }
 
   async function refreshAll() {
-    await run("Refreshing admin data", async () => {
+    await run("Refreshing data", async () => {
       const [dashboard, orderResult, userResult] = await Promise.all([
         request<DashboardStats>("/api/v1/admin/dashboard/stats"),
         request<{ data: Order[] }>("/api/v1/admin/orders"),
@@ -128,7 +128,7 @@ export function AdminDashboard() {
   }
 
   if (loading || !user || !isAdmin) {
-    return <p style={{ padding: 24 }}>Checking admin access...</p>;
+    return <p style={{ padding: 24 }}>Verifying your access...</p>;
   }
 
   return (

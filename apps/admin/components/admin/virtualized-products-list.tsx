@@ -168,7 +168,7 @@ export function VirtualizedProductsList({
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Action failed",
+        err instanceof Error ? err.message : "Something went wrong",
       );
     }
   }, [confirm, queryClient]);
@@ -208,10 +208,10 @@ export function VirtualizedProductsList({
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-white px-6 py-16 text-center">
         <p className="text-sm font-semibold text-red-700">
-          Failed to load products
+          Couldn't load your products
         </p>
         <p className="mt-1 text-xs text-red-400">
-          {error instanceof Error ? error.message : "Unknown error"}
+          {error instanceof Error ? error.message : "Something went wrong"}
         </p>
       </div>
     );
@@ -353,7 +353,7 @@ export function VirtualizedProductsList({
         }
         description={
           confirm?.type === "delete"
-            ? "This soft-deletes the product. It will no longer appear in admin lists."
+            ? "This will remove the product from your store. You can always add it back later."
             : "The product status will be set to inactive and hidden from the storefront."
         }
         onCancel={() => setConfirm(null)}
