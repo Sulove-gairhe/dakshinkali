@@ -25,6 +25,7 @@ type NavbarProps = {
   brandName?: string;
   brandLogoSrc?: string;
   searchPlaceholder?: string;
+  showSecondaryNav?: boolean;
   cartCount?: number;
   wishlistCount?: number;
   cartPreviewItems?: CartItem[];
@@ -56,6 +57,7 @@ export function Navbar({
   brandName = "Dakshinkali Electronics",
   brandLogoSrc = "/images/logo-placeholder.webp",
   searchPlaceholder = "Search for TVs, refrigerators, appliances...",
+  showSecondaryNav = true,
   cartCount = 0,
   wishlistCount = 0,
   cartPreviewItems = [],
@@ -142,68 +144,72 @@ export function Navbar({
           </div>
         </div>
       </div>
-      <div
-        className="relative z-40 border-t border-border/70 bg-white"
-        onMouseLeave={() => setIsBrandsOpen(false)}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <nav className="scrollbar-hide flex items-center gap-2 overflow-x-auto py-3">
+      {showSecondaryNav && (
+        <div
+          className="relative z-40 border-t border-border/70 bg-white"
+          onMouseLeave={() => setIsBrandsOpen(false)}
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <nav className="scrollbar-hide flex items-center gap-2 overflow-x-auto py-3">
+              <div
+                className="shrink-0"
+                onMouseEnter={() => setIsBrandsOpen(true)}
+              >
+                <button
+                  type="button"
+                  className="nav-link flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold"
+                >
+                  BY BRANDS
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform duration-200 ${
+                      isBrandsOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {menuItems.map((item) => {
+                const ItemIcon = item.icon;
+                return (
+                  <a
+                    key={item.label}
+                    href={item.href || "#"}
+                    className={
+                      item.highlighted
+                        ? "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-primary ring-1 ring-accent/35 transition-colors duration-300 hover:bg-accent/10"
+                        : "nav-link shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold"
+                    }
+                  >
+                    {ItemIcon ? <ItemIcon className="h-4 w-4" /> : null}
+                    {item.label}
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
+
+          {isBrandsOpen && (
             <div
-              className="shrink-0"
+              className="absolute left-4 top-full z-[80] w-56 rounded-xl border border-border bg-card py-3 shadow-2xl sm:left-6 lg:left-[max(2rem,calc((100vw-88rem)/2+2rem))]"
               onMouseEnter={() => setIsBrandsOpen(true)}
             >
-              <button
-                type="button"
-                className="nav-link flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold"
-              >
-                BY BRANDS
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    isBrandsOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-            </div>
-
-            {menuItems.map((item) => {
-              const ItemIcon = item.icon;
-              return (
+              {brands.map((brand, index) => (
                 <a
-                  key={item.label}
-                  href={item.href || "#"}
-                  className={
-                    item.highlighted
-                      ? "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-primary ring-1 ring-accent/35 transition-colors duration-300 hover:bg-accent/10"
-                      : "nav-link shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold"
-                  }
+                  key={brand.label}
+                  href={brand.href || "#"}
+                  className={`block px-4 py-3 text-sm font-semibold text-card-foreground transition-all duration-200 hover:translate-x-1 hover:text-primary ${
+                    index !== brands.length - 1
+                      ? "border-b border-border/50"
+                      : ""
+                  }`}
                 >
-                  {ItemIcon ? <ItemIcon className="h-4 w-4" /> : null}
-                  {item.label}
+                  {brand.label}
                 </a>
-              );
-            })}
-          </nav>
+              ))}
+            </div>
+          )}
         </div>
-
-        {isBrandsOpen && (
-          <div
-            className="absolute left-4 top-full z-[80] w-56 rounded-xl border border-border bg-card py-3 shadow-2xl sm:left-6 lg:left-[max(2rem,calc((100vw-88rem)/2+2rem))]"
-            onMouseEnter={() => setIsBrandsOpen(true)}
-          >
-            {brands.map((brand, index) => (
-              <a
-                key={brand.label}
-                href={brand.href || "#"}
-                className={`block px-4 py-3 text-sm font-semibold text-card-foreground transition-all duration-200 hover:translate-x-1 hover:text-primary ${
-                  index !== brands.length - 1 ? "border-b border-border/50" : ""
-                }`}
-              >
-                {brand.label}
-              </a>
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </header>
   );
 }

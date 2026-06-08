@@ -6,6 +6,7 @@ export interface CreateOrderRequest {
     customerPhone?: string | null;
     shippingAddress: ShippingAddress;
     paymentMethod?: PaymentMethod;
+    couponCode?: string | null;
     notes?: string | null;
 }
 
@@ -36,6 +37,9 @@ export interface OrderDTO {
     subtotal: number;
     shippingCost: number;
     tax: number;
+    couponCode: string | null;
+    discountAmount: number;
+    originalSubtotal: number | null;
     total: number;
     paymentMethod: PaymentMethod;
     paymentStatus: PaymentStatus;
@@ -64,6 +68,9 @@ export function mapOrderToDTO(order: OrderWithItemsEntity): OrderDTO {
         subtotal: order.subtotal,
         shippingCost: order.shippingCost,
         tax: order.tax,
+        couponCode: order.couponCode,
+        discountAmount: order.discountAmount,
+        originalSubtotal: order.originalSubtotal,
         total: order.total,
         paymentMethod: order.paymentMethod,
         paymentStatus: order.paymentStatus,

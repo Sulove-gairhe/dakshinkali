@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { SiteNavbar } from "@/components/site-navbar";
 import { ProductDetail } from "@/components/product/product-detail";
 import { getProductBySlug } from "@/lib/store-products";
 import { fetchDbProductBySlug } from "@/lib/db-products";
@@ -46,6 +47,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           ),
         }}
       />
+      <SiteNavbar showSecondaryNav={false} />
       <ProductDetail product={product} />
     </>
   );

@@ -2,13 +2,52 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { useState } from "react";
+import {
+  BadgePercent,
+  CheckCircle2,
+  Loader2,
+  Minus,
+  Plus,
+  ShieldCheck,
+  ShoppingBag,
+  Trash2,
+  X,
+} from "lucide-react";
 import { formatPrice, useCart } from "@/components/cart-provider";
 import { SiteNavbar } from "@/components/site-navbar";
 
 export default function CartPage() {
-  const { items, itemCount, subtotal, removeItem, updateQuantity } = useCart();
-  const grandTotal = subtotal;
+  const {
+    items,
+    itemCount,
+    subtotal,
+    discountedSubtotal,
+    appliedCoupon,
+    removeItem,
+    updateQuantity,
+    applyCoupon,
+    clearCoupon,
+  } = useCart();
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const grandTotal = discountedSubtotal;
+
+  async function handleApplyCoupon() {
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      await applyCoupon(couponCode);
+      setCouponCode("");
+    } catch (error) {
+      setCouponError(
+        error instanceof Error ? error.message : "Unable to apply coupon.",
+      );
+    } finally {
+      setCouponLoading(false);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -145,28 +184,89 @@ export default function CartPage() {
                   <span className="font-semibold">{formatPrice(subtotal)}</span>
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="coupon-code"
-                    className="text-sm font-semibold text-foreground"
-                  >
-                    Coupon Code
-                  </label>
-                  <div className="mt-2 flex gap-2">
+                <div className="rounded-xl border border-primary/25 bg-primary/5 p-4 shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white text-primary ring-1 ring-primary/20">
+                      <BadgePercent className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <label
+                        htmlFor="coupon-code"
+                        className="block text-xl font-black uppercase tracking-wide text-foreground"
+                      >
+                        Coupon Code
+                      </label>
+                      <p className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground">
+                        Enter an active code. We verify the discount, dates, category, products, and limits before applying it.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex gap-2">
                     <input
                       id="coupon-code"
                       type="text"
-                      placeholder="Enter code"
-                      className="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                      value={couponCode}
+                      onChange={(event) =>
+                        setCouponCode(event.target.value.toUpperCase().replace(/\s+/g, ""))
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && couponCode.trim()) {
+                          void handleApplyCoupon();
+                        }
+                      }}
+                      placeholder="DASHAIN2000"
+                      className="min-w-0 flex-1 rounded-lg border border-primary/30 bg-white px-3 py-3 text-sm font-bold uppercase tracking-wide outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25"
                     />
                     <button
                       type="button"
-                      className="shrink-0 rounded-md bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-secondary/90"
+                      onClick={() => void handleApplyCoupon()}
+                      disabled={couponLoading || !couponCode.trim()}
+                      className="shrink-0 rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Apply Now
+                      {couponLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Apply"
+                      )}
                     </button>
                   </div>
+                  {couponError ? (
+                    <p className="mt-2 text-xs font-medium text-destructive">
+                      {couponError}
+                    </p>
+                  ) : null}
+                  {appliedCoupon ? (
+                    <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-3 text-sm text-emerald-800">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="flex items-center gap-2 font-bold">
+                          <CheckCircle2 className="h-4 w-4" />
+                          {appliedCoupon.code} applied
+                        </span>
+                        <button
+                          type="button"
+                          onClick={clearCoupon}
+                          className="rounded p-1 hover:bg-emerald-100"
+                          aria-label="Remove coupon"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        Server verified and saved for checkout
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
+
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Coupon Discount</span>
+                    <span className="font-semibold text-emerald-700">
+                      -{formatPrice(appliedCoupon.discountAmount)}
+                    </span>
+                  </div>
+                ) : null}
 
                 <div className="border-t border-border pt-4">
                   <div className="flex items-center justify-between">

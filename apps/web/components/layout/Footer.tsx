@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle, Navigation } from "lucide-react";
+import type { SVGProps } from "react";
+import { Navigation } from "lucide-react";
 import { FadeUp } from "@/components/ui/FadeUp";
 
 const mapEmbedSrc =
@@ -11,9 +12,9 @@ const mapEmbedSrc =
 const directionsUrl =
   "https://www.google.com/maps/dir/?api=1&destination=Dakshinkali+Electronic+Center,+New+Road,+Pokhara,+Kaski,+Nepal";
 
-function InstagramIcon() {
+function InstagramIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
   return (
-    <svg aria-hidden="true" className="size-4" viewBox="0 0 24 24" fill="none">
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" {...props}>
       <rect
         x="4"
         y="4"
@@ -24,20 +25,70 @@ function InstagramIcon() {
         strokeWidth="2"
       />
       <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="2" />
-      <circle cx="16.7" cy="7.3" r="1.1" fill="currentColor" />
+      <circle cx="16.7" cy="7.3" r="1.1" stroke="currentColor" strokeWidth="2" />
     </svg>
   );
 }
 
-function FacebookIcon() {
+function FacebookIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
   return (
     <svg
       aria-hidden="true"
-      className="size-4"
+      className={className}
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
+      {...props}
     >
-      <path d="M14.2 8.4V6.9c0-.7.5-1.1 1.2-1.1h1.5V3.2c-.7-.1-1.5-.2-2.2-.2-2.3 0-3.9 1.4-3.9 3.9v1.5H8.4v3h2.4V21h3.1v-9.6h2.5l.4-3h-2.6Z" />
+      <path
+        d="M14.2 8.4V6.9c0-.7.5-1.1 1.2-1.1h1.5V3.2c-.7-.1-1.5-.2-2.2-.2-2.3 0-3.9 1.4-3.9 3.9v1.5H8.4v3h2.4V21h3.1v-9.6h2.5l.4-3h-2.6Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function WhatsAppIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M5.5 19.5 6.7 16A7.2 7.2 0 1 1 9 18.1l-3.5 1.4Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.9"
+      />
+      <path
+        d="M9.3 8.4c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.7 1.6c.1.3 0 .5-.2.7l-.4.5c.6 1 1.5 1.8 2.6 2.3l.5-.5c.2-.2.4-.3.7-.2l1.6.7c.3.1.4.3.4.6v.4c0 .4-.2.7-.5.9-.5.3-1 .4-1.6.3-2.8-.5-5.1-2.6-5.9-5.3-.1-.7 0-1.4.4-2Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
+
+function ViberIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" {...props}>
+      <path
+        d="M7 4.8A8.8 8.8 0 0 1 12 3.5c4.3 0 7.5 2.7 7.5 6.9 0 4.1-2.9 6.6-6.7 6.9L9 20.5v-3.2h-.8c-2.2 0-3.7-1.5-3.7-3.8v-3.1c0-2.4.8-4.3 2.5-5.6Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.9"
+      />
+      <path
+        d="M9.4 8.2c2.7.1 4.3 1.7 4.4 4.4M9.7 10.1c1.5.1 2.3.9 2.4 2.3"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M8.9 12.2c1 1.5 2.2 2.5 3.6 3 .5.1 1-.1 1.2-.5l.2-.4c.1-.3 0-.6-.3-.8l-1-.5c-.2-.1-.5-.1-.7.1l-.3.3c-.6-.3-1-.7-1.4-1.3l.3-.3c.2-.2.2-.5.1-.7l-.5-1c-.2-.3-.5-.4-.8-.3l-.4.2c-.4.2-.6.7-.5 1.2.1.3.3.7.5 1Z"
+        stroke="currentColor"
+        strokeLinejoin="round"
+        strokeWidth="1.45"
+      />
     </svg>
   );
 }
@@ -56,12 +107,12 @@ const socialLinks = [
   {
     label: "WhatsApp",
     href: "https://wa.me/9779846514318",
-    icon: MessageCircle,
+    icon: WhatsAppIcon,
   },
   {
     label: "Viber",
     href: "viber://chat?number=%2B9779846069986",
-    icon: MessageCircle,
+    icon: ViberIcon,
   },
 ];
 
@@ -94,7 +145,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-secondary text-secondary-foreground">
+    <footer className="border-t border-white/10 bg-[#0b1117] text-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
         <FadeUp>
           <div className="mb-10 flex flex-col items-center border-b border-white/10 pb-8 text-center">
@@ -113,9 +164,9 @@ export function Footer() {
                     rel="noreferrer"
                     aria-label={social.label}
                     title={social.label}
-                    className="inline-flex size-14 items-center justify-center rounded-full border-2 border-primary bg-white/8 text-white shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b1117]"
+                    className="inline-flex size-14 items-center justify-center rounded-full border-2 border-primary bg-white/12 text-white shadow-lg transition-colors hover:border-accent hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[#0b1117]"
                   >
-                    <Icon aria-hidden="true" />
+                    <Icon className="size-7" aria-hidden="true" />
                   </a>
                 );
               })}

@@ -1,12 +1,39 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
+import { BadgePercent, CheckCircle2, Loader2, ShieldCheck, X } from "lucide-react";
 import { formatPrice, useCart } from "@/components/cart-provider";
 
 export function OrderSummary() {
-  const { items, subtotal } = useCart();
+  const {
+    items,
+    subtotal,
+    discountedSubtotal,
+    appliedCoupon,
+    applyCoupon,
+    clearCoupon,
+  } = useCart();
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
   const deliveryFee = 150; // Rs. 150 delivery fee
-  const grandTotal = subtotal + deliveryFee;
+  const grandTotal = discountedSubtotal + deliveryFee;
+
+  async function handleApplyCoupon() {
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      await applyCoupon(couponCode);
+      setCouponCode("");
+    } catch (error) {
+      setCouponError(
+        error instanceof Error ? error.message : "Unable to apply coupon.",
+      );
+    } finally {
+      setCouponLoading(false);
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-xl backdrop-blur-md">
@@ -49,6 +76,86 @@ export function OrderSummary() {
               <span className="text-muted-foreground">Subtotal</span>
               <span className="font-semibold text-foreground">{formatPrice(subtotal)}</span>
             </div>
+            <div className="rounded-xl border border-primary/25 bg-primary/5 p-4">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-primary ring-1 ring-primary/20">
+                  <BadgePercent className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-lg font-black uppercase tracking-wide text-foreground">
+                    Coupon Code
+                  </p>
+                  <p className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground">
+                    Verified against live offers, validity dates, products, and category rules.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(event) =>
+                    setCouponCode(event.target.value.toUpperCase().replace(/\s+/g, ""))
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && couponCode.trim()) {
+                      void handleApplyCoupon();
+                    }
+                  }}
+                  placeholder="DASHAIN2000"
+                  className="min-w-0 flex-1 rounded-lg border border-primary/30 bg-white px-3 py-3 text-sm font-bold uppercase tracking-wide outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/25"
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleApplyCoupon()}
+                  disabled={couponLoading || !couponCode.trim()}
+                  className="rounded-lg bg-primary px-4 py-3 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {couponLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Apply"
+                  )}
+                </button>
+              </div>
+              {couponError ? (
+                <p className="mt-2 text-xs font-medium text-destructive">
+                  {couponError}
+                </p>
+              ) : null}
+              {appliedCoupon ? (
+                <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-3 text-xs text-emerald-800">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-1.5 font-bold">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {appliedCoupon.code} applied
+                    </span>
+                    <button
+                      type="button"
+                      onClick={clearCoupon}
+                      className="rounded p-1 hover:bg-emerald-100"
+                      aria-label="Remove coupon"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  <p className="mt-2 flex items-center gap-1.5 font-medium text-emerald-700">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    Server verified for this cart
+                  </p>
+                </div>
+              ) : null}
+            </div>
+            {appliedCoupon ? (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Coupon ({appliedCoupon.code})
+                </span>
+                <span className="font-semibold text-emerald-700">
+                  -{formatPrice(appliedCoupon.discountAmount)}
+                </span>
+              </div>
+            ) : null}
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Delivery Fee</span>
               <span className="font-semibold text-foreground">{formatPrice(deliveryFee)}</span>

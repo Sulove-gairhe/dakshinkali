@@ -28,14 +28,6 @@ type OrderSummary = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const availableCoupons = [
-  {
-    code: "DASH10",
-    title: "10% off home appliances",
-    detail: "Valid on refrigerators, freezers, and washing machines.",
-  },
-];
-
 const workflowSteps = [
   "Order Placed",
   "Payment Review",
@@ -188,7 +180,7 @@ export function AccountPageContent() {
             <ProfileMetric label="Member status" value="Active" />
             <ProfileMetric
               label="Saved coupons"
-              value={`${availableCoupons.length} available`}
+              value="Apply at checkout"
             />
             <ProfileMetric
               label="Your orders"
@@ -363,9 +355,10 @@ export function AccountPageContent() {
               </div>
 
               <div className="mt-6 space-y-3">
-                {availableCoupons.map((coupon) => (
-                  <CouponCard key={coupon.code} {...coupon} active />
-                ))}
+                <div className="rounded-md border border-dashed border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                  Available coupon codes can be applied in the cart or checkout
+                  summary when they match your order.
+                </div>
               </div>
             </section>
 
@@ -434,35 +427,3 @@ function AddressCard({
   );
 }
 
-function CouponCard({
-  code,
-  title,
-  detail,
-  active = false,
-}: {
-  code: string;
-  title: string;
-  detail: string;
-  active?: boolean;
-}) {
-  return (
-    <article
-      className={
-        active
-          ? "rounded-md border border-primary/40 bg-primary/10 p-4"
-          : "rounded-md border border-border bg-muted/40 p-4"
-      }
-    >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="rounded bg-background px-2 py-1 text-xs font-bold">
-          {code}
-        </span>
-        <span className="text-xs font-semibold text-muted-foreground">
-          {active ? "Available" : "Used"}
-        </span>
-      </div>
-      <h4 className="mt-3 text-sm font-bold">{title}</h4>
-      <p className="mt-1 text-sm text-muted-foreground">{detail}</p>
-    </article>
-  );
-}

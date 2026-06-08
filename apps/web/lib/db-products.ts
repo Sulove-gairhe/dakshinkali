@@ -70,6 +70,7 @@ type DbProductRow = {
     description: string | null;
     price: number;
     category: string;
+    category_id: string | null;
     status: "active" | "inactive" | "out_of_stock" | "low_stock";
     publishing_status: "draft" | "live";
     images: DbImageRecord[] | null;
@@ -128,6 +129,7 @@ function mapRowToStoreProduct(row: DbProductRow): StoreProduct | null {
         href: `/products/${slug}`,
         brand: sd.brand ?? "",
         category: row.category,
+        categoryId: row.category_id,
         collection: sd.collection,
         status: mapStatus(row.status),
         searchTerms: sd.searchTerms,
@@ -201,7 +203,7 @@ export async function fetchDbProducts(): Promise<StoreProduct[]> {
 
         const { data, error } = await supabase
             .from("products")
-            .select("id, name, description, price, category, status, publishing_status, images, storefront_data")
+            .select("id, name, description, price, category, category_id, status, publishing_status, images, storefront_data")
             .eq("publishing_status", "live")
             .in("status", ["active", "low_stock"])
             .is("deleted_at", null)
@@ -237,7 +239,7 @@ export async function fetchDbProductBySlug(
 
         const { data, error } = await supabase
             .from("products")
-            .select("id, name, description, price, category, status, publishing_status, images, storefront_data")
+            .select("id, name, description, price, category, category_id, status, publishing_status, images, storefront_data")
             .eq("publishing_status", "live")
             .in("status", ["active", "low_stock"])
             .is("deleted_at", null)

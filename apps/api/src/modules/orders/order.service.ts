@@ -1,3 +1,7 @@
+import {
+    normalizeCouponCode,
+    validateCouponForCart,
+} from '@dakshinkali/database';
 import { ValidationException } from '../../common/exceptions/validation.exception';
 import { ForbiddenException } from '../../common/exceptions/forbidden.exception';
 import { NotFoundException } from '../../common/exceptions/not-found.exception';
@@ -41,7 +45,37 @@ export class OrderService {
         const shippingCost = 0;
         const tax = 0;
         const subtotal = cart.subtotal;
-        const total = subtotal + shippingCost + tax;
+        let discountAmount = 0;
+        let couponCode: string | null = null;
+
+        if (request.couponCode) {
+            couponCode = normalizeCouponCode(request.couponCode);
+            const coupon = await this.orderRepository.findCouponByCode(couponCode);
+            const categoryIds = await this.orderRepository.findProductCategoryIds(
+                cart.items.map(item => item.productId)
+            );
+            const result = validateCouponForCart({
+                coupon,
+                code: couponCode,
+                subtotal,
+                items: cart.items.map(item => ({
+                    productId: item.productId,
+                    categoryId: categoryIds.get(item.productId) ?? null,
+                    lineTotal: item.subtotal,
+                })),
+            });
+
+            if (!result.valid) {
+                throw new ValidationException(result.message, [
+                    { field: 'couponCode', message: result.message },
+                ]);
+            }
+            discountAmount = result.discountAmount;
+            couponCode = result.code;
+        }
+
+        const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+        const total = discountedSubtotal + shippingCost + tax;
 
         const orderRecord: CreateOrderRecord = {
             userId,
@@ -57,10 +91,13 @@ export class OrderService {
                 postalCode: request.shippingAddress.postalCode,
                 country: request.shippingAddress.country || 'Nepal',
             },
-            subtotal,
+            subtotal: discountedSubtotal,
             shippingCost,
             tax,
             total,
+            couponCode,
+            discountAmount,
+            originalSubtotal: subtotal,
             paymentMethod: request.paymentMethod || 'cash_on_delivery',
             paymentStatus: 'pending',
             notes: request.notes || null,

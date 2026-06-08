@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { type CouponRecord } from '@dakshinkali/database';
 import {
     CreateOrderRecord,
     OrderEntity,
@@ -35,6 +36,9 @@ export class OrderRepository {
             p_payment_status: record.paymentStatus,
             p_notes: record.notes || null,
             p_items: record.items,
+            p_coupon_code: record.couponCode || null,
+            p_discount_amount: record.discountAmount || 0,
+            p_original_subtotal: record.originalSubtotal ?? record.subtotal,
         });
 
         if (error) {
@@ -70,6 +74,9 @@ export class OrderRepository {
             shipping_cost: record.shippingCost,
             tax: record.tax,
             total: record.total,
+            coupon_code: record.couponCode || null,
+            discount_amount: record.discountAmount || 0,
+            original_subtotal: record.originalSubtotal ?? record.subtotal,
             payment_method: record.paymentMethod,
             payment_status: record.paymentStatus,
             notes: record.notes || null,
@@ -200,6 +207,41 @@ export class OrderRepository {
         };
     }
 
+    async findCouponByCode(code: string): Promise<CouponRecord | null> {
+        const { data, error } = await this.supabase
+            .from('coupons')
+            .select('*')
+            .eq('code', code)
+            .is('archived_at', null)
+            .maybeSingle();
+
+        if (error) throw new Error(`Failed to find coupon: ${error.message}`);
+        if (!data) return null;
+
+        return {
+            ...data,
+            discount_value: this.toRequiredNumber(data.discount_value),
+            max_discount_amount: this.toOptionalNumber(data.max_discount_amount),
+            minimum_order_amount: this.toOptionalNumber(data.minimum_order_amount),
+            usage_limit: this.toOptionalNumber(data.usage_limit),
+            used_count: this.toRequiredNumber(data.used_count),
+            applicable_category_ids: data.applicable_category_ids ?? [],
+            applicable_product_ids: data.applicable_product_ids ?? [],
+        } as CouponRecord;
+    }
+
+    async findProductCategoryIds(productIds: string[]): Promise<Map<string, string | null>> {
+        if (productIds.length === 0) return new Map();
+
+        const { data, error } = await this.supabase
+            .from('products')
+            .select('id,category_id')
+            .in('id', productIds);
+
+        if (error) throw new Error(`Failed to load coupon product categories: ${error.message}`);
+        return new Map((data ?? []).map((row: any) => [row.id as string, row.category_id as string | null]));
+    }
+
     private async findItems(orderId: string): Promise<OrderItemEntity[]> {
         const { data, error } = await this.supabase.from('order_items').select().eq('order_id', orderId);
         if (error) throw new Error(`Failed to find order items: ${error.message}`);
@@ -263,6 +305,9 @@ export class OrderRepository {
             subtotal: Number(row.subtotal),
             shippingCost: Number(row.shipping_cost),
             tax: Number(row.tax),
+            couponCode: row.coupon_code,
+            discountAmount: Number(row.discount_amount ?? 0),
+            originalSubtotal: row.original_subtotal === null ? null : Number(row.original_subtotal),
             total: Number(row.total),
             paymentMethod: row.payment_method,
             paymentStatus: row.payment_status,
@@ -270,5 +315,16 @@ export class OrderRepository {
             createdAt: new Date(row.created_at),
             updatedAt: new Date(row.updated_at),
         };
+    }
+
+    private toOptionalNumber(value: unknown): number | null {
+        if (value === null || value === undefined || value === '') return null;
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue : null;
+    }
+
+    private toRequiredNumber(value: unknown): number {
+        const numberValue = Number(value ?? 0);
+        return Number.isFinite(numberValue) ? numberValue : 0;
     }
 }
