@@ -21,6 +21,13 @@ export type PaymentMethod =
   | "bank_transfer"
   | "fonepay_qr";
 
+export const COD_PAYMENT_METHOD = "cash_on_delivery" as const;
+
+export const FONEPAY_PAYMENT_METHODS = [
+  "fonepay_qr",
+  "bank_transfer",
+] as const satisfies readonly PaymentMethod[];
+
 export interface ShippingAddress {
   line1: string;
   line2?: string | null;
@@ -100,7 +107,7 @@ export interface OrderListFilters {
   search?: string;
   status?: OrderStatus;
   paymentStatus?: PaymentStatus;
-  paymentMethod?: PaymentMethod;
+  paymentMethod?: PaymentMethod | "fonepay_qr_group";
   dateFrom?: string;
   dateTo?: string;
   page?: number;

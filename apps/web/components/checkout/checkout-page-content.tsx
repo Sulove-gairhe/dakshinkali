@@ -35,21 +35,70 @@ const isUUID = (val: string) => {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 };
 
-// =============================================================================
-// Admin Notification — Skeleton Stub
-// =============================================================================
-// TODO: Implement actual admin notification when a Fonepay payment proof is
-//       submitted. Integration options:
-//       - Send email via Resend / SendGrid to admin@dakshinkali.com
-//       - Create an in-app notification record in a `notifications` table
-//       - Trigger a webhook to a monitoring service
-//
-// Current behaviour: logs to console only. No email/SMS is actually sent.
-// =============================================================================
+function getProofUploadErrorMessage(error: {
+  message?: string;
+  statusCode?: string | number;
+}) {
+  const message = error.message ?? "";
+  const statusCode = String(error.statusCode ?? "");
+
+  if (
+    statusCode === "404" ||
+    /bucket not found/i.test(message) ||
+    /storage bucket/i.test(message)
+  ) {
+    return "Payment proof storage is not set up yet. Please apply the order-proofs storage migration, then try placing the order again.";
+  }
+
+  if (/mime type|not allowed/i.test(message)) {
+    return "This proof file type is not allowed. Please upload a PNG, JPEG, WebP, or PDF file.";
+  }
+
+  if (/size|payload too large|too large/i.test(message)) {
+    return "Payment proof file is too large. Please upload a file under 5MB.";
+  }
+
+  return message || "Payment proof could not be uploaded. Please try again.";
+}
+
+function getCheckoutErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message || "Something went wrong while placing your order. Please try again.";
+  }
+
+  if (error && typeof error === "object") {
+    const record = error as Record<string, unknown>;
+    const message = typeof record.message === "string" ? record.message : "";
+    const details = typeof record.details === "string" ? record.details : "";
+    const hint = typeof record.hint === "string" ? record.hint : "";
+    const code = typeof record.code === "string" ? record.code : "";
+    const combined = [message, details, hint].filter(Boolean).join(" ");
+
+    if (/proof_|admin_notification_status|payment_status|pending_admin_approval/i.test(combined)) {
+      return "Order proof fields are not set up yet. Please apply the latest order proof migrations, then try again.";
+    }
+
+    if (/coupon is no longer valid|usage limit/i.test(combined)) {
+      return "This coupon is no longer valid or has reached its usage limit. Please remove it and try again.";
+    }
+
+    if (/row-level security|violates row-level security|permission denied/i.test(combined)) {
+      return "Checkout permission is not configured for orders yet. Please apply the latest order RLS migrations, then try again.";
+    }
+
+    if (message) return message;
+    if (details) return details;
+    if (hint) return hint;
+    if (code) return `Checkout failed with database error ${code}.`;
+  }
+
+  return "Something went wrong while placing your order. Please try again.";
+}
+
 function notifyAdminOfPayment(orderNumber: string, customerEmail: string): void {
   console.info(
-    `[notify-admin] SKELETON — Payment proof submitted for order ${orderNumber} by ${customerEmail}. ` +
-    `TODO: Send admin notification (email/SMS/in-app).`,
+    `[notify-admin] Payment proof submitted for order ${orderNumber} by ${customerEmail}. ` +
+    "The admin approval queue will surface this order.",
   );
 }
 
@@ -58,7 +107,6 @@ export function CheckoutPageContent() {
   const { user, profile, loading, isAuthenticated, session, supabase } = useAuth();
   const {
     items,
-    itemCount,
     subtotal,
     appliedCoupon,
     applyCoupon,
@@ -95,13 +143,15 @@ export function CheckoutPageContent() {
 
   // Prefill user details once profile is loaded
   useEffect(() => {
-    if (profile) {
+    if (!profile) return;
+    const timer = window.setTimeout(() => {
       setFormData((prev) => ({
         ...prev,
         fullName: profile.full_name || "",
         email: profile.email || "",
       }));
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [profile]);
 
   // Auth Guard redirect
@@ -122,7 +172,7 @@ export function CheckoutPageContent() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center bg-background text-muted-foreground">
         <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-        <p className="text-sm font-semibold tracking-wide animate-pulse">Securing checkout session...</p>
+        <p className="text-sm font-semibold tracking-wide animate-pulse">Preparing your checkout...</p>
       </div>
     );
   }
@@ -157,106 +207,67 @@ export function CheckoutPageContent() {
     const discountedSubtotal = Math.max(0, subtotal - discountAmount);
     const totalAmount = discountedSubtotal + deliveryFee;
     const isFonepay = paymentMethod === "fonepay";
-    // TODO: After applying supabase/migrations/20260526000000_add_proof_columns_complete.sql
-    //       via Supabase Dashboard SQL Editor, change to:
-    //   isFonepay ? "fonepay_qr" : "cash_on_delivery"
-    const mappedPaymentMethod = isFonepay ? "bank_transfer" : "cash_on_delivery";
-
-    // Build notes: embed proof metadata as JSON (schema-safe fallback until migration is applied)
-    let notesContent: string | null = formData.deliveryNotes || null;
-    if (isFonepay && fonepayFile) {
-      const proofMeta = JSON.stringify({
-        _type: "fonepay_proof",
-        fileName: fonepayFile.name,
-        fileType: fonepayFile.type,
-        fileSize: fonepayFile.size,
-        uploadedAt: new Date().toISOString(),
-      });
-      notesContent = notesContent
-        ? `${notesContent}\n---\n${proofMeta}`
-        : proofMeta;
-    }
-    const orderNotes = notesContent;
-
-    // Check if cart contains static/storefront products that cannot go through backend DB verification
-    const hasStaticProducts = items.some(item => !isUUID(item.id));
+    const mappedPaymentMethod = isFonepay ? "fonepay_qr" : "cash_on_delivery";
+    const initialOrderStatus = "pending_admin_approval";
+    const initialPaymentStatus = isFonepay ? "pending_verification" : "pending";
+    const orderNotes = formData.deliveryNotes || null;
     let orderSuccess = false;
     let orderNumberGenerated = "";
+    let proofPayload: Record<string, string | number | null> = {};
 
-    // 1. Attempt Backend API sync & order placement (if all products are dynamic UUIDs)
-    if (!hasStaticProducts && API_URL && session?.access_token) {
+    if (isFonepay && fonepayFile && supabase) {
       try {
-        // Sync cart to DB first
-        // a. Clear DB Cart
-        await fetch(`${API_URL}/api/v1/cart`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
-
-        // b. Add each item to DB Cart
-        for (const item of items) {
-          await fetch(`${API_URL}/api/v1/cart/items`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({
-              productId: item.id,
-              quantity: item.quantity,
-            }),
+        const ext = fonepayFile.name.split(".").pop() || "proof";
+        const storagePath = `orders/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
+          .from("order-proofs")
+          .upload(storagePath, fonepayFile, {
+            contentType: fonepayFile.type,
+            upsert: false,
           });
+
+        if (uploadError) {
+          throw new Error(getProofUploadErrorMessage(uploadError));
         }
 
-        // c. Place the order via API
-        const orderResponse = await fetch(`${API_URL}/api/v1/orders`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            customerEmail: formData.email,
-            customerName: formData.fullName,
-            customerPhone: formData.phone,
-            shippingAddress: {
-              line1: formData.fullAddress,
-              line2: formData.landmark || null,
-              city: formData.provinceCity,
-              state: formData.provinceCity,
-              postalCode: "44600",
-              country: "Nepal",
-            },
-            paymentMethod: mappedPaymentMethod,
-            couponCode: validatedCoupon?.code ?? null,
-            notes: orderNotes,
-          }),
-        });
+        const { data: urlData } = supabase.storage
+          .from("order-proofs")
+          .getPublicUrl(storagePath);
 
-        if (orderResponse.ok) {
-          const orderData = await orderResponse.json();
-          orderNumberGenerated = orderData.orderNumber;
-          orderSuccess = true;
-        }
-      } catch (err) {
-        console.warn("Backend order submission failed, falling back to direct Supabase client insert:", err);
+        proofPayload = {
+          proof_file_url: urlData.publicUrl,
+          proof_file_name: fonepayFile.name,
+          proof_file_type: fonepayFile.type,
+          proof_file_size: fonepayFile.size,
+          proof_uploaded_at: new Date().toISOString(),
+          proof_storage_provider: "supabase",
+          proof_storage_path: storagePath,
+          proof_cleanup_status: "pending",
+          admin_notification_status: "pending",
+        };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : null;
+        setSubmitError(
+          message ||
+            "Payment proof could not be uploaded. Please try again.",
+        );
+        setSubmitting(false);
+        return;
       }
     }
 
-    // 2. Direct Supabase client insert (Fallback or for Static Products)
+    // Orders are written directly so the admin approval queue receives the
+    // correct status and payment proof fields immediately.
     if (!orderSuccess && supabase) {
       try {
         orderNumberGenerated = `DK-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
-        // a. Insert order
         const { data: newOrder, error: orderError } = await supabase
           .from("orders")
           .insert({
             user_id: user.id,
             order_number: orderNumberGenerated,
-            status: "pending",
+            status: initialOrderStatus,
             customer_email: formData.email,
             customer_name: formData.fullName,
             customer_phone: formData.phone,
@@ -274,24 +285,16 @@ export function CheckoutPageContent() {
             discount_amount: discountAmount,
             original_subtotal: subtotal,
             payment_method: mappedPaymentMethod,
-            payment_status: "pending",
-            // Proof metadata is stored in notes as JSON (schema-safe fallback).
-            // TODO: After applying supabase/migrations/20260526000000_add_proof_columns_complete.sql
-            //       via Supabase Dashboard SQL Editor:
-            //   - Set status -> "pending_admin_approval" for Fonepay
-            //   - Set payment_status -> "pending_verification" for Fonepay
-            //   - Move proof metadata into dedicated columns: proof_file_name, proof_file_type,
-            //     proof_file_size, proof_file_url, proof_storage_path, proof_storage_provider,
-            //     proof_uploaded_at, proof_cleanup_status, admin_notification_status
+            payment_status: initialPaymentStatus,
             notes: orderNotes,
+            ...proofPayload,
           })
           .select("id")
           .single();
 
         if (orderError) throw orderError;
-        if (!newOrder) throw new Error("Order creation failed - no data returned");
+        if (!newOrder) throw new Error("Something went wrong placing your order. Please try again.");
 
-        // b. Insert items
         const orderItemsToInsert = items.map(item => ({
           order_id: newOrder.id,
           product_id: isUUID(item.id) ? item.id : null,
@@ -309,21 +312,19 @@ export function CheckoutPageContent() {
 
         if (itemsError) throw itemsError;
 
-        // c. Insert status history
         const { error: historyError } = await supabase
           .from("order_status_history")
           .insert({
             order_id: newOrder.id,
-            status: "pending",
+            status: initialOrderStatus,
             notes: isFonepay
-              ? "Order created - awaiting admin payment verification (proof metadata in notes field)"
-              : "Order created",
+              ? "Order created - waiting for payment verification"
+              : "Order created - waiting for COD approval",
             changed_by: user.id
           });
 
         if (historyError) throw historyError;
 
-        // d. Clear DB cart if it exists
         const { data: cartData } = await supabase
           .from("carts")
           .select("id")
@@ -337,12 +338,23 @@ export function CheckoutPageContent() {
             .eq("cart_id", cartData.id);
         }
 
+        if (API_URL && session?.access_token) {
+          await fetch(`${API_URL}/api/v1/cart`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          }).catch(() => undefined);
+        }
+
         orderSuccess = true;
-      } catch (err: any) {
-        const errDetail = err ? JSON.stringify(err, Object.getOwnPropertyNames(err)) : "null";
-        console.error("Direct Supabase insert failed:", err, "detail:", errDetail);
-        setSubmitError(err?.message || errDetail || "An unexpected error occurred while placing your order. Please try again.");
+      } catch (err: unknown) {
+        setSubmitError(getCheckoutErrorMessage(err));
       }
+    }
+
+    if (!orderSuccess && !submitError && !supabase) {
+      setSubmitError("Checkout is not connected right now. Please try again.");
     }
 
     if (orderSuccess) {
@@ -641,7 +653,7 @@ export function CheckoutPageContent() {
                 <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl flex gap-3 items-start">
                   <ShieldCheck className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <div className="text-xs text-muted-foreground leading-relaxed">
-                    <span className="font-bold text-foreground">Security Guarantee:</span> Your details are protected by our end-to-end secure database schema and RLS policies. By submitting, you agree to place this order with Dakshinkali Electronics.
+                    <span className="font-bold text-foreground">Security Guarantee:</span> Your details are safe and secure with us. By submitting, you agree to place this order with Dakshinkali Electronics.
                   </div>
                 </div>
               </div>

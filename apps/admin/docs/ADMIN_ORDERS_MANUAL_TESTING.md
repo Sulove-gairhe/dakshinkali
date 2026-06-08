@@ -3,7 +3,7 @@
 ## Prerequisites
 
 1. Apply `supabase/migrations/20260527200000_admin_orders_support.sql`
-2. Ensure Storage bucket `order-proofs` exists (public read optional)
+2. Apply `supabase/migrations/20260608120000_order_proofs_storage.sql`
 3. Admin user with `profiles.role = 'admin'`
 4. `pnpm --filter @dakshinkali/admin dev` on port 3001
 
@@ -14,7 +14,7 @@
 - [ ] Confirm COD → status `confirmed`, payment stays `pending`
 - [ ] Cancel COD → status `cancelled`
 
-## Proof verification (Fonepay / eSewa / Khalti / bank transfer)
+## Fonepay / QR payment approval
 
 - [ ] Order with `payment_status = pending_verification`
 - [ ] Split view on desktop; tabs on mobile
@@ -40,10 +40,11 @@
 
 - [ ] `/admin/orders` pagination (25 per page)
 - [ ] Search by order number prefix and customer email
-- [ ] Sidebar badges for Awaiting Review / Awaiting Approval
-- [ ] Highlight rows for `pending_verification` and `pending_admin_approval`
+- [ ] Sidebar shows one Awaiting Approval entry
+- [ ] Awaiting Approval separates COD and Fonepay / QR payment sections
+- [ ] Highlight rows for staff action without exposing raw status values
 
 ## Regression
 
-- [ ] Storefront checkout unchanged
+- [ ] Storefront checkout creates COD and QR orders in Awaiting Approval
 - [ ] `store-products.ts` unchanged

@@ -9,7 +9,7 @@ export default async function AdminSectionLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let counts = { pendingVerification: 0, pendingApproval: 0 };
+  let counts = { pendingVerification: 0, pendingApproval: 0, awaitingApproval: 0 };
   let notifications = {
     pendingVerification: 0,
     pendingApproval: 0,

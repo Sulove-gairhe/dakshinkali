@@ -17,6 +17,8 @@ import {
   isValidOrderTransition,
   paymentMethodLabel,
   canShipOrder,
+  orderItemPreview,
+  orderStatusLabel,
 } from "@/lib/admin/order-utils";
 
 const COLUMNS: { id: OrderStatus; title: string }[] = [
@@ -37,7 +39,7 @@ export function OrdersBoard() {
       const data = await listBoardOrders();
       setOrders(data);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load board");
+      toast.error(err instanceof Error ? err.message : "Couldn't load your orders");
     } finally {
       setLoading(false);
     }
@@ -62,7 +64,7 @@ export function OrdersBoard() {
 
     if (!isValidOrderTransition(order.status, newStatus)) {
       toast.error(
-        `Cannot move order to ${newStatus.replace(/_/g, " ")} from ${order.status.replace(/_/g, " ")}`,
+        `Cannot move order to ${orderStatusLabel(newStatus)} from ${orderStatusLabel(order.status)}`,
       );
       return;
     }
@@ -77,7 +79,7 @@ export function OrdersBoard() {
 
     const resultAction = await updateOrderStatus(orderId, newStatus);
     if (!resultAction.success) {
-      toast.error(actionErrorMessage(resultAction) ?? "Status update failed");
+      toast.error(actionErrorMessage(resultAction) ?? "Couldn't update the status");
       return;
     }
 
@@ -118,13 +120,15 @@ export function OrdersBoard() {
                   </p>
                 </div>
                 <div className="min-h-[200px] space-y-2 p-2">
-                  {ordersByStatus(column.id).map((order, index) => (
-                    <Draggable
-                      key={order.id}
-                      draggableId={order.id}
-                      index={index}
-                    >
-                      {(dragProvided) => (
+                  {ordersByStatus(column.id).map((order, index) => {
+                    const preview = orderItemPreview(order);
+                    return (
+                      <Draggable
+                        key={order.id}
+                        draggableId={order.id}
+                        index={index}
+                      >
+                        {(dragProvided) => (
                         <div
                           ref={dragProvided.innerRef}
                           {...dragProvided.draggableProps}
@@ -143,14 +147,18 @@ export function OrdersBoard() {
                           <p className="text-sm text-gray-600">
                             {formatNprPrice(order.total)}
                           </p>
+                          <p className="mt-2 truncate text-sm font-medium text-gray-900">
+                            {preview.title}
+                          </p>
                           <p className="mt-1 text-xs text-gray-500">
                             {paymentMethodLabel(order.payment_method)} ·{" "}
-                            {order.item_count ?? 0} items
+                            {preview.detail}
                           </p>
                         </div>
-                      )}
-                    </Draggable>
-                  ))}
+                        )}
+                      </Draggable>
+                    );
+                  })}
                   {provided.placeholder}
                 </div>
               </div>

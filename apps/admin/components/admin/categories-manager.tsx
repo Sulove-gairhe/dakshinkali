@@ -83,7 +83,7 @@ export function CategoriesManager({
       }
       setPanelOpen(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Save failed";
+      const message = err instanceof Error ? err.message : "Couldn't save. Please try again";
       setError(message);
       toast.error(message);
     } finally {
@@ -101,7 +101,7 @@ export function CategoriesManager({
         updated.is_active ? "Category activated" : "Category deactivated",
       );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Update failed");
+      toast.error(err instanceof Error ? err.message : "Couldn't update. Please try again");
     }
   }
 
@@ -151,7 +151,7 @@ export function CategoriesManager({
             <thead className="bg-gray-50 text-left text-xs uppercase text-gray-500">
               <tr>
                 <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Slug</th>
+                <th className="px-4 py-3">URL Key</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Actions</th>
               </tr>
@@ -216,7 +216,7 @@ export function CategoriesManager({
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Slug</label>
+                <label className="text-sm font-medium">URL Key</label>
                 <input
                   type="text"
                   value={slug}

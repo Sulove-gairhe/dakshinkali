@@ -12,6 +12,7 @@ import { CreateOrderRecord, OrderListQuery, OrderStatus, OrderWithItemsEntity, P
 
 const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
     pending: ['confirmed', 'cancelled'],
+    pending_admin_approval: ['confirmed', 'cancelled'],
     confirmed: ['processing', 'cancelled'],
     processing: ['shipped', 'cancelled'],
     shipped: ['delivered'],
@@ -77,6 +78,7 @@ export class OrderService {
         const discountedSubtotal = Math.max(0, subtotal - discountAmount);
         const total = discountedSubtotal + shippingCost + tax;
 
+        const paymentMethod = request.paymentMethod || 'cash_on_delivery';
         const orderRecord: CreateOrderRecord = {
             userId,
             orderNumber: this.generateOrderNumber(),
@@ -98,8 +100,9 @@ export class OrderService {
             couponCode,
             discountAmount,
             originalSubtotal: subtotal,
-            paymentMethod: request.paymentMethod || 'cash_on_delivery',
-            paymentStatus: 'pending',
+            status: 'pending_admin_approval',
+            paymentMethod,
+            paymentStatus: paymentMethod === 'cash_on_delivery' ? 'pending' : 'pending_verification',
             notes: request.notes || null,
             items: cart.items.map(item => ({
                 productId: item.productId,
@@ -188,7 +191,7 @@ export class OrderService {
     }
 
     private isPaymentMethod(value: string): value is PaymentMethod {
-        return ['cash_on_delivery', 'esewa', 'khalti', 'bank_transfer'].includes(value);
+        return ['cash_on_delivery', 'esewa', 'khalti', 'bank_transfer', 'fonepay_qr'].includes(value);
     }
 
     private generateOrderNumber(): string {

@@ -33,7 +33,7 @@ export function OrderProofViewer({
     const result = await uploadOrderProof(formData);
     setUploading(false);
     if (!result.success) {
-      toast.error(actionErrorMessage(result) ?? "Upload failed");
+      toast.error(actionErrorMessage(result) ?? "Upload didn't work. Please try again");
       return;
     }
     toast.success("Proof uploaded");
@@ -45,8 +45,7 @@ export function OrderProofViewer({
       <div className="flex h-full min-h-[280px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
         <p className="text-sm font-medium text-gray-700">Proof not yet uploaded</p>
         <p className="mt-1 text-xs text-gray-500">
-          {/* TODO: Remove manual upload once checkout populates proof_file_url */}
-          Checkout may store proof metadata in notes until the upload pipeline is wired.
+          Ask the customer for a payment screenshot or upload a proof file manually.
         </p>
         <label className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
           <Upload className="h-4 w-4" />
@@ -133,7 +132,7 @@ export function OrderProofViewer({
 
         {error ? (
           <p className="absolute bottom-4 text-sm text-red-600">
-            Failed to load proof preview
+            Couldn't load the preview
           </p>
         ) : null}
       </div>

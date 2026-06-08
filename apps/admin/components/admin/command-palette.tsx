@@ -15,8 +15,8 @@ const QUICK_ACTIONS = [
   { label: "Create Blog Post", href: "/admin/blog/new" },
   { label: "View All Orders", href: "/admin/orders" },
   {
-    label: "Awaiting Verification",
-    href: "/admin/orders?paymentStatus=pending_verification",
+    label: "Awaiting Approval",
+    href: "/admin/orders/approval",
   },
   { label: "View Categories", href: "/admin/categories" },
 ];
@@ -104,12 +104,12 @@ export function CommandPalette({
         type="button"
         className="absolute inset-0"
         onClick={onClose}
-        aria-label="Close command palette"
+        aria-label="Close search"
       />
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Command palette"
+        aria-label="Quick search"
         className="relative w-full max-w-lg overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl"
       >
         <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-3">

@@ -1,6 +1,6 @@
-export type OrderStatus = 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-export type PaymentMethod = 'cash_on_delivery' | 'esewa' | 'khalti' | 'bank_transfer';
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+export type OrderStatus = 'pending' | 'pending_admin_approval' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+export type PaymentMethod = 'cash_on_delivery' | 'esewa' | 'khalti' | 'bank_transfer' | 'fonepay_qr';
+export type PaymentStatus = 'pending' | 'pending_verification' | 'paid' | 'failed' | 'refunded';
 
 export interface ShippingAddress {
     line1: string;
@@ -84,6 +84,7 @@ export interface CreateOrderRecord {
     discountAmount?: number;
     originalSubtotal?: number | null;
     total: number;
+    status?: OrderStatus;
     paymentMethod: PaymentMethod;
     paymentStatus: PaymentStatus;
     notes?: string | null;

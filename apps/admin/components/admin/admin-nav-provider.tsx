@@ -6,6 +6,7 @@ import type { AdminNotificationCounts } from "@/lib/admin/actions/notifications"
 export type OrderNavCounts = {
   pendingVerification: number;
   pendingApproval: number;
+  awaitingApproval: number;
 };
 
 export type AdminNavContextValue = OrderNavCounts & {
@@ -24,6 +25,7 @@ const defaultNotifications: AdminNotificationCounts = {
 const AdminNavContext = createContext<AdminNavContextValue>({
   pendingVerification: 0,
   pendingApproval: 0,
+  awaitingApproval: 0,
   notifications: defaultNotifications,
   role: null,
 });

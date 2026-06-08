@@ -24,6 +24,7 @@ export async function getAdminNotificationCounts(): Promise<AdminNotificationCou
       supabase
         .from("orders")
         .select("id", { count: "exact", head: true })
+        .eq("payment_method", "cash_on_delivery")
         .eq("status", "pending_admin_approval"),
       supabase
         .from("products")

@@ -191,7 +191,7 @@ export function Footer() {
               </span>
               <span>Dakshinkali Electronics</span>
             </Link>
-            <p className="mt-3 max-w-sm text-sm leading-6 text-secondary-foreground/65">
+            <p className="mt-3 max-w-sm text-sm leading-6 text-white/70">
               Pokhara&apos;s trusted electronics shop since 2001.
             </p>
             <div className="mt-4 w-full max-w-[220px] sm:max-w-[260px]">
@@ -208,7 +208,7 @@ export function Footer() {
 
           {footerColumns.map((column, columnIndex) => (
             <FadeUp key={column.title} delay={(columnIndex + 1) * 80}>
-              <h2 className="text-sm font-bold uppercase tracking-wide text-secondary-foreground">
+              <h2 className="text-sm font-bold uppercase tracking-wide text-white">
                 {column.title}
               </h2>
               <ul className="mt-4 space-y-3">
@@ -222,14 +222,14 @@ export function Footer() {
                           href={link.href}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-sm text-secondary-foreground/60 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="text-sm text-white/70 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           {link.label}
                         </a>
                       ) : (
                         <Link
                           href={link.href}
-                          className="text-sm text-secondary-foreground/60 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="text-sm text-white/70 transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           {link.label}
                         </Link>
@@ -242,13 +242,13 @@ export function Footer() {
           ))}
 
           <FadeUp delay={240}>
-            <h2 className="text-sm font-bold uppercase tracking-wide text-secondary-foreground">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-white">
               Visit Us
             </h2>
-            <p className="mt-4 text-sm font-semibold text-secondary-foreground/85">
+            <p className="mt-4 text-sm font-semibold text-white/90">
               Dakshinkali Electronic Center
             </p>
-            <p className="mt-2 text-xs leading-5 text-secondary-foreground/65 sm:text-sm sm:leading-6">
+            <p className="mt-2 text-xs leading-5 text-white/70 sm:text-sm sm:leading-6">
               Pokhara (New Road), Kaski
               <br />
               In front of the Old Metropolitan Office
@@ -276,7 +276,7 @@ export function Footer() {
           </FadeUp>
         </div>
 
-        <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-sm text-secondary-foreground/45 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-2 border-t border-white/10 pt-6 text-sm text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {currentYear} Dakshinkali Electronics, Pokhara. All rights
             reserved.

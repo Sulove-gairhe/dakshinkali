@@ -98,7 +98,7 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        Loading...
+        Just a moment...
       </div>
     );
   }
@@ -114,18 +114,10 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
           <AuthBrandTitle />
           <p className="mt-6 text-sm leading-6 text-muted-foreground">
             {configError ??
-              "Authentication is unavailable right now. Please try again shortly."}
+              "Sign in is temporarily unavailable. Please try again shortly."}
           </p>
           <p className="mt-3 text-xs leading-5 text-muted-foreground/80">
-            Production requires{" "}
-            <code className="rounded bg-muted px-1 py-0.5">
-              NEXT_PUBLIC_SUPABASE_URL
-            </code>{" "}
-            and{" "}
-            <code className="rounded bg-muted px-1 py-0.5">
-              NEXT_PUBLIC_SUPABASE_ANON_KEY
-            </code>{" "}
-            in your hosting environment.
+            Our team is working to restore this service. Please check back soon.
           </p>
           <Link
             href="/"
@@ -238,7 +230,7 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
     setMessage(null);
 
     if (!supabase) {
-      setErrorMessage("Authentication is not configured.");
+      setErrorMessage("Sign in is not available right now.");
       return;
     }
 

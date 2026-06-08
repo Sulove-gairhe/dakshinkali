@@ -54,7 +54,7 @@ export function BlogPostsList({
       setPosts(result.posts);
       setTotal(result.total);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load posts");
+      toast.error(err instanceof Error ? err.message : "Couldn't load your posts");
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ export function BlogPostsList({
       await load();
       return;
     }
-    toast.error(actionErrorMessage(result) ?? "Action failed");
+    toast.error(actionErrorMessage(result) ?? "Something went wrong");
   }
 
   async function handleDelete() {
@@ -79,7 +79,7 @@ export function BlogPostsList({
       await load();
       return;
     }
-    toast.error(actionErrorMessage(result) ?? "Delete failed");
+    toast.error(actionErrorMessage(result) ?? "Couldn't delete. Please try again");
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));

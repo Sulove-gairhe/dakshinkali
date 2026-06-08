@@ -22,16 +22,10 @@ export function NotificationBell({
 
   const rows: NotificationRow[] = [
     {
-      key: "verification",
-      label: "Awaiting payment verification",
-      count: counts.pendingVerification,
-      href: "/admin/orders?paymentStatus=pending_verification",
-    },
-    {
       key: "approval",
-      label: "Awaiting COD approval",
-      count: counts.pendingApproval,
-      href: "/admin/orders?status=pending_admin_approval",
+      label: "Orders awaiting approval",
+      count: counts.pendingVerification + counts.pendingApproval,
+      href: "/admin/orders/approval",
     },
     {
       key: "outOfStock",

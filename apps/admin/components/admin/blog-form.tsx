@@ -21,7 +21,7 @@ import {
   slugifyBlogTitle,
 } from "@/lib/admin/utils";
 
-const TABS = ["Main Info", "Content", "SEO", "Preview"] as const;
+const TABS = ["Main Info", "Content", "Search Visibility", "Preview"] as const;
 type Tab = (typeof TABS)[number];
 
 const AUTOSAVE_KEY_PREFIX = "admin-blog-draft-";
@@ -114,7 +114,7 @@ export function BlogForm({
         setForm(blogFromPost(result.data));
         return form.id;
       }
-      toast.error(actionErrorMessage(result) ?? "Save failed");
+      toast.error(actionErrorMessage(result) ?? "Couldn't save. Please try again");
       return null;
     }
 
@@ -125,7 +125,7 @@ export function BlogForm({
       router.replace(`/admin/blog/${id}/edit`);
       return id;
     }
-    toast.error(actionErrorMessage(result) ?? "Create failed");
+    toast.error(actionErrorMessage(result) ?? "Couldn't create. Please try again");
     return null;
   }
 
@@ -207,7 +207,7 @@ export function BlogForm({
         toast.success("Post published");
         return;
       }
-      toast.error(actionErrorMessage(result) ?? "Publish failed");
+      toast.error(actionErrorMessage(result) ?? "Couldn't publish. Please try again");
     } finally {
       setSaving(false);
     }
@@ -224,7 +224,7 @@ export function BlogForm({
         toast.success("Post unpublished");
         return;
       }
-      toast.error(actionErrorMessage(result) ?? "Unpublish failed");
+      toast.error(actionErrorMessage(result) ?? "Couldn't unpublish. Please try again");
     } finally {
       setSaving(false);
     }
@@ -244,7 +244,7 @@ export function BlogForm({
       toast.success("Cover image uploaded");
       return;
     }
-    toast.error(actionErrorMessage(result) ?? "Upload failed");
+    toast.error(actionErrorMessage(result) ?? "Upload didn't work. Please try again");
   }
 
   const siteUrl = getAdminSiteUrl();
@@ -555,7 +555,7 @@ export function BlogForm({
           />
         ) : null}
 
-        {tab === "SEO" ? (
+        {tab === "Search Visibility" ? (
           <div className="max-w-2xl space-y-4">
             <div>
               <label className="text-sm font-medium text-gray-700">

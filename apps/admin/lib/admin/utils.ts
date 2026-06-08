@@ -263,8 +263,11 @@ export {
   canShipOrder,
   formatFileSize,
   formatShippingAddress,
+  orderItemPreview,
   orderStatusBadgeClass,
+  orderStatusLabel,
   paymentStatusBadgeClass,
+  paymentStatusLabel,
   formatRelativeTime,
   paymentMethodLabel,
 } from "./order-utils";

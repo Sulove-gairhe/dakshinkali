@@ -56,7 +56,7 @@ export function ProductsList({
       setProducts(result.products);
       setTotal(result.total);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load products");
+      toast.error(err instanceof Error ? err.message : "Couldn't load your products");
     } finally {
       setLoading(false);
     }
@@ -75,7 +75,7 @@ export function ProductsList({
       setConfirm(null);
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Action failed");
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     }
   }
 
@@ -206,7 +206,7 @@ export function ProductsList({
         }
         description={
           confirm?.type === "delete"
-            ? "This soft-deletes the product. It will no longer appear in admin lists."
+            ? "This will remove the product from your store. You can always add it back later."
             : "The product status will be set to inactive and hidden from the storefront."
         }
         onCancel={() => setConfirm(null)}

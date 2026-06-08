@@ -73,9 +73,9 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
           </div>
 
           <div className="mb-7 grid grid-cols-3 gap-3">
-            <IconBadge title="Password verified by Supabase" icon={<KeyRound className="size-5" />} />
-            <IconBadge title="Admin or staff role required" icon={<UserCheck className="size-5" />} />
-            <IconBadge title="Server-side role protection" icon={<ShieldCheck className="size-5" />} />
+            <IconBadge title="Secure password login" icon={<KeyRound className="size-5" />} />
+            <IconBadge title="Admin or staff account" icon={<UserCheck className="size-5" />} />
+            <IconBadge title="Protected access" icon={<ShieldCheck className="size-5" />} />
           </div>
 
           <form

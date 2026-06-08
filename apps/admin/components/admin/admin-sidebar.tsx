@@ -27,14 +27,9 @@ const mainNav = [
 const orderLinks = [
   { href: "/admin/orders", label: "All Orders", badgeKey: null },
   {
-    href: "/admin/orders?paymentStatus=pending_verification",
-    label: "Awaiting Review",
-    badgeKey: "pendingVerification" as const,
-  },
-  {
-    href: "/admin/orders?status=pending_admin_approval",
+    href: "/admin/orders/approval",
     label: "Awaiting Approval",
-    badgeKey: "pendingApproval" as const,
+    badgeKey: "awaitingApproval" as const,
   },
   { href: "/admin/orders/board", label: "Fulfillment Board", badgeKey: null },
 ] as const;
@@ -105,17 +100,8 @@ export function AdminSidebar({
               if (item.href === "/admin/orders/board") {
                 return pathname.startsWith("/admin/orders/board");
               }
-              if (item.href.includes("paymentStatus=pending_verification")) {
-                return (
-                  pathname === "/admin/orders" &&
-                  searchParams.get("paymentStatus") === "pending_verification"
-                );
-              }
-              if (item.href.includes("status=pending_admin_approval")) {
-                return (
-                  pathname === "/admin/orders" &&
-                  searchParams.get("status") === "pending_admin_approval"
-                );
+              if (item.href === "/admin/orders/approval") {
+                return pathname.startsWith("/admin/orders/approval");
               }
               return (
                 pathname === "/admin/orders" &&
@@ -128,6 +114,8 @@ export function AdminSidebar({
                 ? counts.pendingVerification
                 : item.badgeKey === "pendingApproval"
                   ? counts.pendingApproval
+                  : item.badgeKey === "awaitingApproval"
+                    ? counts.awaitingApproval
                   : 0;
 
             return (

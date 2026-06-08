@@ -1,7 +1,8 @@
 "use server";
 
 import { requireAdminUser } from "@/lib/admin/auth-server";
-import { formatNprPrice } from "@/lib/admin/utils";
+import { formatNprPrice, orderStatusLabel } from "@/lib/admin/utils";
+import type { OrderStatus } from "@/lib/admin/order-types";
 import type { StorefrontData } from "@/lib/admin/types";
 
 // TODO: migrate command search to full-text search when data grows.
@@ -85,7 +86,7 @@ export async function commandSearchOrders(
     id: row.id as string,
     orderNumber: row.order_number as string,
     customerName: row.customer_name as string,
-    status: (row.status as string).replace(/_/g, " "),
+    status: orderStatusLabel(row.status as OrderStatus),
     href: `/admin/orders/${row.id}`,
   }));
 }

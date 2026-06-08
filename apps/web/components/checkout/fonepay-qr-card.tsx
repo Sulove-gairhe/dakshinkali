@@ -15,7 +15,7 @@ const QR_IMAGES = [
   { src: "/images/dakshinkali qr code ss.jpeg", label: "Fonepay QR Screenshot" },
 ];
 
-const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/jpg", "application/pdf"];
+const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp", "application/pdf"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export function FonepayQrCard({ file, onChangeFile, error }: FonepayQrCardProps) {
@@ -39,7 +39,7 @@ export function FonepayQrCard({ file, onChangeFile, error }: FonepayQrCardProps)
       if (!selected) return;
 
       if (!ACCEPTED_TYPES.includes(selected.type)) {
-        setUploadError("Only PNG, JPEG, and PDF files are accepted.");
+        setUploadError("Only PNG, JPEG, WebP, and PDF files are accepted.");
         return;
       }
 
@@ -132,7 +132,7 @@ export function FonepayQrCard({ file, onChangeFile, error }: FonepayQrCardProps)
               Click to upload proof
             </div>
             <p className="text-xs text-muted-foreground">
-              PNG, JPEG, or PDF (max 5MB)
+              PNG, JPEG, WebP, or PDF (max 5MB)
             </p>
           </div>
         )}
@@ -140,7 +140,7 @@ export function FonepayQrCard({ file, onChangeFile, error }: FonepayQrCardProps)
         <input
           ref={fileInputRef}
           type="file"
-          accept=".png,.jpg,.jpeg,.pdf"
+          accept=".png,.jpg,.jpeg,.webp,.pdf"
           onChange={handleFileSelect}
           className="hidden"
         />

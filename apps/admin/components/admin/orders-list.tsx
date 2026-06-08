@@ -1,18 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Bell, Eye } from "lucide-react";
 import { toast } from "sonner";
-import { AdminDrawer } from "./admin-drawer";
 import { ListTableSkeleton } from "./list-table-skeleton";
 import {
   formatNprPrice,
   formatRelativeTime,
+  orderItemPreview,
   orderStatusBadgeClass,
+  orderStatusLabel,
   paymentMethodLabel,
   paymentStatusBadgeClass,
+  paymentStatusLabel,
 } from "@/lib/admin/utils";
 import {
   listAdminOrders,
@@ -22,6 +24,7 @@ import type { AdminOrderRecord, OrderStatus, PaymentMethod, PaymentStatus } from
 import { actionErrorMessage } from "@/lib/admin/order-types";
 
 export function OrdersList() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<AdminOrderRecord[]>([]);
@@ -37,7 +40,6 @@ export function OrdersList() {
   const [paymentMethod, setPaymentMethod] = useState(
     searchParams.get("paymentMethod") ?? "",
   );
-  const [quickView, setQuickView] = useState<AdminOrderRecord | null>(null);
 
   useEffect(() => {
     setStatus(searchParams.get("status") ?? "");
@@ -53,14 +55,15 @@ export function OrdersList() {
         search: search || undefined,
         status: (status as OrderStatus) || undefined,
         paymentStatus: (paymentStatus as PaymentStatus) || undefined,
-        paymentMethod: (paymentMethod as PaymentMethod) || undefined,
+        paymentMethod:
+          (paymentMethod as PaymentMethod | "fonepay_qr_group") || undefined,
         page,
         pageSize,
       });
       setOrders(result.orders);
       setTotal(result.total);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load orders");
+      toast.error(err instanceof Error ? err.message : "Couldn't load your orders");
     } finally {
       setLoading(false);
     }
@@ -74,7 +77,7 @@ export function OrdersList() {
   async function handleQuickCod(orderId: string) {
     const result = await quickConfirmCod(orderId);
     if (!result.success) {
-      toast.error(actionErrorMessage(result) ?? "Confirm failed");
+      toast.error(actionErrorMessage(result) ?? "Couldn't confirm this order");
       return;
     }
     toast.success("COD order confirmed");
@@ -116,7 +119,7 @@ export function OrdersList() {
             "cancelled",
           ].map((s) => (
             <option key={s} value={s}>
-              {s}
+              {orderStatusLabel(s as OrderStatus)}
             </option>
           ))}
         </select>
@@ -132,7 +135,7 @@ export function OrdersList() {
           {["pending", "pending_verification", "paid", "failed", "refunded"].map(
             (s) => (
               <option key={s} value={s}>
-                {s}
+                {paymentStatusLabel(s as PaymentStatus)}
               </option>
             ),
           )}
@@ -146,17 +149,8 @@ export function OrdersList() {
           className="rounded-lg border border-gray-200 px-3 py-2 text-sm"
         >
           <option value="">All payment methods</option>
-          {[
-            "cash_on_delivery",
-            "fonepay_qr",
-            "esewa",
-            "khalti",
-            "bank_transfer",
-          ].map((m) => (
-            <option key={m} value={m}>
-              {paymentMethodLabel(m as PaymentMethod)}
-            </option>
-          ))}
+          <option value="cash_on_delivery">Cash on Delivery</option>
+          <option value="fonepay_qr_group">Fonepay / QR Payment</option>
         </select>
       </div>
 
@@ -201,6 +195,7 @@ export function OrdersList() {
             </thead>
             <tbody>
               {orders.map((order) => {
+                const preview = orderItemPreview(order);
                 const highlightProof =
                   order.payment_status === "pending_verification";
                 const highlightApproval =
@@ -212,8 +207,8 @@ export function OrdersList() {
                 return (
                   <tr
                     key={order.id}
-                    onClick={() => setQuickView(order)}
-                    className={`cursor-pointer border-t border-gray-100 hover:bg-gray-50/50 ${
+                    onClick={() => router.push(`/admin/orders/${order.id}`)}
+                    className={`cursor-pointer border-t border-gray-100 transition hover:bg-gray-50/80 ${
                       highlightProof || highlightApproval
                         ? "border-l-4 border-l-primary bg-primary/5"
                         : ""
@@ -228,7 +223,12 @@ export function OrdersList() {
                         {order.customer_email}
                       </p>
                     </td>
-                    <td className="px-4 py-3">{order.item_count ?? 0}</td>
+                    <td className="px-4 py-3">
+                      <p className="max-w-[220px] truncate font-medium text-gray-900">
+                        {preview.title}
+                      </p>
+                      <p className="text-xs text-gray-500">{preview.detail}</p>
+                    </td>
                     <td className="px-4 py-3">{formatNprPrice(order.total)}</td>
                     <td className="px-4 py-3">
                       <span className="rounded bg-gray-100 px-2 py-0.5 text-xs">
@@ -242,16 +242,14 @@ export function OrdersList() {
                         {order.status === "pending_admin_approval" ? (
                           <Bell className="h-3 w-3" />
                         ) : null}
-                        {order.status.replace(/_/g, " ")}
+                        {orderStatusLabel(order.status)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs ${paymentStatusBadgeClass(order.payment_status)}`}
                       >
-                        {order.payment_status === "pending_verification"
-                          ? "Awaiting Proof Review"
-                          : order.payment_status}
+                        {paymentStatusLabel(order.payment_status)}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-500">
@@ -311,55 +309,6 @@ export function OrdersList() {
         </div>
       )}
 
-      <AdminDrawer
-        open={!!quickView}
-        onClose={() => setQuickView(null)}
-        title="Order quick view"
-        width="md"
-      >
-        {quickView ? (
-          <div className="space-y-4 text-sm">
-            <p className="font-mono text-xs font-semibold text-gray-900">
-              {quickView.order_number}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs ${orderStatusBadgeClass(quickView.status)}`}
-              >
-                {quickView.status.replace(/_/g, " ")}
-              </span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs ${paymentStatusBadgeClass(quickView.payment_status)}`}
-              >
-                {quickView.payment_status}
-              </span>
-            </div>
-            <div>
-              <p className="font-medium">{quickView.customer_name}</p>
-              <p className="text-gray-500">{quickView.customer_phone}</p>
-            </div>
-            <p>
-              <span className="text-gray-500">Total: </span>
-              {formatNprPrice(quickView.total)}
-            </p>
-            <p>
-              <span className="text-gray-500">Payment: </span>
-              {paymentMethodLabel(quickView.payment_method)}
-            </p>
-            <p>
-              <span className="text-gray-500">Items: </span>
-              {quickView.item_count ?? 0}
-            </p>
-            <Link
-              href={`/admin/orders/${quickView.id}`}
-              className="inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-              onClick={() => setQuickView(null)}
-            >
-              View full order
-            </Link>
-          </div>
-        ) : null}
-      </AdminDrawer>
     </>
   );
 }
