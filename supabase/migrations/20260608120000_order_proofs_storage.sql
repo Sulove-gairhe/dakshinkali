@@ -8,7 +8,7 @@ VALUES (
   'order-proofs',
   'order-proofs',
   true,
-  5242880,
+git  5242880,
   ARRAY['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
 )
 ON CONFLICT (id) DO UPDATE
