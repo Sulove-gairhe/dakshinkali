@@ -9,6 +9,7 @@ import { CartService } from '../cart/services/cart.service';
 import { OrderRepository } from './order.repository';
 import { CreateOrderRequest } from './order.dto';
 import { CreateOrderRecord, OrderListQuery, OrderStatus, OrderWithItemsEntity, PaymentMethod } from './types';
+import { notifyAdminsOfNewOrder } from '../../services/admin-order-notifications';
 
 const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
     pending: ['confirmed', 'cancelled'],
@@ -115,11 +116,18 @@ export class OrderService {
         };
 
         if (typeof this.orderRepository.createFromCart === 'function') {
-            return this.orderRepository.createFromCart(orderRecord, cart.id);
+            const order = await this.orderRepository.createFromCart(orderRecord, cart.id);
+            void notifyAdminsOfNewOrder(order.id).catch((error) => {
+                console.error('[ADMIN_ORDER_NOTIFY_ERROR]', { orderId: order.id, error });
+            });
+            return order;
         }
 
         const order = await this.orderRepository.create(orderRecord);
         await this.cartService.clearCart(userId, null);
+        void notifyAdminsOfNewOrder(order.id).catch((error) => {
+            console.error('[ADMIN_ORDER_NOTIFY_ERROR]', { orderId: order.id, error });
+        });
         return order;
     }
 

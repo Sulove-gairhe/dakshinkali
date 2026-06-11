@@ -7,6 +7,7 @@ import {
   CommandPalette,
   useCommandPaletteShortcut,
 } from "./command-palette";
+import { AdminPushInitializer } from "@/components/notifications/AdminPushInitializer";
 
 export function AdminLayoutShell({
   title,
@@ -35,6 +36,7 @@ export function AdminLayoutShell({
         <main className="flex flex-1 min-h-0 flex-col overflow-auto p-4 md:p-6">{children}</main>
       </div>
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
+      <AdminPushInitializer />
     </div>
   );
 }

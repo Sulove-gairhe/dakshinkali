@@ -149,7 +149,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
         <FadeUp>
           <div className="mb-10 flex flex-col items-center border-b border-white/10 pb-8 text-center">
-            <p className="text-sm font-bold uppercase tracking-wide text-primary">
+            <p className="text-sm font-bold uppercase tracking-wide text-white">
               Connect now
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-4">
@@ -178,11 +178,11 @@ export function Footer() {
           <FadeUp>
             <Link
               href="/"
-              className="inline-flex items-center gap-3 text-xl font-bold tracking-tight text-secondary-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex items-center gap-3 text-xl font-bold tracking-tight text-white transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="relative size-12 overflow-hidden rounded-full border border-white/10 bg-white">
                 <Image
-                  src="/images/logo-placeholder.jpeg"
+                  src="/images/logo-placeholder white.png"
                   alt="Dakshinkali Electronics logo"
                   fill
                   sizes="48px"
