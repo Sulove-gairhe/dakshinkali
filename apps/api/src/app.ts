@@ -16,6 +16,7 @@ import { registerProductRoutes } from './modules/products/routes/express.routes'
 import { registerCartRoutes } from './modules/cart/routes/express.routes';
 import { registerOrderRoutes } from './modules/orders';
 import { registerAdminSupportRoutes } from './modules/admin';
+import { registerInternalOrderNotifyRoutes } from './modules/internal/order-notify.routes';
 import { checkDatabaseHealth, isDatabaseConnected } from './lib/database';
 
 /**
@@ -112,6 +113,9 @@ export function createApp(): Express {
 
     // Order routes
     registerOrderRoutes(app);
+
+    // Internal routes (order notifications)
+    registerInternalOrderNotifyRoutes(app);
 
     // Profile and admin dashboard/user routes
     registerAdminSupportRoutes(app);

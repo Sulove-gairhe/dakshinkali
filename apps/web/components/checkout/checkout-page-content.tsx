@@ -95,11 +95,21 @@ function getCheckoutErrorMessage(error: unknown) {
   return "Something went wrong while placing your order. Please try again.";
 }
 
-function notifyAdminOfPayment(orderNumber: string, customerEmail: string): void {
-  console.info(
-    `[notify-admin] Payment proof submitted for order ${orderNumber} by ${customerEmail}. ` +
-    "The admin approval queue will surface this order.",
-  );
+function notifyAdminOfNewOrder(orderId: string, apiUrl: string | undefined): void {
+  const secret =
+    process.env.NEXT_PUBLIC_ORDER_NOTIFY_SECRET ||
+    (process.env.NODE_ENV !== "production" ? "dev-order-notify-secret" : undefined);
+
+  if (!apiUrl || !secret) {
+    return;
+  }
+
+  void fetch(`${apiUrl}/api/v1/internal/orders/${orderId}/notify`, {
+    method: "POST",
+    headers: {
+      "X-Order-Notify-Secret": secret,
+    },
+  }).catch(() => undefined);
 }
 
 export function CheckoutPageContent() {
@@ -213,6 +223,7 @@ export function CheckoutPageContent() {
     const orderNotes = formData.deliveryNotes || null;
     let orderSuccess = false;
     let orderNumberGenerated = "";
+    let createdOrderId = "";
     let proofPayload: Record<string, string | number | null> = {};
 
     if (isFonepay && fonepayFile && supabase) {
@@ -295,6 +306,8 @@ export function CheckoutPageContent() {
         if (orderError) throw orderError;
         if (!newOrder) throw new Error("Something went wrong placing your order. Please try again.");
 
+        createdOrderId = newOrder.id;
+
         const orderItemsToInsert = items.map(item => ({
           order_id: newOrder.id,
           product_id: isUUID(item.id) ? item.id : null,
@@ -358,9 +371,8 @@ export function CheckoutPageContent() {
     }
 
     if (orderSuccess) {
-      // Notify admin for Fonepay orders (skeleton stub)
-      if (isFonepay) {
-        notifyAdminOfPayment(orderNumberGenerated, formData.email);
+      if (createdOrderId) {
+        notifyAdminOfNewOrder(createdOrderId, API_URL);
       }
 
       setSuccessDetails({

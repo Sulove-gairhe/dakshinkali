@@ -14,23 +14,44 @@
 
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
-✓ Compiled successfully in 8.3s
+✓ Compiled successfully in 44s
   Running TypeScript ...
-Failed to type check.
+  Finished TypeScript in 19.0s ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/20) ...
+  Generating static pages using 11 workers (5/20) 
+  Generating static pages using 11 workers (10/20) 
+  Generating static pages using 11 workers (15/20) 
+✓ Generating static pages using 11 workers (20/20) in 1464ms
+  Finalizing page optimization ...
 
-./app/admin/page.tsx:28:10
-Type error: 'Link' cannot be used as a JSX component.
-  Its type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps<any>> & LinkProps<any> & { children?: ReactNode; } & RefAttributes<...>>' is not a valid JSX element type.
-    Type 'ForwardRefExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps<any>> & LinkProps<any> & { children?: ReactNode; } & RefAttributes<...>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
-      Type 'React.ReactNode' is not assignable to type 'import("C:/Users/sulov/OneDrive/Desktop/dakshinkali/node_modules/.pnpm/@types+react@18.3.28/node_modules/@types/react/index").ReactNode'.
-        Type 'bigint' is not assignable to type 'ReactNode'.
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /admin
+├ ƒ /admin/blog
+├ ƒ /admin/blog/[id]/edit
+├ ƒ /admin/blog/new
+├ ƒ /admin/categories
+├ ƒ /admin/coupons
+├ ƒ /admin/manage/staff
+├ ƒ /admin/orders
+├ ƒ /admin/orders/[id]
+├ ƒ /admin/orders/approval
+├ ƒ /admin/orders/board
+├ ƒ /admin/products
+├ ƒ /admin/products/[id]/edit
+├ ƒ /admin/products/new
+├ ƒ /admin/setup-access
+├ ƒ /api/admin/fcm-token
+├ ƒ /api/env-check
+├ ƒ /api/firebase-config
+├ ƒ /auth/callback
+└ ƒ /login
 
-  [90m26 |[0m
-  [90m27 |[0m       <div className=[32m"mt-8 grid gap-4 md:grid-cols-3"[0m>
-[31m[1m>[0m [90m28 |[0m         <[33mLink[0m
-  [90m   |[0m          [31m[1m^[0m
-  [90m29 |[0m           href=[32m"/admin/products"[0m
-  [90m30 |[0m           className=[32m"card-cozy flex items-center gap-3 p-5 hover:border-amber-300"[0m
-  [90m31 |[0m         >
-Next.js build worker exited with code: 1 and signal: null
- ELIFECYCLE  Command failed with exit code 1.
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

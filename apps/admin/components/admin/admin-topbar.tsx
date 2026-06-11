@@ -4,7 +4,6 @@ import { LogOut, Menu, Search } from "lucide-react";
 import { useAuth } from "@dakshinkali/auth";
 import { useRouter } from "next/navigation";
 import { NotificationBell } from "./notification-bell";
-import { useAdminNavCounts } from "./admin-nav-provider";
 
 export function AdminTopbar({
   title,
@@ -17,7 +16,6 @@ export function AdminTopbar({
 }) {
   const { user, profile, signOut } = useAuth();
   const router = useRouter();
-  const { notifications } = useAdminNavCounts();
 
   async function handleLogout() {
     await signOut();
@@ -52,7 +50,7 @@ export function AdminTopbar({
         >
           <Search className="h-5 w-5" />
         </button>
-        <NotificationBell counts={notifications} />
+        <NotificationBell />
         <div className="hidden text-right sm:block">
           <p className="text-sm font-medium text-gray-900">{displayName}</p>
           <p className="text-xs text-gray-500">{user?.email}</p>
