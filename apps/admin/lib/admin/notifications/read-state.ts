@@ -1,37 +1,117 @@
 const STORAGE_KEY = "admin-order-notifications-read";
+const MAX_AGE_MS = 48 * 60 * 60 * 1000;
 
-function readIds(): Set<string> {
-  if (typeof window === "undefined") return new Set();
+export type OrderNotificationReadEntry = {
+  orderId: string;
+  createdAt: string;
+  read: boolean;
+};
+
+function isFresh(entry: OrderNotificationReadEntry, now = Date.now()) {
+  const createdAt = new Date(entry.createdAt).getTime();
+  return Number.isFinite(createdAt) && now - createdAt <= MAX_AGE_MS;
+}
+
+function normalizeEntry(value: unknown): OrderNotificationReadEntry | null {
+  if (typeof value === "string") {
+    return {
+      orderId: value,
+      createdAt: new Date().toISOString(),
+      read: true,
+    };
+  }
+
+  if (!value || typeof value !== "object") return null;
+
+  const record = value as Record<string, unknown>;
+  if (
+    typeof record.orderId !== "string" ||
+    typeof record.createdAt !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    orderId: record.orderId,
+    createdAt: record.createdAt,
+    read: record.read === true,
+  };
+}
+
+function readEntries(): OrderNotificationReadEntry[] {
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
+    if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return new Set();
-    return new Set(parsed.filter((id): id is string => typeof id === "string"));
+    if (!Array.isArray(parsed)) return [];
+    const entries = parsed
+      .map((item) => normalizeEntry(item))
+      .filter((item): item is OrderNotificationReadEntry => Boolean(item))
+      .filter((item) => isFresh(item));
+    writeEntries(entries);
+    return entries;
   } catch {
-    return new Set();
+    return [];
   }
 }
 
-function writeIds(ids: Set<string>) {
+function writeEntries(entries: OrderNotificationReadEntry[]) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
 }
 
-export function getReadOrderNotificationIds(): Set<string> {
-  return readIds();
+export function getOrderNotificationReadState(): OrderNotificationReadEntry[] {
+  return readEntries();
 }
 
-export function markOrderNotificationRead(orderId: string): Set<string> {
-  const ids = readIds();
-  ids.add(orderId);
-  writeIds(ids);
-  return ids;
+export function upsertOrderNotificationEntry(
+  orderId: string,
+  createdAt = new Date().toISOString(),
+): OrderNotificationReadEntry[] {
+  const entries = readEntries();
+  const existing = entries.find((entry) => entry.orderId === orderId);
+  if (existing) {
+    writeEntries(entries);
+    return entries;
+  }
+
+  const next = [
+    ...entries,
+    {
+      orderId,
+      createdAt,
+      read: false,
+    },
+  ];
+  writeEntries(next);
+  return next;
+}
+
+export function markOrderNotificationRead(
+  orderId: string,
+): OrderNotificationReadEntry[] {
+  const entries = readEntries();
+  const existing = entries.find((entry) => entry.orderId === orderId);
+  const next = existing
+    ? entries.map((entry) =>
+        entry.orderId === orderId ? { ...entry, read: true } : entry,
+      )
+    : [
+        ...entries,
+        {
+          orderId,
+          createdAt: new Date().toISOString(),
+          read: true,
+        },
+      ];
+  writeEntries(next);
+  return next;
 }
 
 export function isOrderNotificationRead(
   orderId: string,
-  readIds: Set<string>,
+  entries: OrderNotificationReadEntry[],
 ): boolean {
-  return readIds.has(orderId);
+  return entries.some((entry) => entry.orderId === orderId && entry.read);
 }

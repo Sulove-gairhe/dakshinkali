@@ -5,22 +5,22 @@ import { OrderRepository } from '../modules/orders/order.repository';
 import type { OrderWithItemsEntity } from '../modules/orders/types';
 import { sendAdminOrderPush } from './admin-push-notifications';
 
-async function claimOrderNotification(orderId: string): Promise<boolean> {
+async function claimOrderNotification(orderId: string): Promise<Record<string, unknown> | null> {
     const supabase = createSupabaseClient();
     const { data, error } = await supabase
         .from('orders')
         .update({ admin_notification_status: 'sent' })
         .eq('id', orderId)
         .eq('admin_notification_status', 'pending')
-        .select('id')
+        .select('*')
         .maybeSingle();
 
     if (error) {
         console.error('[ADMIN_ORDER_NOTIFY_CLAIM_ERROR]', { orderId, message: error.message });
-        return false;
+        return null;
     }
 
-    return !!data;
+    return (data as Record<string, unknown> | null) ?? null;
 }
 
 async function markNotificationFailed(orderId: string): Promise<void> {
@@ -66,10 +66,13 @@ async function loadOrderWithItems(orderId: string): Promise<OrderWithItemsEntity
 
 export async function notifyAdminsOfNewOrder(orderId: string): Promise<void> {
     try {
+        console.log('[NOTIFY_START]', orderId);
         const claimed = await claimOrderNotification(orderId);
         if (!claimed) {
+            console.log('[NOTIFY_SKIP]', { orderId, reason: 'already notified' });
             return;
         }
+        console.log('[NOTIFY_CLAIMED]', claimed);
 
         const order = await loadOrderWithItems(orderId);
         if (!order) {
@@ -93,6 +96,9 @@ export async function notifyAdminsOfNewOrder(orderId: string): Promise<void> {
             sendAdminOrderPush(order),
         ]);
 
+        console.log('[NOTIFY_EMAIL_RESULT]', results[0]);
+        console.log('[NOTIFY_PUSH_RESULT]', results[1]);
+
         const failures = results.filter((r) => r.status === 'rejected');
         if (failures.length > 0) {
             failures.forEach((failure) => {
@@ -102,6 +108,7 @@ export async function notifyAdminsOfNewOrder(orderId: string): Promise<void> {
                 });
             });
         }
+        console.log('[NOTIFY_DONE]', orderId);
     } catch (error) {
         console.error('[ADMIN_ORDER_NOTIFY_ERROR]', { orderId, error });
     }
