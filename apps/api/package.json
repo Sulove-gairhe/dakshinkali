@@ -4,7 +4,7 @@
     "private": true,
     "main": "src/app.ts",
     "scripts": {
-        "dev": "nodemon --exec \"node -r dotenv/config -r tsconfig-paths/register -r ts-node/register src/server.ts\" --ext ts --watch src dotenv_config_path=../../.env",
+        "dev": "nodemon --exec \"node -r dotenv/config -r tsconfig-paths/register -r ts-node/register src/server.ts\" --ext ts --watch src dotenv_config_path=.env",
         "build": "tsc",
         "start": "node dist/server.js",
         "lint": "eslint src --ext .ts",

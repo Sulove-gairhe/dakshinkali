@@ -10,9 +10,10 @@ import {
   formatRelativeTime,
 } from "@/lib/admin/order-utils";
 import {
-  getReadOrderNotificationIds,
+  getOrderNotificationReadState,
   isOrderNotificationRead,
   markOrderNotificationRead,
+  type OrderNotificationReadEntry,
 } from "@/lib/admin/notifications/read-state";
 import { useLowStockProducts } from "@/lib/admin/notifications/use-low-stock-products";
 import { useOrderNotifications } from "@/lib/admin/notifications/use-order-notifications";
@@ -77,22 +78,35 @@ function ProductThumb({
   );
 }
 
+function getOrderCardTitle(order: {
+  order_items: { product_name: string }[];
+  order_number: string;
+}) {
+  const firstProductName = order.order_items[0]?.product_name?.trim();
+  if (!firstProductName) return `#${order.order_number}`;
+
+  const remainingCount = order.order_items.length - 1;
+  return remainingCount > 0
+    ? `${firstProductName} +${remainingCount} more`
+    : firstProductName;
+}
+
 export function NotificationBell() {
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [lowStockExpanded, setLowStockExpanded] = useState(false);
-  const [readIds, setReadIds] = useState<Set<string>>(() => new Set());
+  const [readEntries, setReadEntries] = useState<OrderNotificationReadEntry[]>([]);
   const { orders, loading: ordersLoading } = useOrderNotifications();
   const { products: lowStockProducts, loading: lowStockLoading } =
     useLowStockProducts();
 
   useEffect(() => {
-    setReadIds(getReadOrderNotificationIds());
+    setReadEntries(getOrderNotificationReadState());
   }, []);
 
   const unreadCount = orders.filter(
-    (order) => !isOrderNotificationRead(order.id, readIds),
+    (order) => !isOrderNotificationRead(order.id, readEntries),
   ).length;
 
   useEffect(() => {
@@ -106,8 +120,8 @@ export function NotificationBell() {
   }, [open]);
 
   function handleOrderClick(orderId: string) {
-    const nextReadIds = markOrderNotificationRead(orderId);
-    setReadIds(nextReadIds);
+    const nextReadEntries = markOrderNotificationRead(orderId);
+    setReadEntries(nextReadEntries);
     setOpen(false);
     router.push(`/admin/orders/${orderId}`);
   }
@@ -200,11 +214,12 @@ export function NotificationBell() {
             ) : (
               <ul>
                 {orders.map((order) => {
-                  const unread = !isOrderNotificationRead(order.id, readIds);
+                  const unread = !isOrderNotificationRead(order.id, readEntries);
                   const previewImage =
                     order.order_items[0]?.product_image_url ?? null;
                   const previewLabel =
                     order.order_items[0]?.product_name ?? order.order_number;
+                  const title = getOrderCardTitle(order);
 
                   return (
                     <li key={order.id}>
@@ -212,7 +227,7 @@ export function NotificationBell() {
                         type="button"
                         onClick={() => handleOrderClick(order.id)}
                         className={`flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-gray-50 ${
-                          unread ? "bg-primary/5" : ""
+                          unread ? "bg-primary/5" : "opacity-60 grayscale"
                         }`}
                       >
                         <OrderPreviewImage
@@ -221,7 +236,7 @@ export function NotificationBell() {
                         />
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium text-gray-900">
-                            {order.order_items[0]?.product_name ?? `#${order.order_number}`} · {order.customer_name}
+                            {title} · {order.customer_name}
                           </p>
                           <p className="truncate text-xs text-gray-500">
                             {formatNprPrice(order.total)}

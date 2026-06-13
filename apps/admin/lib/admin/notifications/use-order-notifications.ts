@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { OrderNotificationCard } from "./bell-types";
 import type { OrderStatus, PaymentStatus } from "@/lib/admin/order-types";
+import { upsertOrderNotificationEntry } from "./read-state";
 
 const CACHE_KEY = "admin-order-notifications-cache";
 const CUTOFF_MS = 48 * 60 * 60 * 1000; // 48 hours
@@ -32,6 +33,45 @@ function saveCache(list: OrderNotificationCard[]) {
   } catch (e) {
     console.warn("Failed to save notifications cache", e);
   }
+}
+
+function saveNotifications(list: OrderNotificationCard[]) {
+  saveCache(list);
+  list.forEach((item) => {
+    upsertOrderNotificationEntry(item.id, item.created_at);
+  });
+}
+
+async function fetchOrderNotificationById(
+  supabase: ReturnType<typeof createClient>,
+  orderId: string,
+) {
+  const { data, error } = await supabase
+    .from("orders")
+    .select(
+      `
+      id,
+      order_number,
+      customer_name,
+      total,
+      status,
+      payment_status,
+      created_at,
+      order_items (
+        product_name,
+        product_image_url
+      )
+    `,
+    )
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (error || !data) {
+    if (error) console.warn("[ORDER_NOTIFICATIONS_LOAD_ERROR]", error.message);
+    return null;
+  }
+
+  return mapOrderRowFull(data as Record<string, unknown>);
 }
 
 function mapOrderRowFull(row: Record<string, unknown>): OrderNotificationCard {
@@ -133,7 +173,7 @@ export function useOrderNotifications() {
           .filter((item) => now - new Date(item.created_at).getTime() < CUTOFF_MS)
           .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-        saveCache(mergedList);
+        saveNotifications(mergedList);
         return mergedList;
       });
       setLoading(false);
@@ -143,15 +183,37 @@ export function useOrderNotifications() {
       const mapped = mapOrderRowFull(row);
       // New realtime insert should have current timestamp
       mapped.created_at = new Date().toISOString();
+      upsertOrderNotificationEntry(mapped.id, mapped.created_at);
 
       setOrders((prev) => {
         const without = prev.filter((item) => item.id !== mapped.id);
         const mergedList = [mapped, ...without].sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-        saveCache(mergedList);
+        saveNotifications(mergedList);
         return mergedList;
       });
+
+      window.setTimeout(() => {
+        void (async () => {
+          const fullOrder = await fetchOrderNotificationById(supabase, mapped.id);
+          if (!fullOrder) return;
+
+          setOrders((prev) => {
+            const existing = prev.find((item) => item.id === fullOrder.id);
+            const createdAt = existing?.created_at ?? mapped.created_at;
+            const updated = { ...fullOrder, created_at: createdAt };
+            const without = prev.filter((item) => item.id !== updated.id);
+            const mergedList = [updated, ...without].sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime(),
+            );
+            saveNotifications(mergedList);
+            return mergedList;
+          });
+        })();
+      }, 750);
     };
 
     const handleUpdate = (row: Record<string, unknown>) => {
@@ -170,7 +232,7 @@ export function useOrderNotifications() {
         const mergedList = [updatedMapped, ...without].sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-        saveCache(mergedList);
+        saveNotifications(mergedList);
         return mergedList;
       });
     };

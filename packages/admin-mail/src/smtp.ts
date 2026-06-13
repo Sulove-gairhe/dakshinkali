@@ -1,3 +1,8 @@
+// TODO: Switch SMTP_USER to dakshinkalielectronics@gmail.com once
+// Google Workspace SMTP access is confirmed and App Password works.
+// Current sender: sulovegairhe510@gmail.com (display name overridden via SMTP_FROM)
+// To fix dakshinkalielectronics: ensure 2FA is on, IMAP is enabled,
+// delete all existing App Passwords and regenerate fresh one.
 import crypto from "crypto";
 import net from "net";
 import tls from "tls";
@@ -46,6 +51,13 @@ function createSmtpMessage(input: SmtpMailInput) {
 }
 
 export async function sendSmtpMail(input: SmtpMailInput) {
+  console.log("[SMTP_ATTEMPT]", {
+    host: input.host,
+    port: input.port,
+    user: input.username,
+    to: input.to,
+  });
+
   const secure = input.port === 465;
   let socket: net.Socket | tls.TLSSocket = secure
     ? tls.connect(input.port, input.host, { servername: input.host })
@@ -84,12 +96,16 @@ export async function sendSmtpMail(input: SmtpMailInput) {
       socket.once("timeout", onTimeout);
     });
 
-  const sendCommand = async (command: string, expected: number[]) => {
+  const sendCommand = async (
+    command: string,
+    expected: number[],
+    commandLabel = command,
+  ) => {
     socket.write(`${command}\r\n`);
     const response = await waitForResponse();
     const code = Number(response.slice(0, 3));
     if (!expected.includes(code)) {
-      throw new Error(`SMTP command failed: ${command} -> ${response.trim()}`);
+      throw new Error(`SMTP command failed: ${commandLabel} -> ${response.trim()}`);
     }
   };
 
@@ -108,13 +124,17 @@ export async function sendSmtpMail(input: SmtpMailInput) {
     }
 
     await sendCommand("AUTH LOGIN", [334]);
-    await sendCommand(Buffer.from(input.username).toString("base64"), [334]);
-    await sendCommand(Buffer.from(input.password).toString("base64"), [235]);
+    await sendCommand(Buffer.from(input.username).toString("base64"), [334], "[AUTH_USERNAME]");
+    await sendCommand(Buffer.from(input.password).toString("base64"), [235], "[AUTH_PASSWORD]");
     await sendCommand(`MAIL FROM:<${extractEmailAddress(input.from)}>`, [250]);
     await sendCommand(`RCPT TO:<${extractEmailAddress(input.to)}>`, [250, 251]);
     await sendCommand("DATA", [354]);
     await sendCommand(`${createSmtpMessage(input)}\r\n.`, [250]);
     await sendCommand("QUIT", [221]);
+    console.log("[SMTP_SUCCESS]");
+  } catch (error) {
+    console.log("[SMTP_ERROR]", error instanceof Error ? error.message : String(error));
+    throw error;
   } finally {
     socket.end();
   }
