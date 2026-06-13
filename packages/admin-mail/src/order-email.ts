@@ -1,4 +1,4 @@
-import { getSmtpConfigFromEnv, sendSmtpMail } from "./smtp";
+import { Resend } from "resend";
 
 export type AdminOrderEmailItem = {
   productName: string;
@@ -38,12 +38,7 @@ export type SendAdminOrderEmailOptions = {
 };
 
 function getAdminOrderRecipient() {
-  return (
-    process.env.ADMIN_EMAIL_TO ||
-    process.env.ADMIN_EMAIL_OTP_RECIPIENT ||
-    process.env.ADMIN_EMAIL_FROM ||
-    (process.env.NODE_ENV === "production" ? null : "admin@dakshinkali.shop")
-  );
+  return process.env.ADMIN_EMAIL_TO || null;
 }
 
 function escapeHtml(value: string) {
@@ -69,6 +64,13 @@ function formatShippingAddress(order: AdminOrderEmailInput) {
     order.shippingCountry || "Nepal",
   );
   return lines.filter(Boolean).join("\n");
+}
+
+function getOrderEmailSubject(order: AdminOrderEmailInput) {
+  const firstProductName = order.items[0]?.productName?.trim();
+  return firstProductName
+    ? `New order ${firstProductName}`
+    : `New order #${order.orderNumber}`;
 }
 
 function buildOrderEmailText(
@@ -235,64 +237,48 @@ export async function sendAdminOrderEmail(
   order: AdminOrderEmailInput,
   options: SendAdminOrderEmailOptions,
 ) {
-  const provider = (process.env.ADMIN_EMAIL_PROVIDER || "mock").toLowerCase();
-  const isProduction = process.env.NODE_ENV === "production";
   const recipient = getAdminOrderRecipient();
 
   if (!recipient) {
     throw new Error("Admin order email recipient is not configured.");
   }
 
-  const subject = `New order #${order.orderNumber}`;
+  const subject = getOrderEmailSubject(order);
   const text = buildOrderEmailText(order, options);
   const html = buildOrderEmailHtml(order, options);
 
-  if (provider === "resend") {
-    const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.ADMIN_EMAIL_FROM;
-    if (!apiKey || !from) {
-      throw new Error("RESEND_API_KEY and ADMIN_EMAIL_FROM are required.");
-    }
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ from, to: recipient, subject, text, html }),
+  try {
+    console.log("[SMTP_ATTEMPT]", {
+      provider: "resend",
+      from:
+        process.env.RESEND_FROM ??
+        "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>",
+      to: recipient,
     });
-    if (!response.ok) {
-      throw new Error(`Resend failed with HTTP ${response.status}`);
-    }
-    return;
-  }
 
-  if (provider === "smtp") {
-    const smtp = getSmtpConfigFromEnv();
-    if (!smtp) {
-      throw new Error("SMTP_HOST, SMTP_USER, SMTP_PASS, and SMTP_FROM are required.");
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error("RESEND_API_KEY is required.");
     }
-    await sendSmtpMail({
-      ...smtp,
+
+    const resend = new Resend(apiKey);
+    const { error } = await resend.emails.send({
+      from:
+        process.env.RESEND_FROM ??
+        "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>",
       to: recipient,
       subject,
       text,
       html,
     });
-    return;
-  }
 
-  if (
-    provider === "mock" &&
-    (!isProduction || process.env.ALLOW_MOCK_EMAIL_IN_PRODUCTION === "true")
-  ) {
-    console.log("[ADMIN_ORDER_EMAIL_MOCK]", {
-      recipient,
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-    });
-    return;
-  }
+    if (error) {
+      throw new Error(error.message);
+    }
 
-  throw new Error("Admin email provider is not configured.");
+    console.log("[SMTP_SUCCESS]");
+  } catch (error) {
+    console.log("[SMTP_ERROR]", error instanceof Error ? error.message : String(error));
+    throw error;
+  }
 }
