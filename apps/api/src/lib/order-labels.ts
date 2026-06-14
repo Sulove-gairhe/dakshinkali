@@ -67,3 +67,18 @@ export function getAdminUrl(): string {
             : 'https://admin.dakshinkali.shop')
     );
 }
+
+export function getStorefrontUrl(): string {
+    if (process.env.NODE_ENV !== 'development') {
+        return process.env.NEXT_PUBLIC_WEB_URL || 'https://dakshinkali.shop';
+    }
+
+    if (process.env.NEXT_PUBLIC_WEB_URL && !process.env.NEXT_PUBLIC_WEB_URL.includes('localhost')) {
+        return process.env.NEXT_PUBLIC_WEB_URL;
+    }
+
+    return (
+        process.env.CUSTOMER_EMAIL_WEB_URL ||
+        'https://dakshinkali.shop'
+    );
+}

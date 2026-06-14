@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LayoutGrid, PackageSearch } from "lucide-react";
+import { LayoutGrid, PackageSearch, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmModal } from "./confirm-modal";
 import { ProductCard } from "./products/product-card";
@@ -126,6 +126,13 @@ export function ProductsList({
             <option value="live">Live</option>
           </select>
         </div>
+        <Link
+          href="/admin/products/import"
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        >
+          <Upload className="h-4 w-4" />
+          Import CSV
+        </Link>
         <Link
           href="/admin/products/new"
           className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"

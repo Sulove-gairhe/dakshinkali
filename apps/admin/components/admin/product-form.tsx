@@ -276,6 +276,32 @@ export function ProductForm({
                   className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                 />
               </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium">Model name</label>
+                  <input
+                    type="text"
+                    maxLength={200}
+                    value={form.modelName ?? ""}
+                    onChange={(e) =>
+                      updateForm((f) => ({ ...f, modelName: e.target.value }))
+                    }
+                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">SKU</label>
+                  <input
+                    type="text"
+                    maxLength={120}
+                    value={form.sku ?? ""}
+                    onChange={(e) =>
+                      updateForm((f) => ({ ...f, sku: e.target.value }))
+                    }
+                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
               <div>
                 <label className="text-sm font-medium">
                   Base description ({form.description.length}/2000)
@@ -345,6 +371,62 @@ export function ProductForm({
                     <option key={opt}>{opt}</option>
                   ))}
                 </select>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <label className="text-sm font-medium">
+                    Purchase price
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={form.purchasePrice ?? ""}
+                    onChange={(e) =>
+                      updateForm((f) => ({
+                        ...f,
+                        purchasePrice:
+                          e.target.value === "" ? null : Number(e.target.value),
+                      }))
+                    }
+                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">
+                    Wholesale price
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={form.wholesalePrice ?? ""}
+                    onChange={(e) =>
+                      updateForm((f) => ({
+                        ...f,
+                        wholesalePrice:
+                          e.target.value === "" ? null : Number(e.target.value),
+                      }))
+                    }
+                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Stock quantity</label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={form.stockQuantity ?? 0}
+                    onChange={(e) =>
+                      updateForm((f) => ({
+                        ...f,
+                        stockQuantity: Math.max(0, Number(e.target.value) || 0),
+                      }))
+                    }
+                    className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
+                  />
+                </div>
               </div>
             </div>
           )}

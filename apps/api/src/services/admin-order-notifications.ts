@@ -1,6 +1,11 @@
-import { sendAdminOrderEmail, type AdminOrderEmailInput } from '@dakshinkali/admin-mail';
+import {
+    sendAdminOrderEmail,
+    sendCustomerOrderEmail,
+    type AdminOrderEmailInput,
+    type CustomerOrderEmailData,
+} from '@dakshinkali/admin-mail';
 import { createSupabaseClient } from '@dakshinkali/database';
-import { getAdminUrl, orderStatusLabel, paymentMethodLabel, paymentStatusLabel } from '../lib/order-labels';
+import { getAdminUrl, getStorefrontUrl, orderStatusLabel, paymentMethodLabel, paymentStatusLabel } from '../lib/order-labels';
 import { OrderRepository } from '../modules/orders/order.repository';
 import type { OrderWithItemsEntity } from '../modules/orders/types';
 import { sendAdminOrderPush } from './admin-push-notifications';
@@ -58,6 +63,34 @@ function mapOrderToEmailInput(order: OrderWithItemsEntity): AdminOrderEmailInput
     };
 }
 
+function mapOrderToCustomerEmailInput(order: OrderWithItemsEntity): CustomerOrderEmailData {
+    return {
+        id: order.id,
+        order_number: order.orderNumber,
+        customer_name: order.customerName,
+        customer_email: order.customerEmail,
+        shipping_address_line1: order.shippingAddress.line1,
+        shipping_address_line2: order.shippingAddress.line2 ?? null,
+        shipping_city: order.shippingAddress.city,
+        shipping_state: order.shippingAddress.state,
+        shipping_country: order.shippingAddress.country ?? 'Nepal',
+        payment_method: order.paymentMethod,
+        total: order.total,
+        subtotal: order.subtotal,
+        shipping_cost: order.shippingCost,
+        discount_amount: order.discountAmount,
+        coupon_code: order.couponCode,
+        notes: order.notes,
+        created_at: order.createdAt.toISOString(),
+        items: order.items.map((item) => ({
+            product_name: item.productName,
+            quantity: item.quantity,
+            unit_price: item.unitPrice,
+            product_image_url: item.productImageUrl,
+        })),
+    };
+}
+
 async function loadOrderWithItems(orderId: string): Promise<OrderWithItemsEntity | null> {
     const supabase = createSupabaseClient();
     const repository = new OrderRepository(supabase);
@@ -82,7 +115,9 @@ export async function notifyAdminsOfNewOrder(orderId: string): Promise<void> {
         }
 
         const adminUrl = getAdminUrl();
+        const storefrontUrl = getStorefrontUrl();
         const emailInput = mapOrderToEmailInput(order);
+        const customerEmailInput = mapOrderToCustomerEmailInput(order);
 
         const results = await Promise.allSettled([
             sendAdminOrderEmail(emailInput, {
@@ -94,10 +129,12 @@ export async function notifyAdminsOfNewOrder(orderId: string): Promise<void> {
                 },
             }),
             sendAdminOrderPush(order),
+            sendCustomerOrderEmail(customerEmailInput, { storefrontUrl }),
         ]);
 
         console.log('[NOTIFY_EMAIL_RESULT]', results[0]);
         console.log('[NOTIFY_PUSH_RESULT]', results[1]);
+        console.log('[CUSTOMER_EMAIL_RESULT]', results[2]);
 
         const failures = results.filter((r) => r.status === 'rejected');
         if (failures.length > 0) {

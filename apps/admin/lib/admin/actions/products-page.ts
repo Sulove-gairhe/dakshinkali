@@ -35,8 +35,19 @@ function mapRow(row: Record<string, unknown>): AdminProductRecord {
   return {
     id: row.id as string,
     name: row.name as string,
+    model_name: (row.model_name as string) ?? null,
+    sku: (row.sku as string) ?? null,
     description: (row.description as string) ?? null,
     price: Number(row.price),
+    purchase_price:
+      row.purchase_price === null || row.purchase_price === undefined
+        ? null
+        : Number(row.purchase_price),
+    wholesale_price:
+      row.wholesale_price === null || row.wholesale_price === undefined
+        ? null
+        : Number(row.wholesale_price),
+    stock_quantity: Number(row.stock_quantity ?? 0),
     category: row.category as string,
     category_id: (row.category_id as string) ?? null,
     status: row.status as DbProductStatus,

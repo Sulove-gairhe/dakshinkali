@@ -1,6 +1,6 @@
 import { Express, NextFunction, Request, Response } from 'express';
-import { sendAdminOrderEmail } from '@dakshinkali/admin-mail';
-import { getAdminUrl, orderStatusLabel, paymentMethodLabel, paymentStatusLabel } from '../../lib/order-labels';
+import { sendAdminOrderEmail, sendCustomerOrderEmail } from '@dakshinkali/admin-mail';
+import { getAdminUrl, getStorefrontUrl, orderStatusLabel, paymentMethodLabel, paymentStatusLabel } from '../../lib/order-labels';
 import { notifyAdminsOfNewOrder } from '../../services/admin-order-notifications';
 
 const UUID_REGEX =
@@ -46,9 +46,7 @@ export function registerInternalOrderNotifyRoutes(app: Express): void {
                 return;
             }
 
-            void notifyAdminsOfNewOrder(orderId).catch((error) => {
-                console.error('[INTERNAL_ORDER_NOTIFY_ERROR]', { orderId, error });
-            });
+            void notifyAdminsOfNewOrder(orderId).catch(() => undefined);
 
             res.status(202).json({ ok: true });
         },
@@ -93,6 +91,57 @@ export function registerInternalOrderNotifyRoutes(app: Express): void {
                             paymentStatus: paymentStatusLabel('pending'),
                         },
                     },
+                );
+
+                res.json({ ok: true });
+            } catch (error) {
+                res.status(500).json({
+                    error: error instanceof Error ? error.message : 'Unknown error',
+                });
+            }
+        },
+    );
+
+    app.get(
+        '/api/v1/internal/test-customer-email',
+        validateNotifySecret,
+        async (_req: Request, res: Response) => {
+            try {
+                const recipient = process.env.ADMIN_EMAIL_TO;
+                if (!recipient) {
+                    res.status(500).json({ error: 'ADMIN_EMAIL_TO is not configured.' });
+                    return;
+                }
+
+                await sendCustomerOrderEmail(
+                    {
+                        id: '00000000-0000-4000-8000-000000000001',
+                        order_number: 'DK-TEST-CUSTOMER',
+                        customer_name: 'Test Customer',
+                        customer_email: recipient,
+                        shipping_address_line1: 'street no 12, Newroad/Pokhara',
+                        shipping_address_line2: null,
+                        shipping_city: 'Pokhara',
+                        shipping_state: 'Gandaki',
+                        shipping_country: 'Nepal',
+                        payment_method: 'cash_on_delivery',
+                        total: 92149,
+                        subtotal: 91999,
+                        shipping_cost: 150,
+                        discount_amount: 0,
+                        coupon_code: null,
+                        notes: null,
+                        created_at: new Date().toISOString(),
+                        items: [
+                            {
+                                product_name: 'Samsung 55 inch Smart TV',
+                                quantity: 1,
+                                unit_price: 91999,
+                                product_image_url: null,
+                            },
+                        ],
+                    },
+                    { storefrontUrl: getStorefrontUrl() },
                 );
 
                 res.json({ ok: true });

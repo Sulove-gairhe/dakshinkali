@@ -7,3 +7,8 @@ export type {
   AdminOrderEmailLabels,
   SendAdminOrderEmailOptions,
 } from "./src/order-email";
+export { sendCustomerOrderEmail } from "./src/customer-order-email";
+export type {
+  CustomerOrderEmailData,
+  SendCustomerOrderEmailOptions,
+} from "./src/customer-order-email";
