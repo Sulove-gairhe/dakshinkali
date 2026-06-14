@@ -90,8 +90,13 @@ export interface CategoryRecord {
 export interface AdminProductRecord {
   id: string;
   name: string;
+  model_name: string | null;
+  sku: string | null;
   description: string | null;
   price: number;
+  purchase_price: number | null;
+  wholesale_price: number | null;
+  stock_quantity: number;
   category: string;
   category_id: string | null;
   status: DbProductStatus;
@@ -106,8 +111,13 @@ export interface AdminProductRecord {
 export interface ProductFormState {
   id?: string;
   name: string;
+  modelName?: string;
+  sku?: string;
   description: string;
   price: number;
+  purchasePrice?: number | null;
+  wholesalePrice?: number | null;
+  stockQuantity?: number;
   categoryId: string;
   categoryName: string;
   status: DbProductStatus;

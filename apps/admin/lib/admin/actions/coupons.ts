@@ -147,7 +147,7 @@ export async function listCouponProducts() {
   const { supabase } = await requireAdminUser();
   const { data, error } = await supabase
     .from("products")
-    .select("id,name,category,category_id,price,status,publishing_status,images,storefront_data,description,created_at,updated_at,deleted_at")
+    .select("id,name,model_name,sku,category,category_id,price,purchase_price,wholesale_price,stock_quantity,status,publishing_status,images,storefront_data,description,created_at,updated_at,deleted_at")
     .is("deleted_at", null)
     .eq("publishing_status", "live")
     .order("name", { ascending: true })
@@ -157,6 +157,15 @@ export async function listCouponProducts() {
   return (data ?? []).map((row) => ({
     ...row,
     price: Number(row.price),
+    purchase_price:
+      row.purchase_price === null || row.purchase_price === undefined
+        ? null
+        : Number(row.purchase_price),
+    wholesale_price:
+      row.wholesale_price === null || row.wholesale_price === undefined
+        ? null
+        : Number(row.wholesale_price),
+    stock_quantity: Number(row.stock_quantity ?? 0),
     images: Array.isArray(row.images) ? row.images : [],
   })) as AdminProductRecord[];
 }

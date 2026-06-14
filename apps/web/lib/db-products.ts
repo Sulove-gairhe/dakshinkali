@@ -170,7 +170,6 @@ export async function fetchStorefrontProductsByKey(
       .maybeSingle();
 
     if (error) {
-      console.error("[storefront-products] supabase error", error.message);
       return [];
     }
 
@@ -185,8 +184,7 @@ export async function fetchStorefrontProductsByKey(
     }
 
     return products;
-  } catch (err) {
-    console.error("[storefront-products] unexpected error", err);
+  } catch {
     return [];
   }
 }
@@ -210,7 +208,6 @@ export async function fetchDbProducts(): Promise<StoreProduct[]> {
             .order("updated_at", { ascending: false });
 
         if (error) {
-            console.error("[db-products] Supabase query error:", error.message);
             return [];
         }
 
@@ -221,8 +218,7 @@ export async function fetchDbProducts(): Promise<StoreProduct[]> {
         }
 
         return products;
-    } catch (err) {
-        console.error("[db-products] Unexpected error:", err);
+    } catch {
         return [];
     }
 }
@@ -247,14 +243,12 @@ export async function fetchDbProductBySlug(
             .maybeSingle();
 
         if (error) {
-            console.error("[db-products] Supabase query error:", error.message);
             return null;
         }
 
         if (!data) return null;
         return mapRowToStoreProduct(data as DbProductRow);
-    } catch (err) {
-        console.error("[db-products] Unexpected error:", err);
+    } catch {
         return null;
     }
 }
@@ -282,13 +276,11 @@ export async function fetchDbCategories(): Promise<DbCategory[]> {
             .order("name", { ascending: true });
 
         if (error) {
-            console.error("[db-products] Categories query error:", error.message);
             return [];
         }
 
         return (data ?? []) as DbCategory[];
-    } catch (err) {
-        console.error("[db-products] Unexpected error fetching categories:", err);
+    } catch {
         return [];
     }
 }

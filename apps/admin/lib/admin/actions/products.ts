@@ -22,8 +22,13 @@ import type {
 const saveProductSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1).max(200),
+  modelName: z.string().max(200).optional().nullable(),
+  sku: z.string().max(120).optional().nullable(),
   description: z.string().max(2000).optional().nullable(),
   price: z.number().positive(),
+  purchasePrice: z.number().nonnegative().optional().nullable(),
+  wholesalePrice: z.number().nonnegative().optional().nullable(),
+  stockQuantity: z.number().int().min(0).optional(),
   categoryId: z.string().uuid(),
   status: z.enum(["active", "inactive", "out_of_stock", "low_stock"]),
   publishingStatus: z.enum(["draft", "live"]),
@@ -49,8 +54,19 @@ function mapRow(row: Record<string, unknown>): AdminProductRecord {
   return {
     id: row.id as string,
     name: row.name as string,
+    model_name: (row.model_name as string) ?? null,
+    sku: (row.sku as string) ?? null,
     description: (row.description as string) ?? null,
     price: Number(row.price),
+    purchase_price:
+      row.purchase_price === null || row.purchase_price === undefined
+        ? null
+        : Number(row.purchase_price),
+    wholesale_price:
+      row.wholesale_price === null || row.wholesale_price === undefined
+        ? null
+        : Number(row.wholesale_price),
+    stock_quantity: Number(row.stock_quantity ?? 0),
     category: row.category as string,
     category_id: (row.category_id as string) ?? null,
     status: row.status as DbProductStatus,
@@ -97,8 +113,13 @@ export async function createDraftProduct(categoryId?: string) {
     .from("products")
     .insert({
       name: draftName,
+      model_name: null,
+      sku: null,
       description: null,
       price: 1,
+      purchase_price: null,
+      wholesale_price: null,
+      stock_quantity: 0,
       category: category.name,
       category_id: resolvedCategoryId,
       status: "active",
@@ -238,8 +259,13 @@ export async function saveProduct(
   const parsed = saveProductSchema.parse({
     id: payload.id,
     name: payload.name,
+    modelName: payload.modelName || null,
+    sku: payload.sku || null,
     description: payload.description || null,
     price: payload.price,
+    purchasePrice: payload.purchasePrice ?? null,
+    wholesalePrice: payload.wholesalePrice ?? null,
+    stockQuantity: payload.stockQuantity ?? 0,
     categoryId: payload.categoryId,
     status: payload.status,
     publishingStatus,
@@ -274,8 +300,13 @@ export async function saveProduct(
 
   const row = {
     name: parsed.name,
+    model_name: parsed.modelName?.trim() || null,
+    sku: parsed.sku?.trim() || null,
     description: parsed.description,
     price: parsed.price,
+    purchase_price: parsed.purchasePrice ?? null,
+    wholesale_price: parsed.wholesalePrice ?? null,
+    stock_quantity: parsed.stockQuantity ?? 0,
     category: category.name,
     category_id: parsed.categoryId,
     status: parsed.status,
@@ -418,8 +449,13 @@ export async function productToFormState(product: AdminProductRecord): Promise<P
   return {
     id: product.id,
     name: product.name,
+    modelName: product.model_name ?? "",
+    sku: product.sku ?? "",
     description: product.description ?? "",
     price: product.price,
+    purchasePrice: product.purchase_price,
+    wholesalePrice: product.wholesale_price,
+    stockQuantity: product.stock_quantity,
     categoryId: product.category_id ?? "",
     categoryName: product.category,
     status: product.status,
