@@ -41,7 +41,10 @@ export function validateImportRows(
     if (!isMissingOrNonNegative(row.wholesalePrice)) {
       errors.push("Wholesale Price must be a number greater than or equal to 0");
     }
-    if (!Number.isInteger(row.quantity)) {
+    if (
+      !Number.isInteger(row.quantity) &&
+      !errors.some((error) => error.startsWith("Quantity "))
+    ) {
       errors.push("Quantity must be a whole number");
     }
     if (!isMissingOrNonNegative(row.stockValue)) {

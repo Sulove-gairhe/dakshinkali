@@ -7,6 +7,8 @@ import { slugifyProductName } from "@/lib/admin/utils";
 import { checkSlugAvailable } from "@/lib/admin/actions/products";
 import type { ProductFormState, StorefrontData } from "@/lib/admin/types";
 
+const DESCRIPTION_LABEL_CLASS = "text-sm font-medium text-emerald-700";
+
 function Toggle({
   label,
   checked,
@@ -97,7 +99,7 @@ export function StorefrontPresentationTab({
       </div>
 
       <div>
-        <label className="text-sm font-medium text-gray-700">
+        <label className={DESCRIPTION_LABEL_CLASS}>
           Short description ({(sf.shortDescription ?? "").length}/200)
         </label>
         <textarea
