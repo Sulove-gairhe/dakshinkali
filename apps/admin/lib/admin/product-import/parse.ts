@@ -55,9 +55,30 @@ function parseMoney(value: string | undefined): number | null {
   return Number.isFinite(parsed) ? parsed : Number.NaN;
 }
 
-function parseQuantity(value: string | undefined): number {
-  const parsed = Number((value ?? "").trim());
-  return Number.isInteger(parsed) ? parsed : Number.NaN;
+// Samples: "1 PCS" -> 1, "1.00 PCS" -> 1, "2 pcs" -> 2,
+// "0 PCS" -> 0 and skipped later, "-2 PCS" -> -2 and skipped later,
+// "1.5 PCS" -> invalid because stock_quantity is an integer.
+function parseQuantity(value: string | undefined): {
+  value: number;
+  error?: string;
+} {
+  const raw = String(value ?? "").trim();
+  if (!raw) return { value: Number.NaN, error: "Quantity is required" };
+
+  const cleaned = raw
+    .replace(/,/g, "")
+    .replace(/\b(pcs|pc|piece|pieces)\b/gi, "")
+    .trim();
+  const numeric = Number(cleaned);
+
+  if (!Number.isFinite(numeric)) {
+    return { value: Number.NaN, error: "Quantity must be a valid number" };
+  }
+  if (!Number.isInteger(numeric)) {
+    return { value: Number.NaN, error: "Quantity must be a whole number" };
+  }
+
+  return { value: numeric };
 }
 
 function parseModelName(itemName: string): string | null {
@@ -106,7 +127,8 @@ export function parseProductImportCsv(text: string): {
     const purchasePrice = parseMoney(cell(record, "Purchase Price"));
     const mrp = parseMoney(cell(record, "MRP"));
     const wholesalePrice = parseMoney(cell(record, "Wholesale Price"));
-    const quantity = parseQuantity(cell(record, "Quantity"));
+    const parsedQuantity = parseQuantity(cell(record, "Quantity"));
+    const quantity = parsedQuantity.value;
     const stockValue = parseMoney(cell(record, "Stock Value"));
     const computedStockValue =
       Number.isFinite(purchasePrice) && Number.isFinite(quantity)
@@ -126,7 +148,7 @@ export function parseProductImportCsv(text: string): {
       quantity,
       stockValue,
       computedStockValue,
-      errors: [],
+      errors: parsedQuantity.error ? [parsedQuantity.error] : [],
       warnings: [],
     };
   });

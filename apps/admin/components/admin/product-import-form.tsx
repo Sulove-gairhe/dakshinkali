@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -16,6 +17,7 @@ import type {
 import { ProductImportPreviewTable } from "./product-import-preview";
 
 export function ProductImportForm() {
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<ProductImportPreview | null>(null);
   const [summary, setSummary] = useState<ProductImportCommitSummary | null>(null);
@@ -59,6 +61,8 @@ export function ProductImportForm() {
       toast.success(
         `Imported ${result.createdLive + result.updatedLive} live rows`,
       );
+      router.push("/admin/products");
+      router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Import failed");
     } finally {

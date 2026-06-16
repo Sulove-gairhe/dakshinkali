@@ -42,6 +42,8 @@ const TABS = [
 type Tab = (typeof TABS)[number];
 
 const STATUS_OPTIONS = ["Active", "Low Stock", "Out of Stock", "Inactive"];
+const TITLE_LABEL_CLASS = "text-sm font-medium text-primary";
+const DESCRIPTION_LABEL_CLASS = "text-sm font-medium text-emerald-700";
 
 function statusLabel(status: ProductFormState["status"]) {
   switch (status) {
@@ -265,7 +267,7 @@ export function ProductForm({
           {tab === "Core Details" && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium">Product name *</label>
+                <label className={TITLE_LABEL_CLASS}>Product name *</label>
                 <input
                   type="text"
                   maxLength={200}
@@ -303,7 +305,7 @@ export function ProductForm({
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">
+                <label className={DESCRIPTION_LABEL_CLASS}>
                   Base description ({form.description.length}/2000)
                 </label>
                 <textarea
@@ -613,7 +615,7 @@ export function ProductForm({
                     Preview
                   </h4>
                   <div>
-                    <label className="text-sm font-medium">SEO title</label>
+                    <label className={TITLE_LABEL_CLASS}>SEO title</label>
                     <div className="relative mt-1">
                       <input
                         type="text"
@@ -640,7 +642,7 @@ export function ProductForm({
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">
+                    <label className={DESCRIPTION_LABEL_CLASS}>
                       SEO description
                     </label>
                     <div className="relative mt-1">
@@ -747,7 +749,7 @@ export function ProductForm({
                 </p>
               </div>
               <div>
-                <label className="text-sm font-medium">SEO title</label>
+                <label className={TITLE_LABEL_CLASS}>SEO title</label>
                 <input
                   type="text"
                   value={form.storefrontData.seoTitle ?? ""}
@@ -764,7 +766,7 @@ export function ProductForm({
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">SEO description</label>
+                <label className={DESCRIPTION_LABEL_CLASS}>SEO description</label>
                 <textarea
                   rows={3}
                   value={form.storefrontData.seoDescription ?? ""}
