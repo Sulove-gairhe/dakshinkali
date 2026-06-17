@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { requireAdminUser } from "@/lib/admin/auth-server";
+import {
+  canEditProductSearchVisibility,
+  requireAdminUser,
+} from "@/lib/admin/auth-server";
 import {
   normalizeStorefrontData,
   slugifyProductName,
@@ -18,6 +21,16 @@ import type {
   PublishingStatus,
   StorefrontData,
 } from "@/lib/admin/types";
+
+const SEARCH_VISIBILITY_STOREFRONT_KEYS = [
+  "searchTerms",
+  "seoTitle",
+  "seoDescription",
+] as const;
+
+const STAFF_PRODUCT_STOREFRONT_KEYS = new Set<string>(
+  SEARCH_VISIBILITY_STOREFRONT_KEYS,
+);
 
 const saveProductSchema = z.object({
   id: z.string().uuid().optional(),
@@ -43,6 +56,22 @@ const saveProductSchema = z.object({
   ),
   storefrontData: z.record(z.unknown()),
 });
+
+function assertCanSaveStorefrontDataForRole(
+  role: string | null | undefined,
+  storefrontData: StorefrontData,
+) {
+  if (canEditProductSearchVisibility(role)) {
+    return;
+  }
+
+  const disallowedStorefrontKeys = Object.keys(storefrontData).filter((key) =>
+    STAFF_PRODUCT_STOREFRONT_KEYS.has(key),
+  );
+  if (disallowedStorefrontKeys.length > 0) {
+    throw new Error("Staff cannot update Search & Visibility fields");
+  }
+}
 
 function mapRow(row: Record<string, unknown>): AdminProductRecord {
   const images = Array.isArray(row.images)
@@ -231,9 +260,11 @@ export async function saveProduct(
   payload: ProductFormState,
   options: { publishingStatus?: PublishingStatus; validateLive?: boolean } = {},
 ) {
-  const { supabase } = await requireAdminUser();
+  const { supabase, profile } = await requireAdminUser();
   const publishingStatus =
     options.publishingStatus ?? payload.publishingStatus ?? "draft";
+
+  assertCanSaveStorefrontDataForRole(profile?.role, payload.storefrontData);
 
   let storefrontData = normalizeStorefrontData(payload.storefrontData);
   if (!storefrontData.slug?.trim()) {

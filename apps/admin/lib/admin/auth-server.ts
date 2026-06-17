@@ -38,3 +38,9 @@ export async function requireSuperAdmin() {
 
   return session;
 }
+
+export function canEditProductSearchVisibility(
+  role: string | null | undefined,
+) {
+  return isSuperAdmin(role);
+}

@@ -70,6 +70,21 @@ export function ProductImportForm() {
     }
   }
 
+  function handleBrandChange(rowNumber: number, brand: string) {
+    setPreview((current) => {
+      if (!current) return current;
+
+      return {
+        ...current,
+        rows: current.rows.map((row) =>
+          row.rowNumber === rowNumber
+            ? { ...row, brandGuess: brand || null }
+            : row,
+        ),
+      };
+    });
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -116,6 +131,7 @@ export function ProductImportForm() {
           committing={committing}
           summary={summary}
           onCommit={() => void handleCommit()}
+          onBrandChange={handleBrandChange}
         />
       ) : null}
     </div>
@@ -131,6 +147,7 @@ function sanitizeRowForCommit(row: ProductImportPreviewRow): ProductImportPrevie
     ...row,
     salesPrice: finiteOrNull(row.salesPrice),
     purchasePrice: finiteOrNull(row.purchasePrice),
+    brandGuess: row.brandGuess?.trim() || null,
     mrp: finiteOrNull(row.mrp),
     wholesalePrice: finiteOrNull(row.wholesalePrice),
     quantity: Number.isFinite(row.quantity) ? row.quantity : 0,

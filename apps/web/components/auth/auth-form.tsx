@@ -8,6 +8,7 @@ import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useAuth } from "@dakshinkali/auth";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { requestCustomerPasswordReset } from "@/lib/customer-password-reset";
 import {
   getAuthCallbackUrl,
   getEmailRedirectUrl,
@@ -229,23 +230,18 @@ export function AuthForm({ mode, initialError }: AuthFormProps) {
     setSubmitting(true);
     setMessage(null);
 
-    if (!supabase) {
-      setErrorMessage("Sign in is not available right now.");
-      return;
-    }
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: getAuthCallbackUrl("/login"),
-    });
+    const formData = new FormData();
+    formData.set("email", email);
+    const result = await requestCustomerPasswordReset(formData);
 
     setSubmitting(false);
 
-    if (error) {
-      setErrorMessage(error.message);
+    if (result.status === "error") {
+      setErrorMessage(result.message);
       return;
     }
 
-    setSuccessMessage("Password reset link sent. Check your email inbox.");
+    setSuccessMessage(result.message);
   }
 
   return (

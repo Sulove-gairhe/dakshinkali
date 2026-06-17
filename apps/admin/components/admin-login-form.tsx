@@ -49,14 +49,14 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#080a0f] text-white">
+    <main className="min-h-dvh overflow-x-hidden bg-[#080a0f] text-white">
       <div className="absolute inset-0 bg-[linear-gradient(rgba(53,154,207,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(53,154,207,0.10)_1px,transparent_1px)] bg-[size:44px_44px] opacity-25" />
       <div className="absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_50%_0%,rgba(53,154,207,0.24),transparent_62%)]" />
 
-      <section className="relative mx-auto grid min-h-screen w-full max-w-2xl place-items-center px-5 py-10">
-        <div className="w-full rounded-lg border border-white/10 bg-[#10131a]/95 p-6 shadow-2xl shadow-black/50 backdrop-blur sm:p-9">
+      <section className="relative mx-auto grid min-h-dvh w-full max-w-2xl place-items-center px-4 py-6 sm:px-5 sm:py-10">
+        <div className="w-full rounded-lg border border-white/10 bg-[#10131a]/95 p-5 shadow-2xl shadow-black/50 backdrop-blur sm:p-9">
           <div className="mb-8 flex items-start justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium text-accent">
                 Dakshinkali Admin
               </p>
@@ -67,15 +67,24 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
                 Secure access for authorized staff only.
               </p>
             </div>
-            <div className="grid size-11 place-items-center rounded-lg border border-primary/20 bg-primary/10 text-accent">
+            <div className="grid size-11 shrink-0 place-items-center rounded-lg border border-primary/20 bg-primary/10 text-accent">
               <Lock className="size-5" />
             </div>
           </div>
 
           <div className="mb-7 grid grid-cols-3 gap-3">
-            <IconBadge title="Secure password login" icon={<KeyRound className="size-5" />} />
-            <IconBadge title="Admin or staff account" icon={<UserCheck className="size-5" />} />
-            <IconBadge title="Protected access" icon={<ShieldCheck className="size-5" />} />
+            <IconBadge
+              title="Secure password login"
+              icon={<KeyRound className="size-5" />}
+            />
+            <IconBadge
+              title="Admin or staff account"
+              icon={<UserCheck className="size-5" />}
+            />
+            <IconBadge
+              title="Protected access"
+              icon={<ShieldCheck className="size-5" />}
+            />
           </div>
 
           <form
@@ -96,7 +105,15 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
             </label>
 
             <label className="grid gap-2">
-              <span className="text-sm text-slate-300">Password</span>
+              <span className="flex items-center justify-between gap-3">
+                <span className="text-sm text-slate-300">Password</span>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-accent transition hover:text-primary-foreground/90"
+                >
+                  Forgot password?
+                </Link>
+              </span>
               <span className="relative block">
                 <input
                   name="password"
@@ -140,22 +157,27 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
 
           <Link
             href="/admin/setup-access"
-            className="mt-5 flex items-center gap-3 rounded-lg border border-emerald-300/20 bg-emerald-300/10 p-4 text-sm text-emerald-50 transition hover:border-emerald-200/40 hover:bg-emerald-300/15"
+            className="mt-5 flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-slate-200 transition hover:border-emerald-300/30 hover:bg-emerald-300/10 hover:text-emerald-50"
           >
-            <span className="grid size-9 place-items-center rounded-lg bg-emerald-300/15 text-emerald-200">
-              <UserPlus className="size-4" />
+            <span className="grid size-8 shrink-0 place-items-center rounded-md bg-emerald-300/10 text-emerald-200">
+              <UserPlus className="size-3.5" />
             </span>
-            <span>
-              <span className="block font-semibold">Setup granted staff access</span>
-              <span className="mt-0.5 block text-slate-300">
-                For emails already added by an administrator.
+            <span className="min-w-0">
+              <span className="block font-semibold leading-5">
+                Create a new account
+              </span>
+              <span className="mt-0.5 block text-xs leading-5 text-slate-400">
+                For staff and admin users
               </span>
             </span>
           </Link>
 
           <p className="mt-5 text-sm text-slate-400">
             Storefront:{" "}
-            <Link className="text-accent hover:text-primary-foreground/90" href={webUrl}>
+            <Link
+              className="text-accent hover:text-primary-foreground/90"
+              href={webUrl}
+            >
               Back to shop
             </Link>
           </p>
@@ -165,13 +187,7 @@ export function AdminLoginForm({ initialError }: { initialError?: string }) {
   );
 }
 
-function IconBadge({
-  title,
-  icon,
-}: {
-  title: string;
-  icon: ReactNode;
-}) {
+function IconBadge({ title, icon }: { title: string; icon: ReactNode }) {
   return (
     <div
       title={title}

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { AdminLayoutShell } from "@/components/admin/admin-layout-shell";
 import { ProductForm } from "@/components/admin/product-form";
+import { requireAdminUser } from "@/lib/admin/auth-server";
 import { listCategories } from "@/lib/admin/actions/categories";
 import {
   getAdminProduct,
@@ -14,7 +15,8 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
   try {
-    const [product, categories] = await Promise.all([
+    const [{ profile }, product, categories] = await Promise.all([
+      requireAdminUser(),
       getAdminProduct(id),
       listCategories(false),
     ]);
@@ -24,6 +26,7 @@ export default async function EditProductPage({
         <ProductForm
           initial={await productToFormState(product)}
           categories={categories}
+          currentUserRole={profile?.role}
         />
       </AdminLayoutShell>
     );

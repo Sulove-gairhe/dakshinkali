@@ -15,11 +15,13 @@ export function ProductImportPreviewTable({
   committing,
   summary,
   onCommit,
+  onBrandChange,
 }: {
   preview: ProductImportPreview;
   committing: boolean;
   summary: ProductImportCommitSummary | null;
   onCommit: () => void;
+  onBrandChange: (rowNumber: number, brand: string) => void;
 }) {
   const validCount = preview.rows.filter((row) => row.valid).length;
 
@@ -76,7 +78,19 @@ export function ProductImportPreviewTable({
                 <td className="px-3 py-2 font-medium">{row.rowNumber}</td>
                 <td className="max-w-[220px] px-3 py-2">{row.itemName}</td>
                 <td className="px-3 py-2">{row.modelName ?? "—"}</td>
-                <td className="px-3 py-2">{row.brandGuess ?? "—"}</td>
+                <td className="min-w-[160px] px-3 py-2">
+                  <input
+                    type="text"
+                    value={row.brandGuess ?? ""}
+                    onChange={(event) =>
+                      onBrandChange(row.rowNumber, event.target.value)
+                    }
+                    disabled={committing}
+                    aria-label={`Brand for row ${row.rowNumber}`}
+                    placeholder="Brand"
+                    className="h-9 w-full rounded-md border border-gray-200 bg-white px-2 text-xs text-gray-800 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:bg-gray-50 disabled:text-gray-500"
+                  />
+                </td>
                 <td className="px-3 py-2">{formatNumber(row.salesPrice)}</td>
                 <td className="px-3 py-2">{formatNumber(row.purchasePrice)}</td>
                 <td className="px-3 py-2">{formatNumber(row.wholesalePrice)}</td>
