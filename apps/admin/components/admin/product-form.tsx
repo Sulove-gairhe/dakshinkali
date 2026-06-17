@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
@@ -13,6 +13,7 @@ import { StoreProductPreviewPanel } from "./store-product-preview-panel";
 import { StorefrontPresentationTab } from "./storefront-presentation-tab";
 import { StringArrayEditor } from "./string-array-editor";
 import { ConfirmModal } from "./confirm-modal";
+import { isSuperAdmin } from "@/lib/auth-urls";
 import {
   formatNprPrice,
   mapStoreStatusToDbStatus,
@@ -58,14 +59,34 @@ function statusLabel(status: ProductFormState["status"]) {
   }
 }
 
+function omitSearchVisibilityStorefrontData(
+  storefrontData: ProductFormState["storefrontData"],
+) {
+  const next = { ...storefrontData };
+  delete next.searchTerms;
+  delete next.seoTitle;
+  delete next.seoDescription;
+  return next;
+}
+
 export function ProductForm({
   initial,
   categories,
+  currentUserRole,
 }: {
   initial: ProductFormState;
   categories: CategoryRecord[];
+  currentUserRole: string | null | undefined;
 }) {
   const router = useRouter();
+  const canEditSearchVisibility = isSuperAdmin(currentUserRole);
+  const availableTabs = useMemo<readonly Tab[]>(
+    () =>
+      canEditSearchVisibility
+        ? TABS
+        : TABS.filter((label) => label !== "Search & Visibility"),
+    [canEditSearchVisibility],
+  );
   const [form, setForm] = useState<ProductFormState>(initial);
   const [dirty, setDirty] = useState(false);
   const [tab, setTab] = useState<Tab>("Core Details");
@@ -91,6 +112,12 @@ export function ProductForm({
   }, []);
 
   useEffect(() => {
+    if (!availableTabs.includes(tab)) {
+      setTab("Core Details");
+    }
+  }, [availableTabs, tab]);
+
+  useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (dirty) {
         e.preventDefault();
@@ -110,7 +137,9 @@ export function ProductForm({
       const payload: ProductFormState = {
         ...form,
         storefrontData: normalizeStorefrontData({
-          ...form.storefrontData,
+          ...(canEditSearchVisibility
+            ? form.storefrontData
+            : omitSearchVisibilityStorefrontData(form.storefrontData)),
           slug:
             form.storefrontData.slug?.trim() ||
             slugifyProductName(form.name),
@@ -246,7 +275,7 @@ export function ProductForm({
             </div>
           </div>
           <div className="mt-3 flex gap-1 overflow-x-auto pb-1">
-            {TABS.map((label) => (
+            {availableTabs.map((label) => (
               <button
                 key={label}
                 type="button"
@@ -475,7 +504,7 @@ export function ProductForm({
             />
           )}
 
-          {tab === "Search & Visibility" && (
+          {canEditSearchVisibility && tab === "Search & Visibility" && (
             <div className="space-y-6">
               <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
                 <h3 className="text-sm font-semibold text-primary">

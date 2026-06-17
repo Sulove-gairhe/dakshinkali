@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   Eye,
@@ -21,7 +20,6 @@ import {
 type SetupStep = "credentials" | "otp";
 
 export function AdminSetupAccessForm() {
-  const router = useRouter();
   const [step, setStep] = useState<SetupStep>("credentials");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -31,6 +29,10 @@ export function AdminSetupAccessForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  function completeSetup(redirectTo?: string) {
+    window.location.assign(redirectTo ?? "/admin");
+  }
 
   async function handleCredentialsSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -47,8 +49,7 @@ export function AdminSetupAccessForm() {
 
     if (result.status === "success") {
       toast.success(result.message);
-      router.replace(result.redirectTo ?? "/admin");
-      router.refresh();
+      completeSetup(result.redirectTo);
       return;
     }
 
@@ -82,8 +83,7 @@ export function AdminSetupAccessForm() {
     }
 
     toast.success(result.message);
-    router.replace(result.redirectTo ?? "/admin");
-    router.refresh();
+    completeSetup(result.redirectTo);
   }
 
   return (

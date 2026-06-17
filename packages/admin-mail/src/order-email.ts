@@ -248,11 +248,11 @@ export async function sendAdminOrderEmail(
   const html = buildOrderEmailHtml(order, options);
 
   try {
-    console.log("[SMTP_ATTEMPT]", {
+    console.log("[RESEND_ATTEMPT]", {
       provider: "resend",
       from:
         process.env.RESEND_FROM ??
-        "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>",
+        "Dakshinkali Electro <noreply@dakshinkali.shop>",
       to: recipient,
     });
 
@@ -265,7 +265,7 @@ export async function sendAdminOrderEmail(
     const { error } = await resend.emails.send({
       from:
         process.env.RESEND_FROM ??
-        "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>",
+        "Dakshinkali Electro <noreply@dakshinkali.shop>",
       to: recipient,
       subject,
       text,
@@ -276,9 +276,9 @@ export async function sendAdminOrderEmail(
       throw new Error(error.message);
     }
 
-    console.log("[SMTP_SUCCESS]");
+    console.log("[RESEND_SUCCESS]");
   } catch (error) {
-    console.log("[SMTP_ERROR]", error instanceof Error ? error.message : String(error));
+    console.log("[RESEND_ERROR]", error instanceof Error ? error.message : String(error));
     throw error;
   }
 }

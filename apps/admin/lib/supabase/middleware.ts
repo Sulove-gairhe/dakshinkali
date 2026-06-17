@@ -5,7 +5,13 @@ import {
   isAdminRole,
 } from "@/lib/auth-urls";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback", "/admin/setup-access"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/forgot-password",
+  "/reset-password",
+  "/auth/callback",
+  "/admin/setup-access",
+];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some(
@@ -57,7 +63,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (isPublicPath(pathname)) {
-    if (user && pathname === "/login") {
+    if (
+      user &&
+      (pathname === "/login" ||
+        pathname === "/forgot-password" ||
+        pathname === "/admin/setup-access")
+    ) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("role")

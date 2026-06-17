@@ -4,10 +4,12 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service-server";
-import { isAdminRole, type UserRole } from "@/lib/auth-urls";
+import { getAdminUrl, isAdminRole, type UserRole } from "@/lib/auth-urls";
 import { requireSuperAdmin } from "@/lib/admin/auth-server";
 import {
+  consumeAdminPasswordResetChallenge,
   createAdminEmailOtpChallenge,
+  createAdminPasswordResetChallenge,
   verifyAdminEmailOtpChallenge,
 } from "@/lib/admin/email-otp";
 
@@ -47,6 +49,10 @@ export type AdminSetupAccessResult =
   | { status: "verify_email"; email: string; message: string }
   | { status: "error"; message: string };
 
+export type AdminPasswordResetResult =
+  | { status: "success"; message: string; redirectTo?: string }
+  | { status: "error"; message: string };
+
 export type AdminMember = {
   id: string;
   email: string;
@@ -84,6 +90,22 @@ const setupOtpSchema = setupAccessBaseSchema
   .refine((value) => value.password === value.confirmPassword, {
     path: ["confirmPassword"],
     message: "Credentials don't match",
+  });
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+const resetPasswordSchema = z
+  .object({
+    email: z.string().email(),
+    token: z.string().min(20, "Password reset link is invalid or expired."),
+    password: z.string().min(8, "Password must be at least 8 characters."),
+    confirmPassword: z.string(),
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match.",
   });
 
 const managedEmailSchema = z.object({
@@ -205,6 +227,25 @@ async function fetchAccessGrant(email: string) {
     username: normalizeUsername(data.username),
     role: data.role as "staff" | "admin",
   } satisfies AdminAccessGrant;
+}
+
+async function fetchAdminProfileByEmail(email: string) {
+  const supabase = tryCreateServiceClient();
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email, username, full_name, role, created_at")
+    .eq("email", normalizeEmail(email))
+    .maybeSingle();
+
+  if (error || !data || !isAdminRole(data.role)) {
+    return null;
+  }
+
+  return data as AdminProfile;
 }
 
 async function findSetupCredentialConflict(input: {
@@ -434,6 +475,92 @@ export async function adminPasswordSignIn(
   }
 
   return { status: "success", redirectTo: "/admin" };
+}
+
+export async function requestAdminPasswordReset(
+  formData: FormData,
+): Promise<AdminPasswordResetResult> {
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get("email"),
+  });
+
+  if (!parsed.success) {
+    return { status: "error", message: "Enter a valid email address." };
+  }
+
+  const email = normalizeEmail(parsed.data.email);
+  const profile = await fetchAdminProfileByEmail(email);
+  if (!profile) {
+    return { status: "error", message: "No account exists for that email." };
+  }
+
+  try {
+    const metadata = await getRequestMetadata();
+    await createAdminPasswordResetChallenge({
+      email,
+      resetUrlBase: `${getAdminUrl()}/reset-password`,
+      ...metadata,
+    });
+  } catch (error) {
+    console.warn("[ADMIN_PASSWORD_RESET_SEND_FAILED]", error);
+    return { status: "error", message: "Unable to send password reset email." };
+  }
+
+  return { status: "success", message: "Password reset link has been sent." };
+}
+
+export async function resetAdminPassword(
+  formData: FormData,
+): Promise<AdminPasswordResetResult> {
+  const parsed = resetPasswordSchema.safeParse({
+    email: formData.get("email"),
+    token: formData.get("token"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message:
+        parsed.error.errors[0]?.message ?? "Password reset link is invalid or expired.",
+    };
+  }
+
+  const email = normalizeEmail(parsed.data.email);
+  const profile = await fetchAdminProfileByEmail(email);
+  if (!profile) {
+    return { status: "error", message: "Password reset link is invalid or expired." };
+  }
+
+  const verified = await consumeAdminPasswordResetChallenge({
+    email,
+    token: parsed.data.token,
+  });
+
+  if (!verified) {
+    return { status: "error", message: "Password reset link is invalid or expired." };
+  }
+
+  const supabase = tryCreateServiceClient();
+  if (!supabase) {
+    return { status: "error", message: "Admin service role is not configured." };
+  }
+
+  const { error } = await supabase.auth.admin.updateUserById(profile.id, {
+    password: parsed.data.password,
+  });
+
+  if (error) {
+    console.warn("[ADMIN_PASSWORD_RESET_UPDATE_FAILED]", error);
+    return { status: "error", message: "Unable to update password." };
+  }
+
+  return {
+    status: "success",
+    message: "Password updated. You can now sign in.",
+    redirectTo: "/login",
+  };
 }
 
 export async function beginAdminSetupAccess(
