@@ -252,7 +252,7 @@ export async function sendAdminOrderEmail(
       provider: "resend",
       from:
         process.env.RESEND_FROM ??
-        "Dakshinkali Electro <noreply@dakshinkali.shop>",
+        "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>",
       to: recipient,
     });
 
@@ -265,7 +265,7 @@ export async function sendAdminOrderEmail(
     const { error } = await resend.emails.send({
       from:
         process.env.RESEND_FROM ??
-        "Dakshinkali Electro <noreply@dakshinkali.shop>",
+        "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>",
       to: recipient,
       subject,
       text,
