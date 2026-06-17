@@ -9,7 +9,8 @@ import { z } from "zod";
 
 const RESET_PURPOSE = "customer_password_reset";
 const RESET_TTL_MINUTES = 30;
-const RESET_FROM = "Dakshinkali Electro <noreply@dakshinkali.shop>";
+const RESET_FROM =
+  "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>";
 
 export type CustomerPasswordResetResult =
   | { status: "success"; message: string; redirectTo?: string }
@@ -195,7 +196,7 @@ function buildPasswordResetHtml(resetUrl: string) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; background:#ffffff; border:1px solid #e6edf5; border-radius:16px; overflow:hidden; box-shadow:0 18px 45px rgba(23,32,51,0.08);">
             <tr>
               <td style="background:#0f6b8f; padding:28px 32px;">
-                <p style="margin:0; color:#c9f2ff; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">Dakshinkali Electro</p>
+                <p style="margin:0; color:#c9f2ff; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">Dakshinkali Electronics Centre</p>
                 <h1 style="margin:10px 0 0; color:#ffffff; font-size:24px; line-height:1.25; font-weight:700;">Create a new password</h1>
               </td>
             </tr>

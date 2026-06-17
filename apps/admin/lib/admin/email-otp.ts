@@ -9,7 +9,8 @@ const OTP_TTL_MINUTES = 5;
 const OTP_DIGITS = 6;
 const OTP_MAX_ATTEMPTS = 5;
 const PASSWORD_RESET_TTL_MINUTES = 30;
-const ADMIN_RESEND_FROM = "Dakshinkali Electro <noreply@dakshinkali.shop>";
+const ADMIN_RESEND_FROM =
+  "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>";
 
 export type CreateAdminEmailOtpInput = {
   email: string;

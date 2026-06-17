@@ -31,7 +31,7 @@ export type SendCustomerOrderEmailOptions = {
 };
 
 const DEFAULT_FROM =
-  "Dakshinkali Electro <noreply@dakshinkali.shop>";
+  "Dakshinkali Electronics Centre <noreply@dakshinkali.shop>";
 const PRODUCTION_STOREFRONT_URL = "https://dakshinkali.shop";
 
 function escapeHtml(value: string) {
