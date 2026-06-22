@@ -5,6 +5,7 @@ export const HISABKITAB_PERMISSIONS = {
   },
   inventory: {
     view: "hisabkitab.inventory.view",
+    adjust: "hisabkitab.inventory.adjust",
   },
   stockMovements: {
     view: "hisabkitab.stock_movements.view",
