@@ -48,6 +48,18 @@ describe("HisabKitab permissions", () => {
     ).toBe(false);
   });
 
+  it("includes Phase 2C inventory adjustment permission", () => {
+    expect(
+      hasPermission(
+        {
+          isAdmin: false,
+          staffPermissions: ["hisabkitab.inventory.adjust"],
+        },
+        "hisabkitab.inventory.adjust",
+      ),
+    ).toBe(true);
+  });
+
   it("detects ungranted staff as having no app access", () => {
     expect(
       hasAnyHisabKitabPermission({ isAdmin: false, staffPermissions: [] }),
