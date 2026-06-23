@@ -12,6 +12,7 @@ import {
   getInventoryProducts,
   type InventoryFilter,
   type InventoryProduct,
+  type InventoryProductsPage,
   type ProductStatus,
 } from "@/lib/inventory/inventory.queries";
 
@@ -35,6 +36,39 @@ function getParam(
   return Array.isArray(value) ? value[0] : value;
 }
 
+function getNumberParam(
+  params: Record<string, string | string[] | undefined>,
+  key: string,
+) {
+  const value = Number(getParam(params, key));
+  return Number.isFinite(value) ? value : undefined;
+}
+
+function createInventoryHref(
+  params: Record<string, string | string[] | undefined>,
+  updates: Record<string, string | number | null | undefined>,
+) {
+  const next = new URLSearchParams();
+
+  for (const [key, rawValue] of Object.entries(params)) {
+    const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+    if (value) {
+      next.set(key, value);
+    }
+  }
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === null || value === undefined || value === "") {
+      next.delete(key);
+    } else {
+      next.set(key, String(value));
+    }
+  }
+
+  const query = next.toString();
+  return query ? `/inventory?${query}` : "/inventory";
+}
+
 function formatDate(value: string | null) {
   if (!value) {
     return "No movement";
@@ -55,19 +89,31 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     search: getParam(params, "q"),
     status: getParam(params, "status"),
     stockView: getParam(params, "stock_view") as InventoryFilter["stockView"],
+    page: getNumberParam(params, "page"),
+    pageSize: getNumberParam(params, "page_size"),
   };
+  const adjustProductId = getParam(params, "adjust");
   const canAdjust = hasPermission(
     context,
     HISABKITAB_PERMISSIONS.inventory.adjust,
   );
 
   let products: InventoryProduct[];
+  let pageData: InventoryProductsPage;
   let errorMessage: string | null = null;
 
   try {
-    products = await getInventoryProducts(filters);
+    pageData = await getInventoryProducts(filters);
+    products = pageData.products;
   } catch (error) {
     products = [];
+    pageData = {
+      products: [],
+      total: 0,
+      page: filters.page ?? 1,
+      pageSize: filters.pageSize ?? 25,
+      totalPages: 1,
+    };
     errorMessage =
       error instanceof Error ? error.message : "Unable to load inventory.";
   }
@@ -81,7 +127,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
       />
 
       <section className="mb-5 rounded-lg border border-slate-200 bg-white p-4 shadow-panel">
-        <form className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_180px_180px_auto]">
+        <form className="grid gap-3 xl:grid-cols-[minmax(220px,1fr)_180px_180px_120px_auto]">
           <label className="grid gap-2">
             <span className="text-sm font-medium text-slate-700">Search</span>
             <input
@@ -120,6 +166,21 @@ export default async function InventoryPage({ searchParams }: PageProps) {
             </select>
           </label>
 
+          <label className="grid gap-2">
+            <span className="text-sm font-medium text-slate-700">Page size</span>
+            <select
+              name="page_size"
+              defaultValue={String(pageData.pageSize)}
+              className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </label>
+
+          <input type="hidden" name="page" value="1" />
+
           <div className="flex items-end gap-2">
             <button
               type="submit"
@@ -157,6 +218,46 @@ export default async function InventoryPage({ searchParams }: PageProps) {
 
       {products.length > 0 ? (
         <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-panel">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            <span>
+              Showing {(pageData.page - 1) * pageData.pageSize + 1}-
+              {Math.min(pageData.page * pageData.pageSize, pageData.total)} of{" "}
+              {pageData.total}
+            </span>
+            <div className="flex items-center gap-2">
+              <a
+                href={createInventoryHref(params, {
+                  page: Math.max(pageData.page - 1, 1),
+                  adjust: null,
+                })}
+                aria-disabled={pageData.page <= 1}
+                className={`inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-sm font-semibold ${
+                  pageData.page <= 1
+                    ? "pointer-events-none opacity-50"
+                    : "hover:bg-white"
+                }`}
+              >
+                Previous
+              </a>
+              <span className="text-xs font-semibold uppercase text-slate-500">
+                Page {pageData.page} of {pageData.totalPages}
+              </span>
+              <a
+                href={createInventoryHref(params, {
+                  page: Math.min(pageData.page + 1, pageData.totalPages),
+                  adjust: null,
+                })}
+                aria-disabled={pageData.page >= pageData.totalPages}
+                className={`inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-sm font-semibold ${
+                  pageData.page >= pageData.totalPages
+                    ? "pointer-events-none opacity-50"
+                    : "hover:bg-white"
+                }`}
+              >
+                Next
+              </a>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
@@ -204,12 +305,15 @@ export default async function InventoryPage({ searchParams }: PageProps) {
                     <td className="px-4 py-4 text-slate-600">
                       {formatDate(product.last_stock_movement_at)}
                     </td>
-                    <td className="min-w-[320px] px-4 py-4">
-                      <details>
-                        <summary className="cursor-pointer text-sm font-semibold text-primary">
-                          Adjust stock
-                        </summary>
-                        <div className="mt-3">
+                    <td className="min-w-[260px] px-4 py-4">
+                      {adjustProductId === product.id ? (
+                        <div>
+                          <a
+                            href={createInventoryHref(params, { adjust: null })}
+                            className="mb-3 inline-flex text-sm font-semibold text-slate-500 hover:text-slate-800"
+                          >
+                            Close adjustment
+                          </a>
                           <StockAdjustmentForm
                             productId={product.id}
                             productName={product.name}
@@ -218,7 +322,16 @@ export default async function InventoryPage({ searchParams }: PageProps) {
                             canAdjust={canAdjust}
                           />
                         </div>
-                      </details>
+                      ) : (
+                        <a
+                          href={createInventoryHref(params, {
+                            adjust: product.id,
+                          })}
+                          className="inline-flex h-9 items-center rounded-lg border border-primary/30 px-3 text-sm font-semibold text-primary transition hover:bg-primary/5"
+                        >
+                          Adjust stock
+                        </a>
+                      )}
                     </td>
                   </tr>
                 ))}
