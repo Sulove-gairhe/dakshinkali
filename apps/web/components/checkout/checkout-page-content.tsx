@@ -267,6 +267,41 @@ export function CheckoutPageContent() {
       }
     }
 
+    // Stock validation before order insert
+    if (!orderSuccess && supabase) {
+      try {
+        const stockResponse = await fetch("/api/cart/stock-validation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: items.map((item) => ({
+              productId: item.id,
+              productName: item.name,
+              slug: item.slug,
+              quantity: item.quantity,
+            })),
+          }),
+        });
+
+        const stockResult = await stockResponse.json();
+
+        if (!stockResponse.ok || stockResult.valid === false) {
+          const firstIssue = stockResult.issues?.[0];
+          const errorMsg =
+            firstIssue?.message || "Some items in your cart are no longer available.";
+          throw new Error(errorMsg);
+        }
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Some items in your cart are no longer available.";
+        setSubmitError(message);
+        setSubmitting(false);
+        return;
+      }
+    }
+
     // Orders are written directly so the admin approval queue receives the
     // correct status and payment proof fields immediately.
     if (!orderSuccess && supabase) {

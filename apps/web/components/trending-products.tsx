@@ -157,7 +157,7 @@ export function TrendingProducts({ products }: TrendingProductsProps) {
                       {...product}
                       quantityInCart={getQuantity(product.id)}
                       isWishlisted={hasItem(product.id)}
-                      onAddToCart={() => addItem(product)}
+                      onAddToCart={async () => { await addItem(product); }}
                       onToggleWishlist={() => toggleItem(product)}
                       renderCompare={<CompareToggle product={product} />}
                     />

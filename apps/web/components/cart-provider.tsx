@@ -47,6 +47,10 @@ export type CartItem = CartProduct & {
   unitPrice: number;
 };
 
+export type CartMutationResult =
+  | { ok: true }
+  | { ok: false; message: string; issues?: unknown[] };
+
 export type AppliedCoupon = {
   code: string;
   discountAmount: number;
@@ -61,9 +65,9 @@ type CartContextValue = {
   subtotal: number;
   appliedCoupon: AppliedCoupon | null;
   discountedSubtotal: number;
-  addItem: (product: CartProduct) => void;
+  addItem: (product: CartProduct) => Promise<CartMutationResult>;
   removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  updateQuantity: (productId: string, quantity: number) => Promise<CartMutationResult>;
   getQuantity: (productId: string) => number;
   clearCart: () => void;
   applyCoupon: (code: string) => Promise<AppliedCoupon>;
@@ -174,43 +178,94 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
     window.localStorage.setItem(storageKeyRef.current, JSON.stringify(items));
   }, [isReady, items]);
 
-  const addItem = useCallback((product: CartProduct) => {
-    setAppliedCoupon(null);
-    setItems((currentItems) => {
-      const existingItem = currentItems.find((item) => item.id === product.id);
-      const unitPrice = getProductPrice(product);
-      const currentPrice =
-        typeof product.currentPrice === "number"
-          ? formatPrice(product.currentPrice)
-          : product.currentPrice;
+  async function validateCartItems(
+    itemsToValidate: Array<{ productId: string; quantity: number }>,
+  ): Promise<CartMutationResult> {
+    try {
+      const response = await fetch("/api/cart/stock-validation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: itemsToValidate }),
+      });
 
-      if (existingItem) {
-        return currentItems.map((item) =>
-          item.id === product.id
-            ? {
-                ...item,
-                ...product,
-                currentPrice: currentPrice ?? item.currentPrice,
-                quantity: item.quantity + 1,
-                price: unitPrice || item.unitPrice,
-                unitPrice: unitPrice || item.unitPrice,
-              }
-            : item,
-        );
+      const result = await response.json();
+
+      if (!response.ok || result.valid === false) {
+        const firstIssue = result.issues?.[0];
+        return {
+          ok: false,
+          message:
+            firstIssue?.message || "This item cannot be added to the cart.",
+          issues: result.issues,
+        };
       }
 
-      return [
-        ...currentItems,
-        {
-          ...product,
-          currentPrice: currentPrice ?? formatPrice(unitPrice),
-          quantity: 1,
-          price: unitPrice,
-          unitPrice,
-        },
-      ];
-    });
-  }, []);
+      return { ok: true };
+    } catch {
+      return {
+        ok: false,
+        message: "Unable to verify stock right now. Please try again.",
+      };
+    }
+  }
+
+  const addItem = useCallback(
+    async (product: CartProduct): Promise<CartMutationResult> => {
+      const currentItems = items;
+      const existingItem = currentItems.find(
+        (item) => item.id === product.id,
+      );
+      const currentQuantity = existingItem?.quantity ?? 0;
+      const requestedQuantity = currentQuantity + 1;
+
+      const validation = await validateCartItems([
+        { productId: product.id, quantity: requestedQuantity },
+      ]);
+
+      if (!validation.ok) {
+        return validation;
+      }
+
+      setAppliedCoupon(null);
+      setItems((prevItems) => {
+        const found = prevItems.find((item) => item.id === product.id);
+        const unitPrice = getProductPrice(product);
+        const currentPrice =
+          typeof product.currentPrice === "number"
+            ? formatPrice(product.currentPrice)
+            : product.currentPrice;
+
+        if (found) {
+          return prevItems.map((item) =>
+            item.id === product.id
+              ? {
+                  ...item,
+                  ...product,
+                  currentPrice: currentPrice ?? item.currentPrice,
+                  quantity: item.quantity + 1,
+                  price: unitPrice || item.unitPrice,
+                  unitPrice: unitPrice || item.unitPrice,
+                }
+              : item,
+          );
+        }
+
+        return [
+          ...prevItems,
+          {
+            ...product,
+            currentPrice: currentPrice ?? formatPrice(unitPrice),
+            quantity: 1,
+            price: unitPrice,
+            unitPrice,
+          },
+        ];
+      });
+
+      return { ok: true };
+    },
+    [items],
+  );
 
   const removeItem = useCallback((productId: string) => {
     setItems((currentItems) =>
@@ -219,18 +274,38 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
     setAppliedCoupon(null);
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
-    setItems((currentItems) => {
+  const updateQuantity = useCallback(
+    async (
+      productId: string,
+      quantity: number,
+    ): Promise<CartMutationResult> => {
       if (quantity <= 0) {
-        return currentItems.filter((item) => item.id !== productId);
+        setItems((currentItems) =>
+          currentItems.filter((item) => item.id !== productId),
+        );
+        setAppliedCoupon(null);
+        return { ok: true };
       }
 
-      return currentItems.map((item) =>
-        item.id === productId ? { ...item, quantity } : item,
+      const validation = await validateCartItems([
+        { productId, quantity },
+      ]);
+
+      if (!validation.ok) {
+        return validation;
+      }
+
+      setAppliedCoupon(null);
+      setItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === productId ? { ...item, quantity } : item,
+        ),
       );
-    });
-    setAppliedCoupon(null);
-  }, []);
+
+      return { ok: true };
+    },
+    [],
+  );
 
   const getQuantity = useCallback(
     (productId: string) =>

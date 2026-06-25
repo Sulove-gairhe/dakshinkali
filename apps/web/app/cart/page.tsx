@@ -32,6 +32,7 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [quantityError, setQuantityError] = useState<string | null>(null);
   const grandTotal = discountedSubtotal;
 
   async function handleApplyCoupon() {
@@ -86,6 +87,12 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(320px,3fr)]">
+            {quantityError && (
+              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive font-medium">
+                {quantityError}
+              </div>
+            )}
+
             <section className="space-y-4">
               {items.map((item) => (
                 <article
@@ -131,9 +138,16 @@ export default function CartPage() {
                       <div className="flex items-center rounded-md border border-border">
                         <button
                           type="button"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
-                          }
+                          onClick={async () => {
+                            setQuantityError(null);
+                            const result = await updateQuantity(
+                              item.id,
+                              item.quantity - 1,
+                            );
+                            if (!result.ok) {
+                              setQuantityError(result.message);
+                            }
+                          }}
                           className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-muted"
                           aria-label={`Decrease ${item.name} quantity`}
                         >
@@ -144,9 +158,16 @@ export default function CartPage() {
                         </span>
                         <button
                           type="button"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
-                          }
+                          onClick={async () => {
+                            setQuantityError(null);
+                            const result = await updateQuantity(
+                              item.id,
+                              item.quantity + 1,
+                            );
+                            if (!result.ok) {
+                              setQuantityError(result.message);
+                            }
+                          }}
                           className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-muted"
                           aria-label={`Increase ${item.name} quantity`}
                         >

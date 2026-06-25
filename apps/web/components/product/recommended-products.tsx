@@ -117,8 +117,8 @@ export function RecommendedProducts({ products }: RecommendedProductsProps) {
 
                 {/* Add to cart */}
                 <button
-                  onClick={() =>
-                    addItem({
+                  onClick={() => {
+                    void addItem({
                       id: product.id,
                       slug: product.slug,
                       name: product.name,
@@ -129,8 +129,8 @@ export function RecommendedProducts({ products }: RecommendedProductsProps) {
                       href: product.href,
                       // Pass numeric price so cart calculates totals correctly
                       price: parseProductPrice(product.currentPrice),
-                    })
-                  }
+                    });
+                  }}
                   className={`mt-1 flex w-full items-center justify-center gap-1.5 rounded-full py-1.5 text-xs font-semibold transition-colors ${
                     inCart
                       ? "border border-primary bg-primary text-primary-foreground hover:bg-primary/90"
