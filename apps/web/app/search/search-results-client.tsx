@@ -91,7 +91,7 @@ export function SearchResultsClient() {
   }
 
   function handleAddToCart(product: StoreProduct) {
-    addItem(product);
+    void addItem(product);
   }
 
   return (
