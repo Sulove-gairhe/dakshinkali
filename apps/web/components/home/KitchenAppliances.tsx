@@ -78,7 +78,7 @@ export function KitchenAppliances({ products }: KitchenAppliancesProps) {
       {...product}
       quantityInCart={getQuantity(product.id)}
       isWishlisted={hasItem(product.id)}
-      onAddToCart={() => addItem(product)}
+      onAddToCart={async () => { await addItem(product); }}
       onToggleWishlist={() => toggleItem(product)}
       renderCompare={<CompareToggle product={product} />}
     />

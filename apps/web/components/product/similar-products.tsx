@@ -216,7 +216,7 @@ export function SimilarProducts({ products }: SimilarProductsProps) {
                     onClick={(event) => {
                       event.preventDefault();
                       event.stopPropagation();
-                      addItem({
+                      void addItem({
                         id: product.id,
                         slug: product.slug,
                         name: product.name,

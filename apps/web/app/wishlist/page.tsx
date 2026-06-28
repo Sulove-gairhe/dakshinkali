@@ -112,7 +112,7 @@ export default function WishlistPage() {
                     <div className="mt-auto pt-5">
                       <button
                         type="button"
-                        onClick={() => addItem(item)}
+                        onClick={async () => { await addItem(item); }}
                         className="flex w-full items-center justify-center gap-2 rounded-md bg-secondary px-4 py-3 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-secondary/90"
                       >
                         <ShoppingCart className="h-5 w-5" />

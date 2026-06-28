@@ -9,7 +9,7 @@ import {
   getRecommendedProducts,
   parseProductPrice,
 } from "@/lib/store-products";
-import { useCart } from "@/components/cart-provider";
+import { useCart, type CartMutationResult } from "@/components/cart-provider";
 import { ImageGallery } from "./image-gallery";
 import { VariantSelector } from "./variant-selector";
 import { DescriptionTabs } from "./description-tabs";
@@ -51,9 +51,35 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
   const recommendations = getRecommendedProducts(product, { limit: 8 });
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
+  const [cartError, setCartError] = useState<string | null>(null);
+
+  const handleAddToCart = async (): Promise<CartMutationResult> => {
+    if (quantity <= 0) {
+      setCartError("Quantity must be greater than zero.");
+      return { ok: false, message: "Quantity must be greater than zero." };
+    }
+
+    const result = await addItem({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      shortDescription: product.shortDescription,
+      image: product.image,
+      currentPrice: product.currentPrice,
+      oldPrice: product.oldPrice,
+      href: `/products/${product.slug}`,
+      price: parseProductPrice(product.currentPrice),
+      category: product.category,
+      categoryId: product.categoryId ?? null,
+    });
+
+    if (!result.ok) {
+      setCartError(result.message);
+      return result;
+    }
+
+    for (let i = 1; i < quantity; i++) {
+      const nextResult = await addItem({
         id: product.id,
         slug: product.slug,
         name: product.name,
@@ -66,13 +92,23 @@ export function ProductDetail({ product }: ProductDetailProps) {
         category: product.category,
         categoryId: product.categoryId ?? null,
       });
+
+      if (!nextResult.ok) {
+        setCartError(nextResult.message);
+        return nextResult;
+      }
     }
+
     setQuantity(1);
+    setCartError(null);
+    return { ok: true };
   };
 
-  const handleBuyNow = () => {
-    handleAddToCart();
-    router.push("/checkout");
+  const handleBuyNow = async () => {
+    const result = await handleAddToCart();
+    if (result.ok) {
+      router.push("/checkout");
+    }
   };
 
   return (
@@ -209,6 +245,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   </div>
                 </div>
 
+                {cartError && (
+                  <p className="text-sm text-destructive font-medium">{cartError}</p>
+                )}
+
                 {/* Action Buttons */}
                 <div className="flex gap-4">
                   <button
@@ -246,8 +286,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <CurrentProductPreview
             product={product}
             quantityInCart={getQuantity(product.id)}
-            onAddToCart={() =>
-              addItem({
+            onAddToCart={async () => {
+              const result = await addItem({
                 id: product.id,
                 slug: product.slug,
                 name: product.name,
@@ -259,8 +299,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 price: parseProductPrice(product.currentPrice),
                 category: product.category,
                 categoryId: product.categoryId ?? null,
-              })
-            }
+              });
+              if (!result.ok) {
+                setCartError(result.message);
+              }
+            }}
           />
         </div>
       </div>
@@ -277,6 +320,7 @@ function CurrentProductPreview({
   product: StoreProduct;
   quantityInCart: number;
   onAddToCart: () => void;
+  // onAddToCart can be async; void accepts Promise<void>
 }) {
   const color = getProductColor(product);
 

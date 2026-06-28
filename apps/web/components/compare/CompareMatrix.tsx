@@ -54,7 +54,7 @@ export function CompareMatrix() {
 
                   <button
                     type="button"
-                    onClick={() => addItem(product)}
+                    onClick={async () => { await addItem(product); }}
                     className="flex items-center gap-1.5 rounded-lg bg-secondary px-4 py-2 text-xs font-semibold text-secondary-foreground transition-all duration-200 hover:bg-secondary/90 hover:shadow-md active:scale-95"
                   >
                     <ShoppingCart className="h-3.5 w-3.5" />
