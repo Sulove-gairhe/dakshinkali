@@ -1,6 +1,8 @@
 import { PackageSearch } from "lucide-react";
 import { StockAdjustmentForm } from "@/components/inventory/StockAdjustmentForm";
 import { StockStatusBadge } from "@/components/inventory/StockStatusBadge";
+import { StockImpactPreview } from "@/components/inventory/StockImpactPreview";
+import { ManualDeductionCard } from "@/components/inventory/ManualDeductionCard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import {
   HISABKITAB_PERMISSIONS,
@@ -14,9 +16,18 @@ import {
   type InventoryProduct,
   type ProductStatus,
 } from "@/lib/inventory/inventory.queries";
+import { getBatchStockImpactPreview } from "@/lib/inventory/stockImpact.queries";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+type InventoryDeductionPrefill = {
+  productId: string;
+  deductQty: number;
+  sourceOrder: string;
+  customer: string;
+  searchQuery: string | undefined;
 };
 
 const productStatuses: Array<[ProductStatus | "all", string]> = [
@@ -33,6 +44,51 @@ function getParam(
 ) {
   const value = params[key];
   return Array.isArray(value) ? value[0] : value;
+}
+
+/**
+ * Parse and validate URL prefill parameters from delivered-order notification links
+ * URL format: /inventory?q={product_name}&status=all&stock_view=all&product_id={uuid}&deduct_qty={number}&source_order={order_number}&customer={customer_name}
+ * Returns null if any required param is invalid
+ */
+function parsePrefillParams(
+  params: Record<string, string | string[] | undefined>,
+): InventoryDeductionPrefill | null {
+  const productId = getParam(params, "product_id");
+  const deductQtyStr = getParam(params, "deduct_qty");
+  const sourceOrder = getParam(params, "source_order");
+  const customer = getParam(params, "customer");
+  const searchQuery = getParam(params, "q");
+
+  // Validate required params
+  if (!productId || typeof productId !== "string" || productId.trim() === "") {
+    return null;
+  }
+
+  if (!deductQtyStr || typeof deductQtyStr !== "string") {
+    return null;
+  }
+
+  const deductQty = Number(deductQtyStr);
+  if (isNaN(deductQty) || deductQty <= 0) {
+    return null;
+  }
+
+  if (!sourceOrder || typeof sourceOrder !== "string" || sourceOrder.trim() === "") {
+    return null;
+  }
+
+  if (!customer || typeof customer !== "string" || customer.trim() === "") {
+    return null;
+  }
+
+  return {
+    productId: productId.trim(),
+    deductQty,
+    sourceOrder: sourceOrder.trim(),
+    customer: customer.trim(),
+    searchQuery,
+  };
 }
 
 function formatDate(value: string | null) {
@@ -61,6 +117,23 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     HISABKITAB_PERMISSIONS.inventory.adjust,
   );
 
+  // Parse prefill parameters from delivered-order notification links
+  let prefillData: InventoryDeductionPrefill | null = null;
+  try {
+    prefillData = parsePrefillParams(params);
+    if (prefillData) {
+      console.log("[INVENTORY_PREFILL_PARSED]", {
+        productId: prefillData.productId,
+        deductQty: prefillData.deductQty,
+        sourceOrder: prefillData.sourceOrder,
+        customer: prefillData.customer,
+      });
+    }
+  } catch (error) {
+    // Log error but don't fail the page - invalid prefill params are not critical
+    console.error("[INVENTORY_PREFILL_PARSE_ERROR]", error);
+  }
+
   let products: InventoryProduct[];
   let errorMessage: string | null = null;
 
@@ -70,6 +143,44 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     products = [];
     errorMessage =
       error instanceof Error ? error.message : "Unable to load inventory.";
+  }
+
+  // Batch-fetch stock impact preview for all visible products
+  const productIds = products.map((p) => p.id);
+  let stockImpactMap = new Map<string, Array<{ orderId: string; orderNumber: string; customerName: string; quantity: number; status: "confirmed" | "processing" | "shipped" }>>();
+  
+  if (productIds.length > 0) {
+    try {
+      stockImpactMap = await getBatchStockImpactPreview(productIds);
+    } catch (error) {
+      // Log error but don't fail the page render
+      console.error("[STOCK_IMPACT_PREVIEW_ERROR]", error);
+    }
+  }
+
+  // Resolve product information for prefill if present
+  let prefillProduct: {
+    name: string | null;
+    currentStock: number | null;
+    notVisible: boolean;
+  } | null = null;
+
+  if (prefillData) {
+    const matchingProduct = products.find((p) => p.id === prefillData.productId);
+    if (matchingProduct) {
+      prefillProduct = {
+        name: matchingProduct.name,
+        currentStock: matchingProduct.stock_quantity,
+        notVisible: false,
+      };
+    } else {
+      // Product not in current filtered results
+      prefillProduct = {
+        name: null,
+        currentStock: null,
+        notVisible: true,
+      };
+    }
   }
 
   return (
@@ -143,6 +254,20 @@ export default async function InventoryPage({ searchParams }: PageProps) {
         </section>
       ) : null}
 
+      {/* Manual Deduction Card - replaces Task 14 debug placeholder */}
+      {prefillData && prefillProduct ? (
+        <ManualDeductionCard
+          productId={prefillData.productId}
+          productName={prefillProduct.name}
+          currentStock={prefillProduct.currentStock}
+          deductQty={prefillData.deductQty}
+          sourceOrder={prefillData.sourceOrder}
+          customer={prefillData.customer}
+          canAdjust={canAdjust}
+          productNotVisible={prefillProduct.notVisible}
+        />
+      ) : null}
+
       {!errorMessage && products.length === 0 ? (
         <section className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-panel">
           <PackageSearch className="mx-auto size-8 text-slate-400" />
@@ -192,6 +317,8 @@ export default async function InventoryPage({ searchParams }: PageProps) {
                           Low stock
                         </p>
                       ) : null}
+                      {/* Stock impact preview - pending deductions from active orders */}
+                      <StockImpactPreview items={stockImpactMap.get(product.id) ?? []} />
                     </td>
                     <td className="px-4 py-4">
                       <StockStatusBadge status={product.status} />

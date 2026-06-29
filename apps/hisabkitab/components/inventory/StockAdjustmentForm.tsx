@@ -9,7 +9,7 @@ import type { ActionResult, StockActionMode } from "@/lib/inventory/stockActionH
 import type { ProductStatus } from "@/lib/inventory/inventory.queries";
 import { cn } from "@/lib/utils/cn";
 
-const initialState: ActionResult = { status: "success", message: "" };
+const initialState: ActionResult = { status: "idle", message: "" };
 
 export function StockAdjustmentForm({
   productId,
