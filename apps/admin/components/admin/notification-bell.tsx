@@ -15,6 +15,7 @@ import {
   markOrderNotificationRead,
   type OrderNotificationReadEntry,
 } from "@/lib/admin/notifications/read-state";
+import { useDeliveredOrderNotifications } from "@/lib/admin/notifications/use-delivered-order-notifications";
 import { useLowStockProducts } from "@/lib/admin/notifications/use-low-stock-products";
 import { useOrderNotifications } from "@/lib/admin/notifications/use-order-notifications";
 
@@ -98,6 +99,10 @@ export function NotificationBell() {
   const [lowStockExpanded, setLowStockExpanded] = useState(false);
   const [readEntries, setReadEntries] = useState<OrderNotificationReadEntry[]>([]);
   const { orders, loading: ordersLoading } = useOrderNotifications();
+  const {
+    notifications: deliveredNotifications,
+    loading: deliveredLoading,
+  } = useDeliveredOrderNotifications();
   const { products: lowStockProducts, loading: lowStockLoading } =
     useLowStockProducts();
 
@@ -105,9 +110,14 @@ export function NotificationBell() {
     setReadEntries(getOrderNotificationReadState());
   }, []);
 
-  const unreadCount = orders.filter(
-    (order) => !isOrderNotificationRead(order.id, readEntries),
-  ).length;
+  const unreadCount =
+    orders.filter(
+      (order) => !isOrderNotificationRead(order.id, readEntries),
+    ).length +
+    deliveredNotifications.filter(
+      (notification) =>
+        !isOrderNotificationRead(notification.id, readEntries),
+    ).length;
 
   useEffect(() => {
     function onDocClick(e: MouseEvent) {
@@ -124,6 +134,12 @@ export function NotificationBell() {
     setReadEntries(nextReadEntries);
     setOpen(false);
     router.push(`/admin/orders/${orderId}`);
+  }
+
+  function handleDeliveredLink(notificationId: string) {
+    const nextReadEntries = markOrderNotificationRead(notificationId);
+    setReadEntries(nextReadEntries);
+    setOpen(false);
   }
 
   return (
@@ -205,6 +221,54 @@ export function NotificationBell() {
           </div>
 
           <div className="mt-2">
+            {deliveredLoading ? (
+              <p className="px-4 py-2 text-sm text-gray-400">
+                Loading delivered orders…
+              </p>
+            ) : deliveredNotifications.length > 0 ? (
+              <ul className="border-b border-gray-100 pb-2">
+                {deliveredNotifications.map((notification) => {
+                  const unread = !isOrderNotificationRead(
+                    notification.id,
+                    readEntries,
+                  );
+
+                  return (
+                    <li
+                      key={notification.id}
+                      className={`px-4 py-3 ${
+                        unread ? "bg-primary/5" : "opacity-60"
+                      }`}
+                    >
+                      <p className="text-sm font-semibold text-gray-900">
+                        {notification.title}
+                      </p>
+                      <p className="mt-0.5 text-xs text-gray-600">
+                        {notification.message}
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        {notification.metadata.items.map((item, index) => (
+                          <Link
+                            key={`${notification.id}-${item.product_id}-${index}`}
+                            href={item.hisabkitab_url}
+                            onClick={() =>
+                              handleDeliveredLink(notification.id)
+                            }
+                            className="block text-xs font-semibold text-primary hover:underline"
+                          >
+                            Open {item.product_name} in HisabKitab
+                          </Link>
+                        ))}
+                      </div>
+                      <p className="mt-2 text-[11px] text-gray-400">
+                        {formatRelativeTime(notification.created_at)}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+
             {ordersLoading ? (
               <p className="px-4 py-2 text-sm text-gray-400">Loading orders…</p>
             ) : orders.length === 0 ? (

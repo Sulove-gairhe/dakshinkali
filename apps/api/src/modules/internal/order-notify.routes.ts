@@ -52,6 +52,40 @@ export function registerInternalOrderNotifyRoutes(app: Express): void {
         },
     );
 
+    // Delivered order notification endpoint
+    app.post(
+        '/api/v1/internal/orders/:orderId/notify-delivered',
+        validateNotifySecret,
+        async (req: Request, res: Response) => {
+            const orderId = req.params.orderId;
+            console.log('[NOTIFY_DELIVERED_ROUTE_HIT]', orderId);
+            if (!UUID_REGEX.test(orderId)) {
+                res.status(400).json({ error: 'Invalid order ID.' });
+                return;
+            }
+
+            // Dynamically import the notification function
+            const { notifyAdminsOfDeliveredOrder } = await import('../../services/admin-order-notifications');
+
+            // Fetch order with items
+            const { OrderRepository } = await import('../orders/order.repository');
+            const { createSupabaseClient } = await import('@dakshinkali/database');
+            const supabase = createSupabaseClient();
+            const repository = new OrderRepository(supabase);
+
+            const order = await repository.findById(orderId);
+            if (!order) {
+                res.status(404).json({ error: 'Order not found.' });
+                return;
+            }
+
+            // Trigger notification asynchronously
+            void notifyAdminsOfDeliveredOrder(orderId, order).catch(() => undefined);
+
+            res.status(202).json({ ok: true });
+        },
+    );
+
     app.get(
         '/api/v1/internal/test-notify-email',
         validateNotifySecret,

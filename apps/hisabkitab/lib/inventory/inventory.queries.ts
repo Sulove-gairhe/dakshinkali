@@ -35,8 +35,26 @@ type StockMovementDateRow = {
 export const INVENTORY_PRODUCT_SELECT =
   "id,name,model_name,sku,stock_quantity,status,publishing_status,deleted_at";
 
+const STOCK_MOVEMENT_PRODUCT_BATCH_SIZE = 100;
+
 function normalizeSearch(value?: string) {
   return value?.trim().toLowerCase() ?? "";
+}
+
+function chunkProductIds(productIds: string[]) {
+  const chunks: string[][] = [];
+
+  for (
+    let index = 0;
+    index < productIds.length;
+    index += STOCK_MOVEMENT_PRODUCT_BATCH_SIZE
+  ) {
+    chunks.push(
+      productIds.slice(index, index + STOCK_MOVEMENT_PRODUCT_BATCH_SIZE),
+    );
+  }
+
+  return chunks;
 }
 
 function matchesSearch(product: ProductRow, search: string) {
@@ -102,21 +120,29 @@ export async function getInventoryProducts(
   const lastMovementByProduct = new Map<string, string>();
 
   if (productIds.length > 0) {
-    const { data: movementRows, error: movementError } = await supabase
-      .from("stock_movements")
-      .select("product_id,created_at")
-      .in("product_id", productIds)
-      .order("created_at", { ascending: false })
-      .limit(Math.max(productIds.length * 5, 100))
-      .returns<StockMovementDateRow[]>();
+    const movementBatches = await Promise.all(
+      chunkProductIds(productIds).map(async (productIdBatch) => {
+        const { data, error } = await supabase
+          .from("stock_movements")
+          .select("product_id,created_at")
+          .in("product_id", productIdBatch)
+          .order("created_at", { ascending: false })
+          .limit(Math.max(productIdBatch.length * 5, 100))
+          .returns<StockMovementDateRow[]>();
 
-    if (movementError) {
-      throw new Error(movementError.message);
-    }
+        if (error) {
+          throw new Error(error.message);
+        }
 
-    for (const movement of movementRows ?? []) {
-      if (!lastMovementByProduct.has(movement.product_id)) {
-        lastMovementByProduct.set(movement.product_id, movement.created_at);
+        return data ?? [];
+      }),
+    );
+
+    for (const movementRows of movementBatches) {
+      for (const movement of movementRows) {
+        if (!lastMovementByProduct.has(movement.product_id)) {
+          lastMovementByProduct.set(movement.product_id, movement.created_at);
+        }
       }
     }
   }

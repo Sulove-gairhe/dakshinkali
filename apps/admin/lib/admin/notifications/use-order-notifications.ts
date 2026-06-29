@@ -9,6 +9,10 @@ import { upsertOrderNotificationEntry } from "./read-state";
 const CACHE_KEY = "admin-order-notifications-cache";
 const CUTOFF_MS = 48 * 60 * 60 * 1000; // 48 hours
 
+function isDeliveredOrder(order: Pick<OrderNotificationCard, "status">) {
+  return order.status === "delivered";
+}
+
 function loadCache(): OrderNotificationCard[] {
   if (typeof window === "undefined") return [];
   try {
@@ -19,7 +23,7 @@ function loadCache(): OrderNotificationCard[] {
     const now = Date.now();
     return parsed.filter((item: OrderNotificationCard) => {
       const time = new Date(item.created_at).getTime();
-      return now - time < CUTOFF_MS;
+      return now - time < CUTOFF_MS && !isDeliveredOrder(item);
     });
   } catch {
     return [];
@@ -181,6 +185,8 @@ export function useOrderNotifications() {
 
     const handleInsert = (row: Record<string, unknown>) => {
       const mapped = mapOrderRowFull(row);
+      if (isDeliveredOrder(mapped)) return;
+
       // New realtime insert should have current timestamp
       mapped.created_at = new Date().toISOString();
       upsertOrderNotificationEntry(mapped.id, mapped.created_at);
@@ -220,6 +226,12 @@ export function useOrderNotifications() {
       const mapped = mapOrderRowFull(row);
 
       setOrders((prev) => {
+        if (isDeliveredOrder(mapped)) {
+          const remaining = prev.filter((item) => item.id !== mapped.id);
+          saveNotifications(remaining);
+          return remaining;
+        }
+
         const existing = prev.find((item) => item.id === mapped.id);
         const createdAt = existing ? existing.created_at : new Date().toISOString();
         const orderItems = (mapped.order_items && mapped.order_items.length > 0)
