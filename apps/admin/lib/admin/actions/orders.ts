@@ -598,6 +598,9 @@ export async function updateOrderStatus(
     const order = await fetchOrderById(supabase, input.orderId);
     if (!order) return { success: false, error: "Order not found" };
 
+    // Capture old status for delivered notification trigger
+    const oldStatus = order.status;
+
     if (!isValidOrderTransition(order.status, input.newStatus)) {
       return {
         success: false,
@@ -634,6 +637,39 @@ export async function updateOrderStatus(
       note?.trim() || `Status updated to ${input.newStatus}`,
       user.id,
     );
+
+    // Trigger delivered notification after successful status update
+    if (input.newStatus === "delivered" && oldStatus !== "delivered") {
+      try {
+        const orderWithItems = mapOrderRow(data as Record<string, unknown>);
+
+        // Call notification orchestration via internal API endpoint
+        // (notification service lives in apps/api/src/services/admin-order-notifications.ts)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "http://localhost:3001";
+        const notifySecret = process.env.ORDER_NOTIFY_SECRET || "dev-order-notify-secret";
+
+        // Fire-and-forget HTTP request to trigger notification
+        fetch(`${apiUrl}/api/v1/internal/orders/${input.orderId}/notify-delivered`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Order-Notify-Secret": notifySecret,
+          },
+          body: JSON.stringify({ orderWithItems }),
+        }).catch((fetchError) => {
+          console.error("[DELIVERED_ORDER_NOTIFY_TRIGGER_ERROR]", {
+            orderId: input.orderId,
+            error: fetchError
+          });
+        });
+      } catch (triggerError) {
+        console.error("[DELIVERED_ORDER_NOTIFY_TRIGGER_ERROR]", {
+          orderId: input.orderId,
+          error: triggerError
+        });
+        // Do not fail the order update if notification trigger fails
+      }
+    }
 
     revalidatePath("/admin/orders");
     revalidatePath(`/admin/orders/${input.orderId}`);

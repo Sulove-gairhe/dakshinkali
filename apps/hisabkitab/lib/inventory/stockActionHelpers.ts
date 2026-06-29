@@ -7,6 +7,7 @@ import {
 
 export type StockActionMode = "increase" | "decrease" | "set";
 export type ActionResult =
+  | { status: "idle"; message: "" }
   | { status: "success"; message: string }
   | { status: "error"; message: string };
 
