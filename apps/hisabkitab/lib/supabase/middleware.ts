@@ -15,7 +15,7 @@ function isSessionPrivacyApi(pathname: string) {
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey =
@@ -59,7 +59,7 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && !isPublicPath(pathname) && !isSessionPrivacyApi(pathname)) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirectTo", pathname);
+    loginUrl.searchParams.set("redirectTo", `${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
   }
 
