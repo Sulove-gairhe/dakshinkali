@@ -50,6 +50,7 @@ const defaultMenuItems: MenuItem[] = [
   { label: "PARTS", href: "#" },
   { label: "TELEVISIONS", href: "/search?category=televisions" },
   { label: "DEALS", href: "#" },
+  { label: "EXCHANGE", href: "https://www.arkostore.com/exchange-appliances" },
   { label: "REQUEST TECHNICIAN", href: "#", highlighted: true, icon: Wrench },
 ];
 

@@ -11,6 +11,7 @@ build
 .tsx.html
 .jsx.html
 .js.html
+.kiro/
 
 # dependencies
 node_modules/

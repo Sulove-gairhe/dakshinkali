@@ -270,7 +270,6 @@ export function Footer() {
               className="mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary sm:text-sm"
             >
               <Navigation className="size-4 shrink-0" aria-hidden="true" />
-              <Navigation className="size-4 shrink-0" aria-hidden="true" />
               Get directions
             </a>
           </FadeUp>
