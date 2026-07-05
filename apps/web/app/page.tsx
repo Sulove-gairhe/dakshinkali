@@ -10,6 +10,7 @@ import { CompareDrawer } from "@/components/compare/CompareDrawer";
 import { CompareModal } from "@/components/compare/CompareModal";
 import { BuyingGuides } from "@/components/home/BuyingGuides";
 import { KitchenAppliances } from "@/components/home/KitchenAppliances";
+import { PromoPopup } from "@/components/home/promo-popup";
 import { Footer } from "@/components/layout/Footer";
 import { fetchStorefrontProductsByKey } from "@/lib/db-products";
 import Link from "next/link";
@@ -25,6 +26,7 @@ export default async function WebStorePage() {
   return (
     <CompareProvider>
       <main className="min-h-screen bg-background text-foreground">
+        <PromoPopup />
         <SiteNavbar />
 
         <HeroGrid
