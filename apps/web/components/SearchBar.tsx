@@ -52,12 +52,16 @@ export function SearchBar({
   const [results, setResults] = useState<SearchResults>(emptyResults);
   const [resolvedQuery, setResolvedQuery] = useState("");
   const [highlightedKey, setHighlightedKey] = useState<string | null>(null);
+  const [lazyDbProducts, setLazyDbProducts] = useState<StoreProduct[] | null>(null);
+  const [lazyDbCategories, setLazyDbCategories] = useState<DbCategory[] | null>(null);
   const debouncedQuery = useDebouncedValue(query, SEARCH_DELAY_MS);
   const meaningfulQuery = query.trim().length >= MIN_QUERY_LENGTH;
   const shouldShowDropdown = isFocused && meaningfulQuery;
 
   // DB data from context (populated by root layout)
   const { dbProducts, dbCategories } = useSearchData();
+  const resolvedDbProducts = lazyDbProducts ?? dbProducts;
+  const resolvedDbCategories = lazyDbCategories ?? dbCategories;
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -79,13 +83,39 @@ export function SearchBar({
     }
 
     const timeout = window.setTimeout(() => {
-      setResults(searchCatalog(trimmedQuery, dbProducts, dbCategories));
+      setResults(searchCatalog(trimmedQuery, resolvedDbProducts, resolvedDbCategories));
       setResolvedQuery(trimmedQuery);
       setHighlightedKey(null);
     }, SIMULATED_FETCH_MS);
 
     return () => window.clearTimeout(timeout);
-  }, [debouncedQuery, dbProducts, dbCategories]);
+  }, [debouncedQuery, resolvedDbProducts, resolvedDbCategories]);
+
+  useEffect(() => {
+    const trimmedQuery = debouncedQuery.trim();
+    if (trimmedQuery.length < MIN_QUERY_LENGTH || lazyDbProducts || dbProducts.length > 0) {
+      return;
+    }
+
+    let cancelled = false;
+    fetch("/api/search-data")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { dbProducts?: StoreProduct[]; dbCategories?: DbCategory[] } | null) => {
+        if (cancelled || !data) return;
+        setLazyDbProducts(data.dbProducts ?? []);
+        setLazyDbCategories(data.dbCategories ?? dbCategories);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLazyDbProducts([]);
+          setLazyDbCategories(dbCategories);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedQuery, lazyDbProducts, dbProducts.length, dbCategories]);
 
   const selectableItems = useMemo(
     () =>

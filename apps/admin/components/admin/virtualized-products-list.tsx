@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { LayoutGrid, Loader2, PackageSearch, Upload } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,18 +20,6 @@ import {
 import type { AdminProductRecord, CategoryRecord } from "@/lib/admin/types";
 
 const PAGE_SIZE = 16;
-const COLUMNS = { base: 1, sm: 2, xl: 3, "2xl": 4 };
-const ROW_HEIGHT = 220; // estimated card height in px
-const ROW_GAP = 16;
-const OVERSCAN = 3;
-
-/** Determine the number of grid columns from the container width */
-function getColumnCount(width: number): number {
-  if (width >= 1536) return COLUMNS["2xl"];
-  if (width >= 1280) return COLUMNS.xl;
-  if (width >= 640) return COLUMNS.sm;
-  return COLUMNS.base;
-}
 
 export function VirtualizedProductsList({
   categories,
@@ -45,8 +32,8 @@ export function VirtualizedProductsList({
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [status, setStatus] = useState("");
   const [publishingStatus, setPublishingStatus] = useState("");
+  const [status, setStatus] = useState("");
 
   // ── Confirm modal ──
   const [confirm, setConfirm] = useState<{
@@ -54,22 +41,7 @@ export function VirtualizedProductsList({
     product: AdminProductRecord;
   } | null>(null);
 
-  // ── Responsive column count ──
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [cols, setCols] = useState(4);
-
-  useEffect(() => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setCols(getColumnCount(entry.contentRect.width));
-      }
-    });
-    observer.observe(el);
-    setCols(getColumnCount(el.clientWidth));
-    return () => observer.disconnect();
-  }, []);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // ── Debounced search ──
   useEffect(() => {
@@ -83,10 +55,10 @@ export function VirtualizedProductsList({
       "admin-products",
       debouncedSearch,
       categoryId,
-      status,
       publishingStatus,
+      status,
     ],
-    [debouncedSearch, categoryId, status, publishingStatus],
+    [debouncedSearch, categoryId, publishingStatus, status],
   );
 
   // ── Infinite query ──
@@ -106,9 +78,8 @@ export function VirtualizedProductsList({
         pageSize: PAGE_SIZE,
         search: debouncedSearch || undefined,
         categoryId: categoryId || undefined,
+        publishingStatus: (publishingStatus as "draft" | "live") || undefined,
         status: (status as AdminProductRecord["status"]) || undefined,
-        publishingStatus:
-          (publishingStatus as "draft" | "live") || undefined,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -121,37 +92,23 @@ export function VirtualizedProductsList({
   );
   const total = data?.pages[0]?.total ?? 0;
 
-  // ── Chunk into rows ──
-  const rows = useMemo(() => {
-    const result: AdminProductRecord[][] = [];
-    for (let i = 0; i < allProducts.length; i += cols) {
-      result.push(allProducts.slice(i, i + cols));
-    }
-    return result;
-  }, [allProducts, cols]);
-
-  // ── Virtualizer ──
-  const virtualizer = useVirtualizer({
-    count: rows.length + (hasNextPage ? 1 : 0), // +1 for sentinel row
-    getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => ROW_HEIGHT + ROW_GAP,
-    overscan: OVERSCAN,
-  });
-
-  const virtualItems = virtualizer.getVirtualItems();
-
   // ── Auto-fetch next page when sentinel comes into view ──
   useEffect(() => {
-    const lastItem = virtualItems[virtualItems.length - 1];
-    if (!lastItem) return;
-    if (
-      lastItem.index >= rows.length - 1 &&
-      hasNextPage &&
-      !isFetchingNextPage
-    ) {
-      void fetchNextPage();
-    }
-  }, [virtualItems, rows.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+    const el = loadMoreRef.current;
+    if (!el || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          void fetchNextPage();
+        }
+      },
+      { rootMargin: "320px" },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, allProducts.length]);
 
   // ── Confirm action handler ──
   const handleConfirm = useCallback(async () => {
@@ -176,8 +133,8 @@ export function VirtualizedProductsList({
   const hasActiveFilters = !!(
     debouncedSearch ||
     categoryId ||
-    status ||
-    publishingStatus
+    publishingStatus ||
+    status
   );
 
   // ── Loading skeleton grid ──
@@ -189,13 +146,13 @@ export function VirtualizedProductsList({
           onSearchChange={setSearch}
           categoryId={categoryId}
           onCategoryChange={setCategoryId}
-          status={status}
-          onStatusChange={setStatus}
           publishingStatus={publishingStatus}
           onPublishingStatusChange={setPublishingStatus}
+          status={status}
+          onStatusChange={setStatus}
           categories={categories}
         />
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
@@ -225,10 +182,10 @@ export function VirtualizedProductsList({
         onSearchChange={setSearch}
         categoryId={categoryId}
         onCategoryChange={setCategoryId}
-        status={status}
-        onStatusChange={setStatus}
         publishingStatus={publishingStatus}
         onPublishingStatusChange={setPublishingStatus}
+        status={status}
+        onStatusChange={setStatus}
         categories={categories}
       />
 
@@ -264,8 +221,8 @@ export function VirtualizedProductsList({
               onClick={() => {
                 setSearch("");
                 setCategoryId("");
-                setStatus("");
                 setPublishingStatus("");
+                setStatus("");
               }}
               className="mt-4 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
@@ -282,65 +239,35 @@ export function VirtualizedProductsList({
         </div>
       )}
 
-      {/* ── Virtualized scrollable grid ── */}
+      {/* ── Product card grid ── */}
       {allProducts.length > 0 && (
-        <div
-          ref={scrollContainerRef}
-          className="flex-1 min-h-0 overflow-y-auto scrollbar-thin"
-        >
-          <div
-            className="relative w-full"
-            style={{ height: virtualizer.getTotalSize() }}
-          >
-            {virtualItems.map((virtualRow) => {
-              const isLoaderRow = virtualRow.index >= rows.length;
-              const rowProducts = rows[virtualRow.index];
-
-              return (
-                <div
-                  key={virtualRow.key}
-                  className="absolute left-0 top-0 w-full"
-                  style={{
-                    height: virtualRow.size,
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                >
-                  {isLoaderRow ? (
-                    <div className="flex items-center justify-center py-8">
-                      {isFetchingNextPage ? (
-                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                      ) : (
-                        <span className="text-xs text-gray-400">
-                          End of results
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <div
-                      className="grid gap-4"
-                      style={{
-                        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-                      }}
-                    >
-                      {rowProducts?.map((product) => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          onDeactivate={(p) =>
-                            setConfirm({ type: "deactivate", product: p })
-                          }
-                          onDelete={(p) =>
-                            setConfirm({ type: "delete", product: p })
-                          }
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4">
+            {allProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onDeactivate={(p) =>
+                  setConfirm({ type: "deactivate", product: p })
+                }
+                onDelete={(p) => setConfirm({ type: "delete", product: p })}
+              />
+            ))}
           </div>
-        </div>
+
+          <div
+            ref={loadMoreRef}
+            className="flex min-h-12 items-center justify-center py-6"
+          >
+            {isFetchingNextPage ? (
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            ) : hasNextPage ? (
+              <span className="text-xs text-gray-400">Loading more products…</span>
+            ) : (
+              <span className="text-xs text-gray-400">End of results</span>
+            )}
+          </div>
+        </>
       )}
 
       {/* ── Confirm modal ── */}
@@ -370,20 +297,20 @@ function FilterBar({
   onSearchChange,
   categoryId,
   onCategoryChange,
-  status,
-  onStatusChange,
   publishingStatus,
   onPublishingStatusChange,
+  status,
+  onStatusChange,
   categories,
 }: {
   search: string;
   onSearchChange: (v: string) => void;
   categoryId: string;
   onCategoryChange: (v: string) => void;
-  status: string;
-  onStatusChange: (v: string) => void;
   publishingStatus: string;
   onPublishingStatusChange: (v: string) => void;
+  status: string;
+  onStatusChange: (v: string) => void;
   categories: CategoryRecord[];
 }) {
   return (
@@ -409,24 +336,24 @@ function FilterBar({
           ))}
         </select>
         <select
-          value={status}
-          onChange={(e) => onStatusChange(e.target.value)}
-          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-        >
-          <option value="">All statuses</option>
-          <option value="active">Active</option>
-          <option value="low_stock">Low stock</option>
-          <option value="out_of_stock">Out of stock</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <select
           value={publishingStatus}
           onChange={(e) => onPublishingStatusChange(e.target.value)}
           className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
-          <option value="">All publishing</option>
-          <option value="draft">Draft</option>
+          <option value="">All Publishing States</option>
           <option value="live">Live</option>
+          <option value="draft">Draft</option>
+        </select>
+        <select
+          value={status}
+          onChange={(e) => onStatusChange(e.target.value)}
+          className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+        >
+          <option value="">All Product Statuses</option>
+          <option value="active">Active</option>
+          <option value="low_stock">Low Stock</option>
+          <option value="out_of_stock">Out of Stock</option>
+          <option value="inactive">Inactive</option>
         </select>
       </div>
       <Link

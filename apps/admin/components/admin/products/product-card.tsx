@@ -172,7 +172,8 @@ function BadgeRow({ product }: { product: AdminProductRecord }) {
   const sfBadges = sf.badges ?? (sf.badge ? [sf.badge] : []);
   sfBadges.forEach((b) => {
     const norm = b.toLowerCase().trim();
-    if (norm !== "imported" && norm !== "manual") {
+    const isPercentageDiscount = /\b\d+(?:\.\d+)?\s*%\s*off\b/.test(norm);
+    if (norm !== "imported" && norm !== "manual" && !isPercentageDiscount) {
       badges.push({
         label: b,
       cls: "bg-gray-50 text-gray-700 ring-gray-200",
@@ -225,12 +226,12 @@ export function ProductCard({
   return (
     <article
       onClick={handleCardClick}
-      className={`group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-primary/40 hover:shadow-md focus-within:border-primary/40 focus-within:shadow-md${slug ? " cursor-pointer" : ""}`}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-primary/40 hover:shadow-md focus-within:border-primary/40 focus-within:shadow-md${slug ? " cursor-pointer" : ""}`}
       aria-label={product.name}
     >
       {/* ── Hover action buttons (top-right) ── */}
       <div
-        className="absolute right-2 top-2 z-10 flex gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+        className="absolute right-2 top-2 z-10 flex gap-1 opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
         role="group"
         aria-label="Product actions"
       >
@@ -255,33 +256,33 @@ export function ProductCard({
       </div>
 
       {/* ── Tier 1: Category + Status ── */}
-      <div className="flex items-center justify-between gap-2 px-3 pt-3 pb-2">
-        <span className="truncate text-[10px] font-bold uppercase tracking-widest text-gray-400">
+      <div className="flex flex-col items-start gap-1.5 px-2.5 pb-2 pt-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2 sm:px-3">
+        <span className="max-w-full truncate text-[9px] font-bold uppercase tracking-widest text-gray-400 sm:text-[10px]">
           {category}
         </span>
         <StatusPill product={product} />
       </div>
 
       {/* ── Tier 2: Thumbnail + Identity ── */}
-      <div className="flex items-start gap-3 px-3 pb-2">
+      <div className="flex flex-1 flex-col gap-2 px-2.5 pb-2 sm:flex-row sm:items-start sm:gap-3 sm:px-3">
         {/* Thumbnail */}
-        <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
+        <div className="h-24 w-full shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-gray-50 min-[420px]:h-28 sm:h-[72px] sm:w-[72px]">
           <ProductThumbnail product={product} />
         </div>
 
         {/* Identity */}
         <div className="min-w-0 flex-1 pt-0.5">
           {brand ? (
-            <p className="mb-0.5 truncate text-[10px] font-bold uppercase tracking-widest text-accent">
+            <p className="mb-0.5 truncate text-[9px] font-bold uppercase tracking-widest text-accent sm:text-[10px]">
               {brand}
             </p>
           ) : (
-            <p className="mb-0.5 truncate text-[10px] font-bold uppercase tracking-widest text-gray-300">
+            <p className="mb-0.5 truncate text-[9px] font-bold uppercase tracking-widest text-gray-300 sm:text-[10px]">
               Unbranded
             </p>
           )}
           <p
-            className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900"
+            className="line-clamp-2 text-xs font-semibold leading-snug text-gray-900 sm:text-sm"
             title={product.name}
           >
             {product.name}
@@ -293,16 +294,18 @@ export function ProductCard({
       </div>
 
       {/* ── Tier 3: Price + Stock status ── */}
-      <div className="flex items-center justify-between gap-2 border-t border-gray-100 bg-gray-50/60 px-3 py-2">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-gray-900">{price}</span>
+      <div className="flex items-center justify-between gap-2 border-t border-gray-100 bg-gray-50/60 px-2.5 py-2 sm:px-3">
+        <div className="min-w-0 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+          <span className="truncate text-xs font-bold text-gray-900 sm:text-sm">
+            {price}
+          </span>
           {product.status === "out_of_stock" && (
-            <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-red-700">
+            <span className="w-fit rounded-full bg-red-100 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-red-700 sm:text-[9px]">
               Out of Stock
             </span>
           )}
           {product.status === "low_stock" && (
-            <span className="rounded-full bg-accent/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary ring-1 ring-accent/25">
+            <span className="w-fit rounded-full bg-accent/15 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-primary ring-1 ring-accent/25 sm:text-[9px]">
               Low Stock
             </span>
           )}
@@ -312,12 +315,12 @@ export function ProductCard({
         <button
           type="button"
           onClick={() => onDeactivate(product)}
-          className="flex items-center gap-1 rounded bg-white px-2 py-1 text-xs font-semibold text-gray-500 hover:bg-gray-50 hover:text-gray-800 ring-1 ring-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-white text-xs font-semibold text-gray-500 ring-1 ring-gray-200 hover:bg-gray-50 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 sm:h-auto sm:w-auto sm:gap-1 sm:px-2 sm:py-1"
           aria-label={`Deactivate ${product.name}`}
           title="Deactivate product"
         >
           <PowerOff className="h-3 w-3" />
-          <span>Deactivate</span>
+          <span className="hidden sm:inline">Deactivate</span>
         </button>
       </div>
     </article>

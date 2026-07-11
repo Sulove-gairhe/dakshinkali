@@ -77,6 +77,21 @@ type DbProductRow = {
     storefront_data: DbStorefrontData | null;
 };
 
+export type StorefrontProductsPageParams = {
+    cursor?: number;
+    pageSize?: number;
+    search?: string;
+    brand?: string;
+    category?: string;
+    sort?: "newest" | "price-high-low" | "price-low-high";
+};
+
+export type StorefrontProductsPage = {
+    products: StoreProduct[];
+    nextCursor: number | null;
+    total: number;
+};
+
 // ─── Status mapping ───────────────────────────────────────────────────────────
 
 function mapStatus(
@@ -220,6 +235,81 @@ export async function fetchDbProducts(): Promise<StoreProduct[]> {
         return products;
     } catch {
         return [];
+    }
+}
+
+/**
+ * Fetch a paginated storefront product slice from Supabase.
+ * This powers catalog lazy loading without reading the full DB catalog upfront.
+ */
+export async function fetchDbProductsPage(
+    params: StorefrontProductsPageParams = {},
+): Promise<StorefrontProductsPage> {
+    try {
+        const supabase = await createClient();
+        const cursor = Math.max(0, params.cursor ?? 0);
+        const pageSize = Math.min(Math.max(params.pageSize ?? 12, 1), 48);
+        const from = cursor;
+        const to = from + pageSize - 1;
+        const search = params.search?.trim();
+        const brand = params.brand?.trim();
+        const category = params.category?.trim();
+
+        let query = supabase
+            .from("products")
+            .select("id, name, description, price, category, category_id, status, publishing_status, images, storefront_data", { count: "exact" })
+            .eq("publishing_status", "live")
+            .in("status", ["active", "low_stock"])
+            .is("deleted_at", null);
+
+        if (search) {
+            const escaped = search.replaceAll("%", "\\%").replaceAll("_", "\\_");
+            query = query.or(
+                `name.ilike.%${escaped}%,description.ilike.%${escaped}%,category.ilike.%${escaped}%`,
+            );
+        }
+
+        if (brand) {
+            const escapedBrand = brand.replaceAll("%", "\\%").replaceAll("_", "\\_");
+            query = query.filter("storefront_data->>brand", "ilike", `%${escapedBrand}%`);
+        }
+
+        if (category) {
+            const escapedCategory = category.replaceAll("%", "\\%").replaceAll("_", "\\_");
+            query = query.ilike("category", `%${escapedCategory}%`);
+        }
+
+        if (params.sort === "price-high-low") {
+            query = query.order("price", { ascending: false });
+        } else if (params.sort === "price-low-high") {
+            query = query.order("price", { ascending: true });
+        } else {
+            query = query.order("updated_at", { ascending: false });
+        }
+
+        const { data, error, count } = await query.range(from, to);
+
+        if (error) {
+            return { products: [], nextCursor: null, total: 0 };
+        }
+
+        const products: StoreProduct[] = [];
+        const seen = new Set<string>();
+        for (const row of data ?? []) {
+            const mapped = mapRowToStoreProduct(row as DbProductRow);
+            if (mapped && !seen.has(mapped.slug)) {
+                seen.add(mapped.slug);
+                products.push(mapped);
+            }
+        }
+
+        const total = count ?? products.length;
+        const nextOffset = from + (data?.length ?? 0);
+        const nextCursor = nextOffset < total ? nextOffset : null;
+
+        return { products, nextCursor, total };
+    } catch {
+        return { products: [], nextCursor: null, total: 0 };
     }
 }
 

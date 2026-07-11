@@ -12,9 +12,18 @@ const mapEmbedSrc =
 const directionsUrl =
   "https://www.google.com/maps/dir/?api=1&destination=Dakshinkali+Electronic+Center,+New+Road,+Pokhara,+Kaski,+Nepal";
 
-function InstagramIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
+function InstagramIcon({
+  className = "size-7",
+  ...props
+}: SVGProps<SVGSVGElement>) {
   return (
-    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" {...props}>
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      {...props}
+    >
       <rect
         x="4"
         y="4"
@@ -25,12 +34,21 @@ function InstagramIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElemen
         strokeWidth="2"
       />
       <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="2" />
-      <circle cx="16.7" cy="7.3" r="1.1" stroke="currentColor" strokeWidth="2" />
+      <circle
+        cx="16.7"
+        cy="7.3"
+        r="1.1"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
 
-function FacebookIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
+function FacebookIcon({
+  className = "size-7",
+  ...props
+}: SVGProps<SVGSVGElement>) {
   return (
     <svg
       aria-hidden="true"
@@ -49,9 +67,18 @@ function FacebookIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement
   );
 }
 
-function WhatsAppIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
+function WhatsAppIcon({
+  className = "size-7",
+  ...props
+}: SVGProps<SVGSVGElement>) {
   return (
-    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" {...props}>
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      {...props}
+    >
       <path
         d="M5.5 19.5 6.7 16A7.2 7.2 0 1 1 9 18.1l-3.5 1.4Z"
         stroke="currentColor"
@@ -68,9 +95,18 @@ function WhatsAppIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement
   );
 }
 
-function ViberIcon({ className = "size-7", ...props }: SVGProps<SVGSVGElement>) {
+function ViberIcon({
+  className = "size-7",
+  ...props
+}: SVGProps<SVGSVGElement>) {
   return (
-    <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" {...props}>
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      {...props}
+    >
       <path
         d="M7 4.8A8.8 8.8 0 0 1 12 3.5c4.3 0 7.5 2.7 7.5 6.9 0 4.1-2.9 6.6-6.7 6.9L9 20.5v-3.2h-.8c-2.2 0-3.7-1.5-3.7-3.8v-3.1c0-2.4.8-4.3 2.5-5.6Z"
         stroke="currentColor"
@@ -269,7 +305,6 @@ export function Footer() {
               rel="noreferrer"
               className="mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-highlight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-secondary sm:text-sm"
             >
-              <Navigation className="size-4 shrink-0" aria-hidden="true" />
               <Navigation className="size-4 shrink-0" aria-hidden="true" />
               Get directions
             </a>

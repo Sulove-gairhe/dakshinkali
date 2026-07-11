@@ -15,9 +15,7 @@ import {
 /* ------------------------------------------------------------------ */
 
 function getCartStorageKey(userId: string | null) {
-  return userId
-    ? `dakshinkali_cart:${userId}`
-    : "dakshinkali_cart:anon";
+  return userId ? `dakshinkali_cart:${userId}` : "dakshinkali_cart:anon";
 }
 
 /* ------------------------------------------------------------------ */
@@ -67,7 +65,10 @@ type CartContextValue = {
   discountedSubtotal: number;
   addItem: (product: CartProduct) => Promise<CartMutationResult>;
   removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => Promise<CartMutationResult>;
+  updateQuantity: (
+    productId: string,
+    quantity: number,
+  ) => Promise<CartMutationResult>;
   getQuantity: (productId: string) => number;
   clearCart: () => void;
   applyCoupon: (code: string) => Promise<AppliedCoupon>;
@@ -161,7 +162,9 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
   const storageKeyRef = useRef(storageKey);
 
   const [items, setItems] = useState<CartItem[]>([]);
-  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(
+    null,
+  );
   const [isReady, setIsReady] = useState(false);
 
   // Load cart from the correct user-scoped key whenever userId changes.
@@ -212,9 +215,7 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
   const addItem = useCallback(
     async (product: CartProduct): Promise<CartMutationResult> => {
       const currentItems = items;
-      const existingItem = currentItems.find(
-        (item) => item.id === product.id,
-      );
+      const existingItem = currentItems.find((item) => item.id === product.id);
       const currentQuantity = existingItem?.quantity ?? 0;
       const requestedQuantity = currentQuantity + 1;
 
@@ -287,9 +288,7 @@ export function CartProvider({ children, userId = null }: CartProviderProps) {
         return { ok: true };
       }
 
-      const validation = await validateCartItems([
-        { productId, quantity },
-      ]);
+      const validation = await validateCartItems([{ productId, quantity }]);
 
       if (!validation.ok) {
         return validation;

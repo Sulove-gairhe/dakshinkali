@@ -12,6 +12,7 @@ import {
   validateStorefrontLiveData,
   updateStorefrontSection,
 } from "@/lib/admin/utils";
+import { applyAdminProductListFilters } from "@/lib/admin/actions/product-list-filters";
 import type {
   AdminProductRecord,
   DbProductStatus,
@@ -178,18 +179,7 @@ export async function listAdminProducts(filters: ProductListFilters = {}) {
     .is("deleted_at", null)
     .order("updated_at", { ascending: false });
 
-  if (filters.search?.trim()) {
-    query = query.ilike("name", `%${filters.search.trim()}%`);
-  }
-  if (filters.categoryId) {
-    query = query.eq("category_id", filters.categoryId);
-  }
-  if (filters.status) {
-    query = query.eq("status", filters.status);
-  }
-  if (filters.publishingStatus) {
-    query = query.eq("publishing_status", filters.publishingStatus);
-  }
+  query = applyAdminProductListFilters(query, filters);
 
   const { data, error, count } = await query.range(from, to);
   if (error) throw new Error(error.message);

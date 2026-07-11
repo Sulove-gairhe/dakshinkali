@@ -26,8 +26,8 @@ export function ProductsList({
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [status, setStatus] = useState("");
   const [publishingStatus, setPublishingStatus] = useState("");
+  const [status, setStatus] = useState("");
   const [confirm, setConfirm] = useState<{
     type: "deactivate" | "delete";
     product: AdminProductRecord;
@@ -42,7 +42,7 @@ export function ProductsList({
     }, 300);
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, categoryId, status, publishingStatus]);
+  }, [search, categoryId, publishingStatus, status]);
 
   async function load() {
     setLoading(true);
@@ -50,8 +50,8 @@ export function ProductsList({
       const result = await listAdminProducts({
         search: search || undefined,
         categoryId: categoryId || undefined,
-        status: (status as AdminProductRecord["status"]) || undefined,
         publishingStatus: (publishingStatus as "draft" | "live") || undefined,
+        status: (status as AdminProductRecord["status"]) || undefined,
       });
       setProducts(result.products);
       setTotal(result.total);
@@ -79,7 +79,7 @@ export function ProductsList({
     }
   }
 
-  const hasActiveFilters = !!(search || categoryId || status || publishingStatus);
+  const hasActiveFilters = !!(search || categoryId || publishingStatus || status);
 
   return (
     <>
@@ -106,24 +106,24 @@ export function ProductsList({
             ))}
           </select>
           <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="">All statuses</option>
-            <option value="active">Active</option>
-            <option value="low_stock">Low stock</option>
-            <option value="out_of_stock">Out of stock</option>
-            <option value="inactive">Inactive</option>
-          </select>
-          <select
             value={publishingStatus}
             onChange={(e) => setPublishingStatus(e.target.value)}
             className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
           >
-            <option value="">All publishing</option>
-            <option value="draft">Draft</option>
+            <option value="">All Publishing States</option>
             <option value="live">Live</option>
+            <option value="draft">Draft</option>
+          </select>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">All Product Statuses</option>
+            <option value="active">Active</option>
+            <option value="low_stock">Low Stock</option>
+            <option value="out_of_stock">Out of Stock</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
         <Link
@@ -173,8 +173,8 @@ export function ProductsList({
               onClick={() => {
                 setSearch("");
                 setCategoryId("");
-                setStatus("");
                 setPublishingStatus("");
+                setStatus("");
               }}
               className="mt-4 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
@@ -193,7 +193,7 @@ export function ProductsList({
 
       {/* ── Product card grid ── */}
       {!loading && products.length > 0 && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4">
           {products.map((product) => (
             <ProductCard
               key={product.id}

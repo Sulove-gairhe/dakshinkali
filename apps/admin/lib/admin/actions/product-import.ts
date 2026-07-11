@@ -28,7 +28,7 @@ const commitRowSchema = z.object({
   computedStockValue: z.number().nullable(),
   errors: z.array(z.string()),
   warnings: z.array(z.string()),
-  action: z.enum(["create live", "update live", "skipped", "error"]),
+  action: z.enum(["create draft", "update draft", "skipped", "error"]),
   existingProductId: z.string().uuid().nullable(),
   valid: z.boolean(),
 });
@@ -133,8 +133,8 @@ export async function previewProductImport(formData: FormData): Promise<{
     preview: {
       rows,
       summary: {
-        createdLive: rows.filter((row) => row.action === "create live").length,
-        updatedLive: rows.filter((row) => row.action === "update live").length,
+        createdDraft: rows.filter((row) => row.action === "create draft").length,
+        updatedDraft: rows.filter((row) => row.action === "update draft").length,
         skipped: rows.filter((row) => row.action === "skipped").length,
         errors: rows.filter((row) => row.action === "error").length,
         warnings: rows.filter((row) => row.warnings.length > 0).length,
@@ -152,8 +152,8 @@ export async function commitProductImport(input: {
   const revalidatedRows = validateImportRows(parsedRows, existingProducts);
   const rows = revalidatedRows.filter((row) => row.valid);
   const summary: ProductImportCommitSummary = {
-    createdLive: 0,
-    updatedLive: 0,
+    createdDraft: 0,
+    updatedDraft: 0,
     skipped: revalidatedRows.filter((row) => row.action === "skipped").length,
     errors: revalidatedRows.filter((row) => row.action === "error").length,
     warnings: revalidatedRows.filter((row) => row.warnings.length > 0).length,
@@ -189,7 +189,7 @@ export async function commitProductImport(input: {
           row.mrp && row.mrp > 0
             ? `Rs. ${Math.round(row.mrp).toLocaleString("en-NP")}`
             : undefined,
-        publishingStatus: "live",
+        publishingStatus: "draft",
         searchTerms: [
           row.itemName,
           row.modelName,
@@ -214,20 +214,20 @@ export async function commitProductImport(input: {
         category_id: null,
         status: "active",
         price,
-        publishing_status: "live",
+        publishing_status: "draft",
         storefront_data: storefrontData,
       };
       if (existing && !hasImages(existing.images)) {
         payload.images = [placeholderImage()];
       }
 
-      if (row.action === "update live" && row.existingProductId) {
+      if (row.action === "update draft" && row.existingProductId) {
         const { error } = await supabase
           .from("products")
           .update(payload)
           .eq("id", row.existingProductId);
         if (error) throw new Error(error.message);
-        summary.updatedLive += 1;
+        summary.updatedDraft += 1;
       } else {
         const { error } = await supabase.from("products").insert({
           ...payload,
@@ -236,7 +236,7 @@ export async function commitProductImport(input: {
           sku: null,
         });
         if (error) throw new Error(error.message);
-        summary.createdLive += 1;
+        summary.createdDraft += 1;
       }
     } catch (error) {
       summary.errors += 1;

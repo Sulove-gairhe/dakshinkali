@@ -13,6 +13,8 @@ import { StoreProductPreviewPanel } from "./store-product-preview-panel";
 import { StorefrontPresentationTab } from "./storefront-presentation-tab";
 import { StringArrayEditor } from "./string-array-editor";
 import { ConfirmModal } from "./confirm-modal";
+import { StockPreviewBox } from "./stock-preview-box";
+import { useStockImpactPreview } from "@/lib/admin/hooks/useStockImpactPreview";
 import { isSuperAdmin } from "@/lib/auth-urls";
 import {
   formatNprPrice,
@@ -43,6 +45,7 @@ const TABS = [
 type Tab = (typeof TABS)[number];
 
 const STATUS_OPTIONS = ["Active", "Low Stock", "Out of Stock", "Inactive"];
+const PRODUCTS_LIST_ROUTE = "/admin/products";
 const TITLE_LABEL_CLASS = "text-sm font-medium text-primary";
 const DESCRIPTION_LABEL_CLASS = "text-sm font-medium text-emerald-700";
 
@@ -105,6 +108,9 @@ export function ProductForm({
     searchTerms: string[];
   } | null>(null);
   const productId = form.id ?? crypto.randomUUID();
+  
+  // Fetch stock impact preview for existing products only (not in create mode)
+  const stockImpact = useStockImpactPreview(form.id);
 
   const updateForm = useCallback((updater: (prev: ProductFormState) => ProductFormState) => {
     setForm(updater);
@@ -169,7 +175,9 @@ export function ProductForm({
           : "Draft saved",
       );
 
-      if (!form.id && result.product.id) {
+      if (publishingStatus === "live") {
+        router.push(PRODUCTS_LIST_ROUTE);
+      } else if (!form.id && result.product.id) {
         router.replace(`/admin/products/${result.product.id}/edit`);
       } else {
         setForm((prev) => ({
@@ -192,7 +200,7 @@ export function ProductForm({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <Link
-                href="/admin/products"
+                href={PRODUCTS_LIST_ROUTE}
                 className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -457,6 +465,16 @@ export function ProductForm({
                     }
                     className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
                   />
+                  {/* Stock impact preview - only shown for existing products */}
+                  {form.id && (
+                    <div className="mt-2">
+                      <StockPreviewBox
+                        items={stockImpact.items}
+                        isLoading={stockImpact.isLoading}
+                        error={stockImpact.error}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

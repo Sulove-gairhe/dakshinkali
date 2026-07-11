@@ -1,6 +1,7 @@
 "use server";
 
 import { requireAdminUser } from "@/lib/admin/auth-server";
+import { applyAdminProductListFilters } from "@/lib/admin/actions/product-list-filters";
 import type {
   AdminProductRecord,
   DbProductStatus,
@@ -79,18 +80,7 @@ export async function fetchAdminProductsPage(
     .is("deleted_at", null)
     .order("updated_at", { ascending: false });
 
-  if (params.search?.trim()) {
-    query = query.ilike("name", `%${params.search.trim()}%`);
-  }
-  if (params.categoryId) {
-    query = query.eq("category_id", params.categoryId);
-  }
-  if (params.status) {
-    query = query.eq("status", params.status);
-  }
-  if (params.publishingStatus) {
-    query = query.eq("publishing_status", params.publishingStatus);
-  }
+  query = applyAdminProductListFilters(query, params);
 
   const { data, error, count } = await query.range(from, to);
   if (error) throw new Error(error.message);

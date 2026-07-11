@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteNavbar } from "@/components/site-navbar";
 import { ProductCard } from "@/components/product-card";
 import { useCart } from "@/components/cart-provider";
@@ -50,6 +50,33 @@ export function SearchResultsClient() {
 
   // Read DB data from context (fetched once in root layout)
   const { dbProducts, dbCategories } = useSearchData();
+  const [lazyDbProducts, setLazyDbProducts] = useState<StoreProduct[] | null>(null);
+  const [lazyDbCategories, setLazyDbCategories] = useState<typeof dbCategories | null>(null);
+
+  useEffect(() => {
+    if (dbProducts.length > 0 || lazyDbProducts) return;
+    let cancelled = false;
+    fetch("/api/search-data")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { dbProducts?: StoreProduct[]; dbCategories?: typeof dbCategories } | null) => {
+        if (cancelled || !data) return;
+        setLazyDbProducts(data.dbProducts ?? []);
+        setLazyDbCategories(data.dbCategories ?? dbCategories);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLazyDbProducts([]);
+          setLazyDbCategories(dbCategories);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dbProducts.length, lazyDbProducts, dbCategories]);
+
+  const resolvedDbProducts = lazyDbProducts ?? dbProducts;
+  const resolvedDbCategories = lazyDbCategories ?? dbCategories;
 
   const result = useMemo(
     () =>
@@ -58,10 +85,10 @@ export function SearchResultsClient() {
         brand: searchParams.get("brand"),
         category: searchParams.get("category"),
         sort: searchParams.get("sort"),
-        extraProducts: dbProducts,
-        extraCategories: dbCategories,
+        extraProducts: resolvedDbProducts,
+        extraCategories: resolvedDbCategories,
       }),
-    [searchParams, dbProducts, dbCategories],
+    [searchParams, resolvedDbProducts, resolvedDbCategories],
   );
 
   function handleSortChange(event: React.ChangeEvent<HTMLSelectElement>) {

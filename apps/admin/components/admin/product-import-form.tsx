@@ -59,7 +59,7 @@ export function ProductImportForm() {
       });
       setSummary(result);
       toast.success(
-        `Imported ${result.createdLive + result.updatedLive} live rows`,
+        `Imported ${result.createdDraft + result.updatedDraft} draft rows`,
       );
       router.push("/admin/products");
       router.refresh();

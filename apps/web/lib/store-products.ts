@@ -86,8 +86,7 @@ function withProductHrefs(
 
 export const trendingProducts: StoreProduct[] = withProductHrefs([
   {
-    id: "1",
-    slug: "samsung-253l-double-door-refrigerator",
+    id: "eaa4dd10-461b-4b2d-8ed2-e0bb0b65ff55", slug: "samsung-253l-double-door-refrigerator",
     name: "Samsung 253L Double Door Frost Free Refrigerator RT28A3022GS/IM",
     shortDescription: "Digital Inverter | Energy Efficient | 10 Year Warranty",
     image: "/images/trending products/Samsung Double door 245 Litres.png",
@@ -102,8 +101,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "frost free", "double door refrigerator"],
   },
   {
-    id: "2",
-    slug: "samsung-192l-single-door-refrigerator",
+    id: "ec0bc3d7-2c8a-4bcf-8743-d596a74cf5cf", slug: "samsung-192l-single-door-refrigerator",
     name: "Samsung 192L Single Door Refrigerator RR20M282ZS8",
     shortDescription:
       "Digital Inverter | Fast Direct Cooling | Stabilizer Free",
@@ -119,8 +117,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "single door refrigerator"],
   },
   {
-    id: "3",
-    slug: "himstar-chest-freezer-170",
+    id: "e3219d99-6b61-409c-992c-895465e10068", slug: "himstar-chest-freezer-170",
     name: "Himstar Chest Freezer 170 Ltr HC-17H55SWG/WB",
     shortDescription: "High Capacity | Energy Efficient | Reliable Cooling",
     image: "/images/trending products/himstal 165 Litre deepfreezer.png",
@@ -135,8 +132,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["deep freezer", "chest freezer", "himista"],
   },
   {
-    id: "4",
-    slug: "samsung-65-crystal-uhd-tv",
+    id: "92a1f1f0-9aae-4476-a115-d248df4721be", slug: "samsung-65-crystal-uhd-tv",
     name: "Samsung 65 inch Crystal UHD 4K Smart TV UA65U8500F",
     shortDescription: "Metal Stream Design | 4K Resolution | Smart Features",
     image: "/images/trending products/Samsung 65 inch tv.png",
@@ -155,8 +151,7 @@ export const trendingProducts: StoreProduct[] = withProductHrefs([
 
 export const bestSellingProducts: StoreProduct[] = withProductHrefs([
   {
-    id: "bestseller-1",
-    slug: "samsung-ww90dg5u24axim-9kg-ai-eco-bubble-wifi-washing-machine",
+    id: "e69033cb-26aa-41a5-a162-e7f00d3d5690", slug: "samsung-ww90dg5u24axim-9kg-ai-eco-bubble-wifi-washing-machine",
     name: "SAMSUNG 9 Kg Washing Machine With AI Eco Bubble WiFi Embedded WW90DG5U24AXIM",
     shortDescription:
       "9 Kg capacity | 1400 RPM | AI Eco Bubble | WiFi Embedded | Hygiene Steam Wash",
@@ -172,8 +167,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["washer", "laundry", "front load", "ai eco bubble", "wifi"],
   },
   {
-    id: "bestseller-2",
-    slug: "samsung-ua55u8500f-55-inch-crystal-uhd-4k-smart-tv",
+    id: "a9f54ebc-0fa6-4273-9745-89abeacbbb13", slug: "samsung-ua55u8500f-55-inch-crystal-uhd-4k-smart-tv",
     name: "SAMSUNG 55 Inch Crystal UHD 4K Smart TV UA55U8500F",
     shortDescription:
       "Crystal Processor 4K | Samsung Knox Security | Solar Cell Remote | Metal Stream Design",
@@ -189,8 +183,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["tv", "television", "4k tv", "crystal uhd"],
   },
   {
-    id: "bestseller-3",
-    slug: "samsung-rr20c20c2gs-192-litres-single-door-refrigerator",
+    id: "b6a10084-9c09-4a09-b6f7-87ba26e72b9e", slug: "samsung-rr20c20c2gs-192-litres-single-door-refrigerator",
     name: "SAMSUNG 192 Litres Single Door Refrigerator RR20C20C2GS/IM",
     shortDescription:
       "192 Litres Capacity | Silver Grey Color | Digital Inverter Technology | Toughened Glass Shelves",
@@ -206,8 +199,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "single door refrigerator", "digital inverter"],
   },
   {
-    id: "bestseller-4",
-    slug: "cg-cgwd15a02hn-hot-normal-water-dispenser",
+    id: "52fac6c5-fcaa-4edf-b721-007216f3351d", slug: "cg-cgwd15a02hn-hot-normal-water-dispenser",
     name: "CG Hot & Normal Water Dispenser - CGWD15A02HN",
     shortDescription:
       "Over heating protector | SS heating water tank | 500W heating power | 5 L/hr hot water",
@@ -223,8 +215,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["water dispenser", "hot water", "kitchen appliance"],
   },
   {
-    id: "bestseller-5",
-    slug: "himstar-ht-43f4ksdj-43-inch-4k-smart-tv",
+    id: "451a2bb5-15c2-4bac-a9e4-4cc08cc0d91c", slug: "himstar-ht-43f4ksdj-43-inch-4k-smart-tv",
     name: "Himstar 43 inch 4k smart TV HT-43F4KSDJ",
     shortDescription:
       "43 Inches | 4K Ultra HD | Google Android 14 | Voice-enabled Bluetooth remote",
@@ -241,8 +232,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["tv", "television", "4k tv", "android tv", "himista"],
   },
   {
-    id: "bestseller-6",
-    slug: "samsung-rr20c2722cr-192-litres-direct-cooling-single-door-refrigerator",
+    id: "d7026dab-f739-424e-9ecb-4eb23593798c", slug: "samsung-rr20c2722cr-192-litres-direct-cooling-single-door-refrigerator",
     name: "SAMSUNG RR20C2722CR/IM - 192 Litres Direct Cooling Single Door Refrigerator",
     shortDescription:
       "192 Litres Capacity | Bar Chrome Handle | Toughened Glass Shelves | Inverter Compressor",
@@ -258,8 +248,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "single door refrigerator", "direct cooling"],
   },
   {
-    id: "bestseller-7",
-    slug: "samsung-wt70c3200ll-7kg-semi-automatic-washing-machine",
+    id: "07ad6304-0dc6-4453-a003-4cf3bd415b58", slug: "samsung-wt70c3200ll-7kg-semi-automatic-washing-machine",
     name: "Samsung WT70C3200LL/TL 7Kg Semi Automatic washing Machine",
     shortDescription:
       "7 kg capacity | Semi-Automatic top load | 5 Star rating | Air Turbo Drying | Magic Filter",
@@ -275,8 +264,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["washer", "laundry", "semi automatic", "top load"],
   },
   {
-    id: "bestseller-8",
-    slug: "samsung-ua43f5550fuxxl-43-inch-full-hd-smart-tv",
+    id: "c54973fc-d342-4779-8fc2-119a49795a71", slug: "samsung-ua43f5550fuxxl-43-inch-full-hd-smart-tv",
     name: "Samsung 43 Inch Full HD Smart TV UA43F5550FUXXL",
     shortDescription:
       '43" Full HD Smart TV | HDR 10+ | Tizen OS | WiFi & Bluetooth | 2 HDMI, 1 USB',
@@ -295,8 +283,7 @@ export const bestSellingProducts: StoreProduct[] = withProductHrefs([
 
 export const clearanceProducts: StoreProduct[] = withProductHrefs([
   {
-    id: "clearance-1",
-    slug: "samsung-rt40h30wnpim-275l",
+    id: "4baaf4ad-1ca5-42fc-972c-eee52da14cfa", slug: "samsung-rt40h30wnpim-275l",
     name: "RT40H30WNPIM Samsung Double Door Refrigerator, 275L",
     shortDescription:
       "275L | Frost-Free | Digital Inverter | 10-Year Compressor Warranty | Adjustable Toughened Glass Shelves | Power Cool | Inox Silver Finish",
@@ -379,8 +366,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     ]
   },
   {
-    id: "clearance-2",
-    slug: "himstar-hr-21d92brj-190l",
+    id: "1d9bc35f-6e23-498c-b86a-ea73a6e08532", slug: "himstar-hr-21d92brj-190l",
     name: "Himstar 190 Ltr Refrigerator HR-21D92BRJ",
     shortDescription:
       "Maroon finish | 190L capacity | Stabilizer free operation | 10 years compressor warranty",
@@ -396,8 +382,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "himista"],
   },
   {
-    id: "clearance-3",
-    slug: "samsung-rr20c2z226u-192l",
+    id: "34fb93f1-7df9-448b-92b4-4034cf3f9cfe", slug: "samsung-rr20c2z226u-192l",
     name: "Samsung RR20C2Z226U/IM 192 Litres Single Door Refrigerator",
     shortDescription:
       "Stylish Grande design | Mystic Overlay Blue | Digital inverter compressor | Fast ice making",
@@ -413,8 +398,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "single door refrigerator"],
   },
   {
-    id: "clearance-4",
-    slug: "godrej-rdemarvel-207c-190l",
+    id: "ae7586bd-0505-4621-b0bc-b3bd13fe4abb", slug: "godrej-rdemarvel-207c-190l",
     name: "Godrej 190 Liter Single Door Refrigerator - RDEMARVEL 207C THF FU WN",
     shortDescription:
       "Anti-bacteria technology | Curve door | Large veg box | 3 toughened glass shelves",
@@ -430,8 +414,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "direct cool"],
   },
   {
-    id: "clearance-5",
-    slug: "himstar-hr-210bhn",
+    id: "bef8c450-203f-4b74-874a-17ffaba59960", slug: "himstar-hr-210bhn",
     name: "Himstar HR-210BHN Refrigerator",
     shortDescription:
       "192L capacity | Diamond Edge Freezing | 5-star rating | Toughened glass shelves",
@@ -447,8 +430,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "himista"],
   },
   {
-    id: "clearance-6",
-    slug: "samsung-rt40h28wnpim-253l",
+    id: "042a44af-bb95-490d-bd70-6c009bd06bb3", slug: "samsung-rt40h28wnpim-253l",
     name: "RT40H28WNPIM Samsung Double Door Refrigerator, 253L",
     shortDescription:
       "236L net capacity | Top mount freezer | Digital inverter | Toughened glass shelves",
@@ -464,8 +446,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["fridge", "frost free", "double door refrigerator"],
   },
   {
-    id: "clearance-7",
-    slug: "himstar-hw-80fs8btkgz-8kg",
+    id: "12c52495-65e1-445d-b62d-6922d41418c3", slug: "himstar-hw-80fs8btkgz-8kg",
     name: "Himstar 8KG Front Load Fully Automatic Washing Machine HW-80FS8BTKGZ",
     shortDescription:
       "Inverter motor | 1400 RPM | Built-in heater | LED display | 10 years motor warranty",
@@ -481,8 +462,7 @@ export const clearanceProducts: StoreProduct[] = withProductHrefs([
     searchTerms: ["washer", "laundry", "front load", "himista"],
   },
   {
-    id: "clearance-8",
-    slug: "tcl-43v6b-43-inch-4k-smart-tv",
+    id: "251e966d-8562-41c9-a564-1d868ce42a08", slug: "tcl-43v6b-43-inch-4k-smart-tv",
     name: "TCL 43V6B 43 inch 4K Smart TV",
     shortDescription:
       "Google TV | HDR10/HLG | Metallic bezel-less design | HDMI 2.1 with eARC",
@@ -504,8 +484,7 @@ const kitchenImage = (fileName: string) => `/images/kitchen/${fileName}`;
 
 export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
   {
-    id: "kitchen-1",
-    slug: "samsung-23l-grill-microwave-mg23a3515ak-tl",
+    id: "ddcb79db-e04a-4e2c-a72e-f92c1eb7f69d", slug: "samsung-23l-grill-microwave-mg23a3515ak-tl",
     name: "Samsung 23L Grill Microwave MG23A3515AK/TL",
     shortDescription:
       "23L grill microwave | Tact and dial controls | Ceramic enamel cavity | Quick Defrost",
@@ -625,8 +604,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     ],
   },
   {
-    id: "kitchen-2",
-    slug: "samsung-universal-tv-remote",
+    id: "f35c1ce1-d2cb-49b6-a77c-ef4dfc89ca5f", slug: "samsung-universal-tv-remote",
     name: "Samsung Universal TV Remote",
     shortDescription:
       "Universal Samsung TV remote | Smart and non-smart TV support | Netflix and Prime buttons",
@@ -721,8 +699,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     deliveryInfo: ["Batteries are not included."],
   },
   {
-    id: "kitchen-3",
-    slug: "samsung-vcc4540s36-sml-bagless-vacuum-cleaner",
+    id: "6ceda648-18a5-4f7f-bf9d-fbc1af21be99", slug: "samsung-vcc4540s36-sml-bagless-vacuum-cleaner",
     name: "Samsung VCC4540S36/SML Bagless Vacuum Cleaner",
     shortDescription:
       "1.3L twin chamber dust capacity | 1800W motor | 360W suction | HEPA exhaust filter",
@@ -820,8 +797,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     deliveryInfo: ["Delivery support available in serviceable areas."],
   },
   {
-    id: "kitchen-4",
-    slug: "godrej-23l-convection-microwave-gme-523-cf1-rm",
+    id: "49d7058c-7ba5-4869-93d6-b4c8105cc49a", slug: "godrej-23l-convection-microwave-gme-523-cf1-rm",
     name: "Godrej 23L Convection Microwave Oven GME 523 CF1 RM",
     shortDescription:
       "23L convection microwave | 205 Instacook recipes | Air Fry mode | Stainless steel cavity",
@@ -956,8 +932,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     ],
   },
   {
-    id: "kitchen-5",
-    slug: "himstar-8l-electric-pressure-cooker-hk-8k1epj-za",
+    id: "3b5cc9e8-1a37-4c24-84ed-c1730c4498e4", slug: "himstar-8l-electric-pressure-cooker-hk-8k1epj-za",
     name: "Himstar 8L Electric Pressure Cooker HK-8K1EPJ/ZA",
     shortDescription:
       "8L capacity | 1200W power | Preset cooking modes | Temperature control",
@@ -1060,8 +1035,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     deliveryInfo: ["Free shipping where applicable.", "Warranty support available."],
   },
   {
-    id: "kitchen-6",
-    slug: "cg-550w-mixer-grinder-cgmg5505a",
+    id: "1a2152da-4101-4155-9c3c-51d056e371ea", slug: "cg-550w-mixer-grinder-cgmg5505a",
     name: "CG 550W Mixer Grinder CGMG5505A",
     shortDescription:
       "550W mixer grinder | 3 stainless steel jars | 3-speed control | Overload protection",
@@ -1151,8 +1125,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     deliveryInfo: ["Warranty support available through Dakshinkali Electronics."],
   },
   {
-    id: "kitchen-7",
-    slug: "cg-2000w-induction-cooktop-cgic20a03",
+    id: "06dc1cd8-375d-4b29-82cd-0347845bb077", slug: "cg-2000w-induction-cooktop-cgic20a03",
     name: "CG 2000W Induction Cooktop CGIC20A03",
     shortDescription:
       "2000W induction cooktop | Crystal glass plate | Digital display | Timer and child lock",
@@ -1245,8 +1218,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
     ],
   },
   {
-    id: "kitchen-8",
-    slug: "cg-5l-bottom-loading-water-dispenser-cgwdb-lec",
+    id: "32e044f4-26ee-4c2c-99e5-da8afcbb60df", slug: "cg-5l-bottom-loading-water-dispenser-cgwdb-lec",
     name: "CG 5L Bottom Loading Water Dispenser CGWDBLEC",
     shortDescription:
       "Bottom loading dispenser | Hot, cold and normal water | 304 stainless steel tank | Child lock",
@@ -1355,8 +1327,7 @@ export const kitchenApplianceProducts: StoreProduct[] = withProductHrefs([
 
 export const detailProducts: StoreProduct[] = withProductHrefs([
   {
-    id: "samsung-ua55cu7700",
-    slug: "samsung-ua55cu7700-55-inch-crystal-ultra-hd-4k-smart-tv",
+    id: "1c125c3a-7433-4bbf-903b-0626c725596a", slug: "samsung-ua55cu7700-55-inch-crystal-ultra-hd-4k-smart-tv",
     name: "Samsung 55-inch Crystal Ultra HD 4K Smart TV | UA55CU7700",
     shortDescription: "55-inch Crystal Ultra HD 4K display with Tizen OS",
     image:

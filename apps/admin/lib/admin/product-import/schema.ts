@@ -1,4 +1,4 @@
-export type ImportAction = "create live" | "update live" | "skipped" | "error";
+export type ImportAction = "create draft" | "update draft" | "skipped" | "error";
 
 export interface ParsedImportRow {
   rowNumber: number;
@@ -26,8 +26,8 @@ export interface ProductImportPreviewRow extends ParsedImportRow {
 export interface ProductImportPreview {
   rows: ProductImportPreviewRow[];
   summary: {
-    createdLive: number;
-    updatedLive: number;
+    createdDraft: number;
+    updatedDraft: number;
     skipped: number;
     errors: number;
     warnings: number;
@@ -35,8 +35,8 @@ export interface ProductImportPreview {
 }
 
 export interface ProductImportCommitSummary {
-  createdLive: number;
-  updatedLive: number;
+  createdDraft: number;
+  updatedDraft: number;
   skipped: number;
   errors: number;
   warnings: number;

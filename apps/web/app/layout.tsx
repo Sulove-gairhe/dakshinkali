@@ -2,7 +2,7 @@ import "./globals.css";
 import { Figtree, Nunito, Poppins } from "next/font/google";
 import { AppProviders } from "@/components/providers";
 import { SearchDataProvider } from "@/components/search-data-provider";
-import { fetchDbProducts, fetchDbCategories } from "@/lib/db-products";
+import { fetchDbCategories } from "@/lib/db-products";
 import { absoluteUrl, getSiteUrl, SITE_NAME } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
@@ -51,11 +51,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Fetch once at the layout level — available to every page including the navbar
-  const [dbProducts, dbCategories] = await Promise.all([
-    fetchDbProducts(),
-    fetchDbCategories(),
-  ]);
+  const dbCategories = await fetchDbCategories();
 
   return (
     <html
@@ -65,7 +61,7 @@ export default async function RootLayout({
       <body>
         <AppProviders>
           <SearchDataProvider
-            dbProducts={dbProducts}
+            dbProducts={[]}
             dbCategories={dbCategories}
           >
             {children}
