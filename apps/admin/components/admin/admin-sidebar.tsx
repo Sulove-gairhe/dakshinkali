@@ -19,6 +19,7 @@ import { useAdminNavCounts } from "./admin-nav-provider";
 const mainNav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/products/brands", label: "Brands", icon: Tag },
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/categories", label: "Categories", icon: Tag },
   { href: "/admin/coupons", label: "Coupons", icon: Percent },

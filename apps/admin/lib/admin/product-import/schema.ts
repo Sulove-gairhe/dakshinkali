@@ -1,10 +1,12 @@
-export type ImportAction = "create live" | "update live" | "skipped" | "error";
+export type ImportAction = "create draft" | "update draft" | "skipped" | "error";
 
 export interface ParsedImportRow {
   rowNumber: number;
   itemName: string;
   modelName: string | null;
   brandGuess: string | null;
+  explicitBrand: string | null;
+  brandResolution?: "canonical" | "existing" | "new-confirmed" | "unresolved" | "rejected";
   categoryGuess: string | null;
   salesPrice: number | null;
   purchasePrice: number | null;
@@ -26,8 +28,8 @@ export interface ProductImportPreviewRow extends ParsedImportRow {
 export interface ProductImportPreview {
   rows: ProductImportPreviewRow[];
   summary: {
-    createdLive: number;
-    updatedLive: number;
+    createdDraft: number;
+    updatedDraft: number;
     skipped: number;
     errors: number;
     warnings: number;
@@ -35,8 +37,8 @@ export interface ProductImportPreview {
 }
 
 export interface ProductImportCommitSummary {
-  createdLive: number;
-  updatedLive: number;
+  createdDraft: number;
+  updatedDraft: number;
   skipped: number;
   errors: number;
   warnings: number;
@@ -52,3 +54,5 @@ export const REQUIRED_HEADERS = [
   "Quantity",
   "Stock Value",
 ] as const;
+
+export const OPTIONAL_HEADERS = ["Brand", "Brand Name"] as const;

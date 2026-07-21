@@ -59,7 +59,7 @@ export function ProductImportForm() {
       });
       setSummary(result);
       toast.success(
-        `Imported ${result.createdLive + result.updatedLive} live rows`,
+        `Imported ${result.createdDraft + result.updatedDraft} draft rows`,
       );
       router.push("/admin/products");
       router.refresh();
@@ -78,7 +78,12 @@ export function ProductImportForm() {
         ...current,
         rows: current.rows.map((row) =>
           row.rowNumber === rowNumber
-            ? { ...row, brandGuess: brand || null }
+            ? {
+                ...row,
+                brandGuess: brand || null,
+                explicitBrand: brand.trim() || null,
+                brandResolution: brand.trim() ? "new-confirmed" : "unresolved",
+              }
             : row,
         ),
       };
@@ -148,6 +153,7 @@ function sanitizeRowForCommit(row: ProductImportPreviewRow): ProductImportPrevie
     salesPrice: finiteOrNull(row.salesPrice),
     purchasePrice: finiteOrNull(row.purchasePrice),
     brandGuess: row.brandGuess?.trim() || null,
+    explicitBrand: row.explicitBrand?.trim() || null,
     mrp: finiteOrNull(row.mrp),
     wholesalePrice: finiteOrNull(row.wholesalePrice),
     quantity: Number.isFinite(row.quantity) ? row.quantity : 0,

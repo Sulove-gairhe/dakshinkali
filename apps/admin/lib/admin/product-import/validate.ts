@@ -97,8 +97,8 @@ export function validateImportRows(
         : row.quantity <= 0
           ? "skipped"
           : existingProductId
-            ? "update live"
-            : "create live";
+            ? "update draft"
+            : "create draft";
 
     return {
       ...row,

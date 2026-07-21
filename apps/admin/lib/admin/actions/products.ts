@@ -12,6 +12,8 @@ import {
   validateStorefrontLiveData,
   updateStorefrontSection,
 } from "@/lib/admin/utils";
+import { applyAdminProductListFilters } from "@/lib/admin/actions/product-list-filters";
+import { resolveBrand } from "@/lib/admin/brand-resolver";
 import type {
   AdminProductRecord,
   DbProductStatus,
@@ -43,6 +45,7 @@ const saveProductSchema = z.object({
   wholesalePrice: z.number().nonnegative().optional().nullable(),
   stockQuantity: z.number().int().min(0).optional(),
   categoryId: z.string().uuid(),
+  brandId: z.string().uuid().optional().nullable(),
   status: z.enum(["active", "inactive", "out_of_stock", "low_stock"]),
   publishingStatus: z.enum(["draft", "live"]),
   images: z.array(
@@ -98,6 +101,7 @@ function mapRow(row: Record<string, unknown>): AdminProductRecord {
     stock_quantity: Number(row.stock_quantity ?? 0),
     category: row.category as string,
     category_id: (row.category_id as string) ?? null,
+    brand_id: (row.brand_id as string) ?? null,
     status: row.status as DbProductStatus,
     publishing_status: row.publishing_status as PublishingStatus,
     images,
@@ -178,18 +182,7 @@ export async function listAdminProducts(filters: ProductListFilters = {}) {
     .is("deleted_at", null)
     .order("updated_at", { ascending: false });
 
-  if (filters.search?.trim()) {
-    query = query.ilike("name", `%${filters.search.trim()}%`);
-  }
-  if (filters.categoryId) {
-    query = query.eq("category_id", filters.categoryId);
-  }
-  if (filters.status) {
-    query = query.eq("status", filters.status);
-  }
-  if (filters.publishingStatus) {
-    query = query.eq("publishing_status", filters.publishingStatus);
-  }
+  query = applyAdminProductListFilters(query, filters);
 
   const { data, error, count } = await query.range(from, to);
   if (error) throw new Error(error.message);
@@ -274,8 +267,19 @@ export async function saveProduct(
     };
   }
 
+  const resolvedBrand = await resolveBrand(supabase, storefrontData.brand);
+  if (resolvedBrand) {
+    storefrontData = {
+      ...storefrontData,
+      brand: resolvedBrand.name,
+    };
+  } else {
+    delete storefrontData.brand;
+  }
+
   const formState: ProductFormState = {
     ...payload,
+    brandId: resolvedBrand?.id ?? null,
     storefrontData,
     publishingStatus,
   };
@@ -298,6 +302,7 @@ export async function saveProduct(
     wholesalePrice: payload.wholesalePrice ?? null,
     stockQuantity: payload.stockQuantity ?? 0,
     categoryId: payload.categoryId,
+    brandId: resolvedBrand?.id ?? null,
     status: payload.status,
     publishingStatus,
     images: payload.images,
@@ -328,6 +333,14 @@ export async function saveProduct(
     prevStorefrontData = (existing?.storefront_data as StorefrontData | null) ?? {};
     mergedStorefrontData = { ...prevStorefrontData, ...storefrontData };
   }
+  if (resolvedBrand) {
+    mergedStorefrontData = {
+      ...mergedStorefrontData,
+      brand: resolvedBrand.name,
+    };
+  } else {
+    delete mergedStorefrontData.brand;
+  }
 
   const row = {
     name: parsed.name,
@@ -340,6 +353,7 @@ export async function saveProduct(
     stock_quantity: parsed.stockQuantity ?? 0,
     category: category.name,
     category_id: parsed.categoryId,
+    brand_id: resolvedBrand?.id ?? null,
     status: parsed.status,
     publishing_status: parsed.publishingStatus,
     images: parsed.images,
@@ -489,6 +503,7 @@ export async function productToFormState(product: AdminProductRecord): Promise<P
     stockQuantity: product.stock_quantity,
     categoryId: product.category_id ?? "",
     categoryName: product.category,
+    brandId: product.brand_id,
     status: product.status,
     publishingStatus: product.publishing_status,
     images: product.images ?? [],

@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdminUser } from "@/lib/admin/auth-server";
 import { slugifyProductName } from "@/lib/admin/utils";
+import {
+  canonicalBrandDisplayName,
+  getRejectedBrandReason,
+  isRejectedBrandCandidate,
+  normalizeBrandName,
+  resolveBrand,
+} from "@/lib/admin/brand-resolver";
 import { parseProductImportCsv } from "@/lib/admin/product-import/parse";
 import { validateImportRows } from "@/lib/admin/product-import/validate";
 import type {
@@ -18,6 +25,8 @@ const commitRowSchema = z.object({
   itemName: z.string().min(1).max(200),
   modelName: z.string().nullable(),
   brandGuess: z.string().nullable(),
+  explicitBrand: z.string().nullable().optional(),
+  brandResolution: z.enum(["canonical", "existing", "new-confirmed", "unresolved", "rejected"]).optional(),
   categoryGuess: z.string().nullable(),
   salesPrice: z.number().nullable(),
   purchasePrice: z.number().nullable(),
@@ -28,7 +37,7 @@ const commitRowSchema = z.object({
   computedStockValue: z.number().nullable(),
   errors: z.array(z.string()),
   warnings: z.array(z.string()),
-  action: z.enum(["create live", "update live", "skipped", "error"]),
+  action: z.enum(["create draft", "update draft", "skipped", "error"]),
   existingProductId: z.string().uuid().nullable(),
   valid: z.boolean(),
 });
@@ -64,7 +73,7 @@ async function getExistingProducts(
 ) {
   const { data, error } = await supabase
     .from("products")
-    .select("id, name, model_name, images, storefront_data")
+    .select("id, name, model_name, images, brand_id, storefront_data, brands(name)")
     .is("deleted_at", null);
 
   if (error) throw new Error(error.message);
@@ -73,6 +82,8 @@ async function getExistingProducts(
     name: string;
     model_name: string | null;
     images?: unknown;
+    brand_id?: string | null;
+    brands?: { name?: string; normalized_name?: string; is_active?: boolean } | null;
     storefront_data?: StorefrontData | null;
   }>;
 }
@@ -126,15 +137,59 @@ export async function previewProductImport(formData: FormData): Promise<{
   }
 
   const existingProducts = await getExistingProducts(supabase);
-  const rows = validateImportRows(parsed.rows, existingProducts);
+  const { data: brandRows, error: brandError } = await supabase
+    .from("brands")
+    .select("id, name, normalized_name, is_active");
+  if (brandError) throw new Error(brandError.message);
+  const brandsByNormalized = new Map(
+    (brandRows ?? []).map((brand) => [brand.normalized_name as string, brand]),
+  );
+  const rows = validateImportRows(parsed.rows, existingProducts).map((row) => {
+    const candidate = row.explicitBrand || row.brandGuess;
+    const normalizedCandidate = normalizeBrandName(candidate);
+    const matchedBrand = normalizedCandidate
+      ? brandsByNormalized.get(normalizedCandidate)
+      : undefined;
+    const existingProduct = row.existingProductId
+      ? existingProducts.find((product) => product.id === row.existingProductId)
+      : null;
+    const existingName = existingProduct?.brands?.name || existingProduct?.storefront_data?.brand;
+    const existingNormalized = normalizeBrandName(existingName);
+    const existingMatch = existingNormalized ? brandsByNormalized.get(existingNormalized) : undefined;
+    const isExplicit = Boolean(row.explicitBrand?.trim());
+    const resolution: NonNullable<ProductImportPreviewRow["brandResolution"]> | undefined = existingMatch?.is_active
+      ? "existing"
+      : candidate && isRejectedBrandCandidate(candidate)
+        ? "rejected"
+        : matchedBrand?.is_active
+          ? isExplicit
+            ? "canonical"
+            : "existing"
+          : isExplicit
+            ? "new-confirmed"
+            : candidate
+              ? "unresolved"
+              : undefined;
+    return {
+      ...row,
+      brandGuess: canonicalBrandDisplayName(row.brandGuess) || null,
+      explicitBrand: row.explicitBrand ? canonicalBrandDisplayName(row.explicitBrand) : null,
+      brandResolution: resolution,
+      warnings: resolution === "unresolved"
+        ? [...row.warnings, "Brand unresolved: confirm an existing brand or enter a legitimate explicit brand"]
+        : resolution === "rejected"
+          ? [...row.warnings, `Rejected brand value: ${getRejectedBrandReason(candidate)}`]
+          : row.warnings,
+    };
+  });
 
   return {
     ok: true,
     preview: {
       rows,
       summary: {
-        createdLive: rows.filter((row) => row.action === "create live").length,
-        updatedLive: rows.filter((row) => row.action === "update live").length,
+        createdDraft: rows.filter((row) => row.action === "create draft").length,
+        updatedDraft: rows.filter((row) => row.action === "update draft").length,
         skipped: rows.filter((row) => row.action === "skipped").length,
         errors: rows.filter((row) => row.action === "error").length,
         warnings: rows.filter((row) => row.warnings.length > 0).length,
@@ -152,8 +207,8 @@ export async function commitProductImport(input: {
   const revalidatedRows = validateImportRows(parsedRows, existingProducts);
   const rows = revalidatedRows.filter((row) => row.valid);
   const summary: ProductImportCommitSummary = {
-    createdLive: 0,
-    updatedLive: 0,
+    createdDraft: 0,
+    updatedDraft: 0,
     skipped: revalidatedRows.filter((row) => row.action === "skipped").length,
     errors: revalidatedRows.filter((row) => row.action === "error").length,
     warnings: revalidatedRows.filter((row) => row.warnings.length > 0).length,
@@ -177,10 +232,20 @@ export async function commitProductImport(input: {
       const slug =
         previousStorefrontData.slug ||
         (await uniqueDraftSlug(supabase, row.modelName || row.itemName, row.existingProductId));
+      const existingBrandCandidate = existing?.brands?.name || previousStorefrontData.brand;
+      let resolvedBrand = existingBrandCandidate && !isRejectedBrandCandidate(existingBrandCandidate)
+        ? await resolveBrand(supabase, existingBrandCandidate, { createIfMissing: false })
+        : null;
+      if (!resolvedBrand && row.explicitBrand && !isRejectedBrandCandidate(row.explicitBrand)) {
+        resolvedBrand = await resolveBrand(supabase, row.explicitBrand, { createIfMissing: true });
+      }
+      if (!resolvedBrand && row.brandGuess && !isRejectedBrandCandidate(row.brandGuess)) {
+        resolvedBrand = await resolveBrand(supabase, row.brandGuess, { createIfMissing: false });
+      }
       const storefrontData: StorefrontData = {
         ...previousStorefrontData,
         slug,
-        brand: previousStorefrontData.brand || row.brandGuess || "Generic",
+        brand: resolvedBrand?.name,
         shortDescription:
           previousStorefrontData.shortDescription ||
           `${row.itemName} available at Dakshinkali Electronics`,
@@ -189,11 +254,11 @@ export async function commitProductImport(input: {
           row.mrp && row.mrp > 0
             ? `Rs. ${Math.round(row.mrp).toLocaleString("en-NP")}`
             : undefined,
-        publishingStatus: "live",
+        publishingStatus: "draft",
         searchTerms: [
           row.itemName,
           row.modelName,
-          row.brandGuess,
+          resolvedBrand?.name,
           categoryName,
           ...(previousStorefrontData.searchTerms ?? []),
         ].filter((term, index, list): term is string =>
@@ -203,6 +268,7 @@ export async function commitProductImport(input: {
         syncedAt: new Date().toISOString(),
       };
       if (!storefrontData.oldPrice) delete storefrontData.oldPrice;
+      if (!resolvedBrand) delete storefrontData.brand;
 
       const payload: Record<string, unknown> = {
         name: row.itemName,
@@ -212,22 +278,23 @@ export async function commitProductImport(input: {
         stock_quantity: row.quantity,
         category: categoryName,
         category_id: null,
+        brand_id: resolvedBrand?.id ?? existing?.brand_id ?? null,
         status: "active",
         price,
-        publishing_status: "live",
+        publishing_status: "draft",
         storefront_data: storefrontData,
       };
       if (existing && !hasImages(existing.images)) {
         payload.images = [placeholderImage()];
       }
 
-      if (row.action === "update live" && row.existingProductId) {
+      if (row.action === "update draft" && row.existingProductId) {
         const { error } = await supabase
           .from("products")
           .update(payload)
           .eq("id", row.existingProductId);
         if (error) throw new Error(error.message);
-        summary.updatedLive += 1;
+        summary.updatedDraft += 1;
       } else {
         const { error } = await supabase.from("products").insert({
           ...payload,
@@ -236,7 +303,7 @@ export async function commitProductImport(input: {
           sku: null,
         });
         if (error) throw new Error(error.message);
-        summary.createdLive += 1;
+        summary.createdDraft += 1;
       }
     } catch (error) {
       summary.errors += 1;

@@ -30,10 +30,10 @@ export function ProductImportPreviewTable({
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-3">
         <div className="flex flex-wrap gap-2 text-xs">
           <span className="rounded bg-green-50 px-2 py-1 font-medium text-green-700">
-            Created live {preview.summary.createdLive}
+            Created draft {preview.summary.createdDraft}
           </span>
           <span className="rounded bg-blue-50 px-2 py-1 font-medium text-blue-700">
-            Updated live {preview.summary.updatedLive}
+            Updated draft {preview.summary.updatedDraft}
           </span>
           <span className="rounded bg-gray-100 px-2 py-1 font-medium text-gray-700">
             Skipped {preview.summary.skipped}
@@ -90,6 +90,29 @@ export function ProductImportPreviewTable({
                     placeholder="Brand"
                     className="h-9 w-full rounded-md border border-gray-200 bg-white px-2 text-xs text-gray-800 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:bg-gray-50 disabled:text-gray-500"
                   />
+                  {row.brandResolution ? (
+                    <span
+                      className={
+                        row.brandResolution === "rejected"
+                          ? "mt-1 inline-block text-[10px] font-semibold text-red-700"
+                          : row.brandResolution === "unresolved"
+                            ? "mt-1 inline-block text-[10px] font-semibold text-amber-700"
+                            : row.brandResolution === "new-confirmed"
+                              ? "mt-1 inline-block text-[10px] font-semibold text-blue-700"
+                              : "mt-1 inline-block text-[10px] font-semibold text-green-700"
+                      }
+                    >
+                      {row.brandResolution === "canonical"
+                        ? "Canonical brand"
+                        : row.brandResolution === "existing"
+                          ? "Existing brand match"
+                          : row.brandResolution === "new-confirmed"
+                            ? "New confirmed brand"
+                            : row.brandResolution === "rejected"
+                              ? "Rejected fragment"
+                              : "Unresolved brand"}
+                    </span>
+                  ) : null}
                 </td>
                 <td className="px-3 py-2">{formatNumber(row.salesPrice)}</td>
                 <td className="px-3 py-2">{formatNumber(row.purchasePrice)}</td>
@@ -103,7 +126,7 @@ export function ProductImportPreviewTable({
                         ? "rounded bg-red-100 px-2 py-1 font-medium text-red-700"
                         : row.action === "skipped"
                           ? "rounded bg-gray-100 px-2 py-1 font-medium text-gray-700"
-                          : row.action === "update live"
+                        : row.action === "update draft"
                           ? "rounded bg-blue-100 px-2 py-1 font-medium text-blue-700"
                           : "rounded bg-green-100 px-2 py-1 font-medium text-green-700"
                     }
@@ -123,8 +146,8 @@ export function ProductImportPreviewTable({
       {summary ? (
         <div className="rounded-lg border border-gray-200 bg-white p-3 text-sm">
           <p className="font-semibold text-gray-800">
-            Created live {summary.createdLive}, updated live{" "}
-            {summary.updatedLive}, skipped {summary.skipped}, errors{" "}
+            Created draft {summary.createdDraft}, updated draft{" "}
+            {summary.updatedDraft}, skipped {summary.skipped}, errors{" "}
             {summary.errors}, warnings {summary.warnings}
           </p>
           {summary.errorRows.length > 0 ? (
