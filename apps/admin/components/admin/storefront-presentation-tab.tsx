@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { StringArrayEditor } from "./string-array-editor";
 import { RelatedProductSelector } from "./related-product-selector";
 import { slugifyProductName } from "@/lib/admin/utils";
+import { listBrandOptions } from "@/lib/admin/actions/brands";
+import {
+  cleanBrandDisplayName,
+  normalizeBrandName,
+  type BrandRecord,
+} from "@/lib/admin/brand-resolver";
 import { checkSlugAvailable } from "@/lib/admin/actions/products";
 import type { ProductFormState, StorefrontData } from "@/lib/admin/types";
 
@@ -34,14 +40,17 @@ function Toggle({
 export function StorefrontPresentationTab({
   form,
   onStorefrontChange,
+  onBrandIdChange,
 }: {
   form: ProductFormState;
   onStorefrontChange: (data: StorefrontData) => void;
+  onBrandIdChange?: (brandId: string | null) => void;
 }) {
   const sf = form.storefrontData;
   const [slugStatus, setSlugStatus] = useState<
     "idle" | "checking" | "ok" | "taken"
   >("idle");
+  const [brands, setBrands] = useState<BrandRecord[]>([]);
 
   useEffect(() => {
     const slug = sf.slug?.trim();
@@ -61,8 +70,31 @@ export function StorefrontPresentationTab({
     return () => clearTimeout(timer);
   }, [sf.slug, form.id]);
 
+  useEffect(() => {
+    let mounted = true;
+    listBrandOptions()
+      .then((items) => {
+        if (mounted) setBrands(items);
+      })
+      .catch(() => {
+        if (mounted) setBrands([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   function patch(partial: Partial<StorefrontData>) {
     onStorefrontChange({ ...sf, ...partial });
+  }
+
+  function handleBrandInput(value: string) {
+    const clean = cleanBrandDisplayName(value);
+    const match = brands.find(
+      (brand) => brand.normalized_name === normalizeBrandName(clean),
+    );
+    onBrandIdChange?.(match?.id ?? null);
+    patch({ brand: clean || undefined });
   }
 
   return (
@@ -90,11 +122,18 @@ export function StorefrontPresentationTab({
         <div>
           <label className="text-sm font-medium text-gray-700">Brand</label>
           <input
+            list="product-brand-options"
             type="text"
             value={sf.brand ?? ""}
-            onChange={(e) => patch({ brand: e.target.value })}
+            onChange={(e) => handleBrandInput(e.target.value)}
+            onBlur={(e) => handleBrandInput(e.target.value)}
             className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm"
           />
+          <datalist id="product-brand-options">
+            {brands.map((brand) => (
+              <option key={brand.id} value={brand.name} />
+            ))}
+          </datalist>
         </div>
       </div>
 

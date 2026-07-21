@@ -96,6 +96,29 @@ function normalizeCategoryName(value) {
     .replace(/\s+/g, " ");
 }
 
+const priorityBrands = new Map([
+  ["samsung", { name: "Samsung", sortPriority: 1 }],
+  ["himstar", { name: "Himstar", sortPriority: 2 }],
+  ["godrej", { name: "Godrej", sortPriority: 3 }],
+  ["tcl", { name: "TCL", sortPriority: 4 }],
+  ["whirlpool", { name: "Whirlpool", sortPriority: 5 }],
+  ["cg", { name: "CG", sortPriority: 6 }],
+]);
+
+function cleanBrandName(value) {
+  return String(value ?? "").trim().replace(/\s+/g, " ");
+}
+
+function normalizeBrandName(value) {
+  return cleanBrandName(value).toLowerCase();
+}
+
+function canonicalBrandName(value) {
+  const clean = cleanBrandName(value);
+  if (!clean) return "";
+  return priorityBrands.get(normalizeBrandName(clean))?.name ?? clean;
+}
+
 function mapStatus(status) {
   switch (status) {
     case "Low Stock":
@@ -230,6 +253,53 @@ async function getOrCreateCategory(supabase, productCategory, cache) {
   return created;
 }
 
+async function getOrCreateBrand(supabase, productBrand, cache) {
+  const name = canonicalBrandName(productBrand);
+  const normalizedName = normalizeBrandName(name);
+  if (!normalizedName) return null;
+  if (cache.has(normalizedName)) return cache.get(normalizedName);
+
+  const { data: existing, error: findError } = await supabase
+    .from("brands")
+    .select("id, name, normalized_name")
+    .eq("normalized_name", normalizedName)
+    .maybeSingle();
+
+  if (findError) throw findError;
+  if (existing) {
+    cache.set(normalizedName, existing);
+    return existing;
+  }
+
+  const priority = priorityBrands.get(normalizedName)?.sortPriority ?? null;
+  const { data: created, error: createError } = await supabase
+    .from("brands")
+    .insert({
+      name,
+      normalized_name: normalizedName,
+      sort_priority: priority,
+      is_active: true,
+    })
+    .select("id, name, normalized_name")
+    .single();
+
+  if (createError && createError.code === "23505") {
+    const { data: concurrent, error: concurrentError } = await supabase
+      .from("brands")
+      .select("id, name, normalized_name")
+      .eq("normalized_name", normalizedName)
+      .single();
+    if (concurrentError) throw concurrentError;
+    cache.set(normalizedName, concurrent);
+    return concurrent;
+  }
+
+  if (createError) throw createError;
+  cache.set(normalizedName, created);
+  console.log(`Created brand: ${created.name}`);
+  return created;
+}
+
 async function findProductBySlug(supabase, slug) {
   const { data, error } = await supabase
     .from("products")
@@ -242,9 +312,11 @@ async function findProductBySlug(supabase, slug) {
   return data;
 }
 
-async function syncProduct(supabase, product, categoryCache, syncedAt) {
+async function syncProduct(supabase, product, categoryCache, brandCache, syncedAt) {
   const category = await getOrCreateCategory(supabase, product.category, categoryCache);
-  const storefrontData = mapStorefrontData(product, syncedAt);
+  const brand = await getOrCreateBrand(supabase, product.brand, brandCache);
+  const canonicalProduct = brand ? { ...product, brand: brand.name } : product;
+  const storefrontData = mapStorefrontData(canonicalProduct, syncedAt);
   const images = mapImages(product);
   const baseRow = {
     name: product.name,
@@ -252,6 +324,7 @@ async function syncProduct(supabase, product, categoryCache, syncedAt) {
     price: parseNprPrice(product.currentPrice),
     category: category.name,
     category_id: category.id,
+    brand_id: brand?.id ?? null,
     status: mapStatus(product.status),
     publishing_status: "live",
     images,
@@ -279,6 +352,9 @@ async function syncProduct(supabase, product, categoryCache, syncedAt) {
   if (overwrite || !existing.category_id) {
     patch.category = baseRow.category;
     patch.category_id = baseRow.category_id;
+  }
+  if (overwrite || !existing.brand_id) {
+    patch.brand_id = baseRow.brand_id;
   }
   if (overwrite || !existing.status) patch.status = baseRow.status;
   if (overwrite || !existing.publishing_status) {
@@ -325,11 +401,12 @@ async function main() {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   const categoryCache = new Map();
+  const brandCache = new Map();
   const syncedAt = new Date().toISOString();
 
   for (const product of products) {
     try {
-      await syncProduct(supabase, product, categoryCache, syncedAt);
+      await syncProduct(supabase, product, categoryCache, brandCache, syncedAt);
     } catch (error) {
       summary.errors += 1;
       console.error(`error    ${product.slug}: ${error.message}`);

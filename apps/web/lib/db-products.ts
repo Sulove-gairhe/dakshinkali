@@ -9,6 +9,13 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
+import {
+    brandSlug,
+    canonicalBrandDisplayName,
+    compareBrandOptions,
+    normalizeBrandName,
+    normalizeBrandParam,
+} from "@/lib/brand-utils";
 import type { StoreProduct } from "@/lib/store-products";
 
 // ─── DB row types ─────────────────────────────────────────────────────────────
@@ -71,10 +78,37 @@ type DbProductRow = {
     price: number;
     category: string;
     category_id: string | null;
+    brand_id: string | null;
+    brands:
+        | { name: string; normalized_name: string }
+        | { name: string; normalized_name: string }[]
+        | null;
     status: "active" | "inactive" | "out_of_stock" | "low_stock";
     publishing_status: "draft" | "live";
     images: DbImageRecord[] | null;
     storefront_data: DbStorefrontData | null;
+};
+
+export type StorefrontProductsPageParams = {
+    cursor?: number;
+    pageSize?: number;
+    search?: string;
+    brand?: string;
+    category?: string;
+    sort?: "newest" | "price-high-low" | "price-low-high";
+};
+
+export type StorefrontProductsPage = {
+    products: StoreProduct[];
+    nextCursor: number | null;
+    total: number;
+};
+
+export type DbBrand = {
+    id: string;
+    name: string;
+    normalized_name: string;
+    sort_priority: number | null;
 };
 
 // ─── Status mapping ───────────────────────────────────────────────────────────
@@ -96,6 +130,15 @@ function mapStatus(
 
 // ─── Row → StoreProduct mapper ────────────────────────────────────────────────
 
+function getJoinedBrandName(
+    brand:
+        | { name: string; normalized_name: string }
+        | { name: string; normalized_name: string }[]
+        | null,
+) {
+    return Array.isArray(brand) ? brand[0]?.name : brand?.name;
+}
+
 function mapRowToStoreProduct(row: DbProductRow): StoreProduct | null {
     const sd = row.storefront_data ?? {};
     const slug = sd.slug?.trim();
@@ -115,6 +158,8 @@ function mapRowToStoreProduct(row: DbProductRow): StoreProduct | null {
 
     const priceFormatted = `Rs. ${Number(row.price).toLocaleString("en-IN")}`;
 
+    const brandName = getJoinedBrandName(row.brands) || canonicalBrandDisplayName(sd.brand);
+
     return {
         id: row.id,
         slug,
@@ -127,7 +172,7 @@ function mapRowToStoreProduct(row: DbProductRow): StoreProduct | null {
         badge: sd.badge,
         badges: sd.badges,
         href: `/products/${slug}`,
-        brand: sd.brand ?? "",
+        brand: brandName,
         category: row.category,
         categoryId: row.category_id,
         collection: sd.collection,
@@ -201,7 +246,7 @@ export async function fetchDbProducts(): Promise<StoreProduct[]> {
 
         const { data, error } = await supabase
             .from("products")
-            .select("id, name, description, price, category, category_id, status, publishing_status, images, storefront_data")
+            .select("id, name, description, price, category, category_id, brand_id, brands(name, normalized_name), status, publishing_status, images, storefront_data")
             .eq("publishing_status", "live")
             .in("status", ["active", "low_stock"])
             .is("deleted_at", null)
@@ -224,6 +269,90 @@ export async function fetchDbProducts(): Promise<StoreProduct[]> {
 }
 
 /**
+ * Fetch a paginated storefront product slice from Supabase.
+ * This powers catalog lazy loading without reading the full DB catalog upfront.
+ */
+export async function fetchDbProductsPage(
+    params: StorefrontProductsPageParams = {},
+): Promise<StorefrontProductsPage> {
+    try {
+        const supabase = await createClient();
+        const cursor = Math.max(0, params.cursor ?? 0);
+        const pageSize = Math.min(Math.max(params.pageSize ?? 12, 1), 48);
+        const from = cursor;
+        const to = from + pageSize - 1;
+        const search = params.search?.trim();
+        const brand = params.brand?.trim();
+        const category = params.category?.trim();
+
+        let query = supabase
+            .from("products")
+            .select("id, name, description, price, category, category_id, brand_id, brands(name, normalized_name), status, publishing_status, images, storefront_data", { count: "exact" })
+            .eq("publishing_status", "live")
+            .in("status", ["active", "low_stock"])
+            .is("deleted_at", null);
+
+        if (search) {
+            const escaped = search.replaceAll("%", "\\%").replaceAll("_", "\\_");
+            query = query.or(
+                `name.ilike.%${escaped}%,description.ilike.%${escaped}%,category.ilike.%${escaped}%`,
+            );
+        }
+
+        if (brand) {
+            const normalizedBrand = normalizeBrandParam(brand);
+            const { data: brandRow } = await supabase
+                .from("brands")
+                .select("id, name")
+                .eq("normalized_name", normalizedBrand)
+                .maybeSingle();
+            const canonicalBrand = (brandRow?.name as string | undefined) || canonicalBrandDisplayName(brand.replace(/-/g, " "));
+            const escapedBrand = canonicalBrand.replaceAll("%", "\\%").replaceAll("_", "\\_");
+            query = brandRow?.id
+                ? query.or(`brand_id.eq.${brandRow.id},storefront_data->>brand.ilike.${escapedBrand}`)
+                : query.filter("storefront_data->>brand", "ilike", escapedBrand);
+        }
+
+        if (category) {
+            const escapedCategory = category.replaceAll("%", "\\%").replaceAll("_", "\\_");
+            query = query.ilike("category", `%${escapedCategory}%`);
+        }
+
+        if (params.sort === "price-high-low") {
+            query = query.order("price", { ascending: false });
+        } else if (params.sort === "price-low-high") {
+            query = query.order("price", { ascending: true });
+        } else {
+            query = query.order("updated_at", { ascending: false });
+        }
+
+        const { data, error, count } = await query.range(from, to);
+
+        if (error) {
+            return { products: [], nextCursor: null, total: 0 };
+        }
+
+        const products: StoreProduct[] = [];
+        const seen = new Set<string>();
+        for (const row of data ?? []) {
+            const mapped = mapRowToStoreProduct(row as DbProductRow);
+            if (mapped && !seen.has(mapped.slug)) {
+                seen.add(mapped.slug);
+                products.push(mapped);
+            }
+        }
+
+        const total = count ?? products.length;
+        const nextOffset = from + (data?.length ?? 0);
+        const nextCursor = nextOffset < total ? nextOffset : null;
+
+        return { products, nextCursor, total };
+    } catch {
+        return { products: [], nextCursor: null, total: 0 };
+    }
+}
+
+/**
  * Fetch a single live product by slug from Supabase.
  * Returns null if not found or on error.
  */
@@ -235,7 +364,7 @@ export async function fetchDbProductBySlug(
 
         const { data, error } = await supabase
             .from("products")
-            .select("id, name, description, price, category, category_id, status, publishing_status, images, storefront_data")
+            .select("id, name, description, price, category, category_id, brand_id, brands(name, normalized_name), status, publishing_status, images, storefront_data")
             .eq("publishing_status", "live")
             .in("status", ["active", "low_stock"])
             .is("deleted_at", null)
@@ -283,4 +412,31 @@ export async function fetchDbCategories(): Promise<DbCategory[]> {
     } catch {
         return [];
     }
+}
+
+export async function fetchDbBrands(): Promise<DbBrand[]> {
+    try {
+        const supabase = await createClient();
+
+        const { data, error } = await supabase
+            .from("brands")
+            .select("id, name, normalized_name, sort_priority")
+            .eq("is_active", true);
+
+        if (error) {
+            return [];
+        }
+
+        return ((data ?? []) as DbBrand[]).sort(compareBrandOptions);
+    } catch {
+        return [];
+    }
+}
+
+export function dbBrandToFilterOption(brand: DbBrand) {
+    return {
+        name: brand.name,
+        slug: brandSlug(brand.name),
+        normalizedName: normalizeBrandName(brand.name),
+    };
 }

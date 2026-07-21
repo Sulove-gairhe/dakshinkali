@@ -1,12 +1,12 @@
 import type { ParsedImportRow } from "./schema";
-import { REQUIRED_HEADERS } from "./schema";
+import { OPTIONAL_HEADERS, REQUIRED_HEADERS } from "./schema";
 
 function normalizeHeader(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
 const headerAliases = new Map(
-  REQUIRED_HEADERS.map((header) => [normalizeHeader(header), header]),
+  [...REQUIRED_HEADERS, ...OPTIONAL_HEADERS].map((header) => [normalizeHeader(header), header]),
 );
 
 function parseCsvLine(line: string): string[] {
@@ -140,6 +140,7 @@ export function parseProductImportCsv(text: string): {
       itemName,
       modelName: parseModelName(itemName),
       brandGuess: parseBrandGuess(itemName),
+      explicitBrand: (cell(record, OPTIONAL_HEADERS[0]) || cell(record, OPTIONAL_HEADERS[1])).trim() || null,
       categoryGuess: parseCategoryGuess(itemName),
       salesPrice,
       purchasePrice,

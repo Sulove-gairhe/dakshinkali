@@ -99,6 +99,7 @@ export interface AdminProductRecord {
   stock_quantity: number;
   category: string;
   category_id: string | null;
+  brand_id: string | null;
   status: DbProductStatus;
   publishing_status: PublishingStatus;
   images: ProductImageRecord[];
@@ -120,6 +121,7 @@ export interface ProductFormState {
   stockQuantity?: number;
   categoryId: string;
   categoryName: string;
+  brandId?: string | null;
   status: DbProductStatus;
   publishingStatus: PublishingStatus;
   images: ProductImageRecord[];
